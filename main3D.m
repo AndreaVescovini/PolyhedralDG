@@ -19,9 +19,13 @@ Nfaces = 4; % number of faces for every element
 % compute dof
 [x,y,z] = Nodes3D(N); [r,s,t] = xyztorst(x,y,z);
 va = EToV(:,1)'; vb = EToV(:,2)'; vc = EToV(:,3)'; vd = EToV(:,4)';
-x = 0.5*(-(1+r+s+t)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc)+(1+t)*VX(vd));
-y = 0.5*(-(1+r+s+t)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc)+(1+t)*VY(vd));
-z = 0.5*(-(1+r+s+t)*VZ(va)+(1+r)*VZ(vb)+(1+s)*VZ(vc)+(1+t)*VZ(vd));
+x = (-(-1+r+s+t)*VX(va)+(r)*VX(vb)+(s)*VX(vc)+(t)*VX(vd));
+y = (-(-1+r+s+t)*VY(va)+(r)*VY(vb)+(s)*VY(vc)+(t)*VY(vd));
+z = (-(-1+r+s+t)*VZ(va)+(r)*VZ(vb)+(s)*VZ(vc)+(t)*VZ(vd));
+
+% x = 0.5*(-(1+r+s+t)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc)+(1+t)*VX(vd));
+% y = 0.5*(-(1+r+s+t)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc)+(1+t)*VY(vd));
+% z = 0.5*(-(1+r+s+t)*VZ(va)+(1+r)*VZ(vb)+(1+s)*VZ(vc)+(1+t)*VZ(vd));
 
 % compute the jacobians
 %%%%%% BISOGNA CONTROLLARE CHE SE N>1 A ME INTERESSANO SOLO I VERTICI,
@@ -30,7 +34,7 @@ z = 0.5*(-(1+r+s+t)*VZ(va)+(1+r)*VZ(vb)+(1+s)*VZ(vc)+(1+t)*VZ(vd));
 [J, Jcof, Jdet, trasl] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
 
 % assemble the linear system
-[A, b] = linsys(f, gd, K, Np, J, Jcof, Jdet, trasl);
+[A, b] = linsys(f, gd, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF);
 
 % solve the linear system
 %u = A\b;
