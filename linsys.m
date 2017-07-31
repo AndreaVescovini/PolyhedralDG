@@ -1,4 +1,4 @@
-function [A, b] = linsys(K, Np, Jdet, Jcof)
+function [A, b] = linsys(f, gd, K, Np, J, Jcof, Jdet, trasl)
 %linsys function that computes the matrix A and the vector b of the linear
 %system that solves the problem
 
@@ -10,15 +10,17 @@ bi = zeros(K*Np,1);
 bs = zeros(K*Np,1);
 
 [nod2, wei2, nod3, wei3] = quadrature;
-[dphi] = basis_grad(nod3);
+[phi, dphi] = basis_evaluation(nod3);
 
 for ie = 1:K %loop on the elements
-    
-    for i = (ie-1)*Np+1:ie*Np %loop on the basis functions
-        for j = (ie-1)*Np+1:ie*Np
-            for q = 1:5 %loop on quadrature points
-                A(i,j) = A(i,j) + (wei3(q)/abs(Jdet(ie)))*(dphi(:,q,j-(ie-1)*Np)'*Jcof(:,:,ie)'*Jcof(:,:,ie)*dphi(:,q,i-(ie-1)*Np));
+    for q = 1:5 %loop on quadrature points
+        for i = 1:Np %loop on the basis functions
+            igl = (ie-1)*Np + i; %global node number
+            for j = 1:Np
+                jgl = (ie-1)*Np + j;
+                A(igl,jgl) = A(igl,jgl) + (wei3(q)/abs(Jdet(ie)))*(dphi(:,q,j)'*Jcof(:,:,ie)'*Jcof(:,:,ie)*dphi(:,q,i));                                
             end
+            b(igl) = b(igl) + abs(Jdet(ie))*wei3(q)*f(trasl(:,ie)+J(:,:,ie)*nod3(:,q))*phi(q,i);
         end
     end
         

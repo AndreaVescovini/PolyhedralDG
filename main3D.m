@@ -3,8 +3,8 @@
 %    u = gd   sul bordo
 
 % dati del problema
-uex = @(x,y,z) exp(x.*y.*z);
-f = @(x,y,z) -exp(x.*y.*z).*((x.*y).^2+(x.*z).^2+(y.*z).^2);
+uex = @(p) exp(p(1,:).*p(2,:).*p(3,:));
+f = @(p) -uex(p).*((p(1,:).*p(2,:)).^2+(p(1,:).*p(3,:)).^2+(p(2,:).*p(3,:)).^2);
 gd = uex;
 N = 1; % degree
 Np = (N+1)*(N+2)*(N+3)/6; %number of points for every element
@@ -27,10 +27,10 @@ z = 0.5*(-(1+r+s+t)*VZ(va)+(1+r)*VZ(vb)+(1+s)*VZ(vc)+(1+t)*VZ(vd));
 %%%%%% BISOGNA CONTROLLARE CHE SE N>1 A ME INTERESSANO SOLO I VERTICI,
 %%%%%% DIPENDE DA COME CREO PRIMA r s t, CHE TRAMITE EToV MAPPANO x y z,
 %%%%%% POTREI PER ESEMPIO METTERE I VERTICI SUBITO NEI PRIMI NODI.
-[Jdet, Jcof] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
+[J, Jcof, Jdet, trasl] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
 
 % assemble the linear system
-[A, b] = linsys(K, Np, Jdet, Jcof);
+[A, b] = linsys(f, gd, K, Np, J, Jcof, Jdet, trasl);
 
 % solve the linear system
 %u = A\b;
