@@ -1,4 +1,4 @@
-function [A, b] = linsys(f, gd, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF)
+function [A, b] = linsys(f, gd, sigma, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF)
 %linsys function that computes the matrix A and the vector b of the linear
 %system that solves the problem
 
@@ -38,7 +38,7 @@ for ie = 1:K %loop on the elements
                 end
                 if EToE(ie, e) == ie % boundary face
                     bi(igl) = bi(igl) + 
-                    bs(igl) = bs(igl) + 
+                    bs(igl) = bs(igl) + sigma*wei2(q)*
                 end              
             end       
         end

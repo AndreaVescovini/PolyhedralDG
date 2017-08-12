@@ -1,8 +1,7 @@
 function [J, Jcof, Jdet, trasl] = jacobians(x, y, z, r, s, t)
-%jacobians functions that computes for every element the absolute value of
-%the determinant of the jacobian and the matrix jcof wrt the simplex (0,0,0),
-%(1,0,0), (0,1,0), (0,0,1) (pag 176 of
-%Modellistica numerica per problemi differenziali, Quarteroni).
+%jacobians functions that computes for every element the determinant of
+%the jacobian and the matrix jcof wrt the simplex (0,0,0),(1,0,0),(0,1,0),(0,0,1)
+%(pag 176 of Modellistica numerica per problemi differenziali, Quarteroni).
 
 K = size(x,2);
 J = zeros(3,3,K);

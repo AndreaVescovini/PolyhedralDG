@@ -1,4 +1,4 @@
-% Poisson problem with Dirichlet conditions
+% 3D Poisson problem with Dirichlet conditions
 % -u'' = f    nel dominio
 %    u = gd   sul bordo
 
@@ -9,6 +9,7 @@ gd = uex;
 N = 1; % degree
 Np = (N+1)*(N+2)*(N+3)/6; %number of points for every element
 Nfaces = 4; % number of faces for every element
+sigma = 10;
 
 % generate the mesh
 [Nv, VX, VY, VZ, K, EToV] = MeshReaderGambit3D('meshes\cubeK5.neu');
@@ -34,7 +35,7 @@ z = (-(-1+r+s+t)*VZ(va)+(r)*VZ(vb)+(s)*VZ(vc)+(t)*VZ(vd));
 [J, Jcof, Jdet, trasl] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
 
 % assemble the linear system
-[A, b] = linsys(f, gd, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF);
+[A, b] = linsys(f, gd, sigma, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF);
 
 % solve the linear system
 %u = A\b;

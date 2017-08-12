@@ -2,6 +2,11 @@ function [EToE,EToF]= tiConnect3D(EToV)
 
 % function [EToE,EToF]= tiConnect3D(EToV)
 % Purpose: tetrahedral face connect algorithm due to Toby Isaac
+% EToE has in rows elements, in columns faces and tells the element touched
+% by that faces.
+% EToF has in rows elemenst, in columns faces and tells the numeber of the
+% faces of the neighbooring elements told by EToE.
+% The faces X is obtained by eliminating from EToV the column X from the end.
 
 Nfaces=4;
 K = size(EToV,1);
@@ -9,7 +14,7 @@ Nnodes = max(max(EToV));
 
 % create list of all faces 1, then 2, 3 & 4
 fnodes = [EToV(:,[1,2,3]);EToV(:,[1,2,4]);...
-          EToV(:,[2,3,4]);EToV(:,[1,3,4])];
+          EToV(:,[1,3,4]);EToV(:,[2,3,4])];
 fnodes = sort(fnodes,2)-1;
 
 % set up default element to element and Element to faces connectivity
@@ -23,7 +28,7 @@ spNodeToNode=[id, (1:Nfaces*K)', EToE(:), EToF(:)];
 sorted=sortrows(spNodeToNode,1);
 
 % find matches in the sorted face list
-[indices,dummy]=find( sorted(1:(end-1),1)==sorted(2:end,1) );
+[indices,~]=find( sorted(1:(end-1),1)==sorted(2:end,1) );
 
 % make links reflexive 
 matchL = [sorted(indices,:)   ;sorted(indices+1,:)];
