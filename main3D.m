@@ -28,14 +28,8 @@ z = (-(-1+r+s+t)*VZ(va)+(r)*VZ(vb)+(s)*VZ(vc)+(t)*VZ(vd));
 % y = 0.5*(-(1+r+s+t)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc)+(1+t)*VY(vd));
 % z = 0.5*(-(1+r+s+t)*VZ(va)+(1+r)*VZ(vb)+(1+s)*VZ(vc)+(1+t)*VZ(vd));
 
-% compute the jacobians
-%%%%%% BISOGNA CONTROLLARE CHE SE N>1 A ME INTERESSANO SOLO I VERTICI,
-%%%%%% DIPENDE DA COME CREO PRIMA r s t, CHE TRAMITE EToV MAPPANO x y z,
-%%%%%% POTREI PER ESEMPIO METTERE I VERTICI SUBITO NEI PRIMI NODI.
-[J, Jcof, Jdet, trasl] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
-
 % assemble the linear system
-[A, b] = linsys(f, gd, sigma, K, Np, Nfaces, J, Jcof, Jdet, trasl, EToE, EToF);
+[A, b] = linsys(f, gd, sigma, K, Np, Nfaces, x, y, z, r, s, t, EToE, EToF);
 
 % solve the linear system
 %u = A\b;

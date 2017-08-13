@@ -57,4 +57,4 @@ for face=1:4
 end
 XYZ = XYZ + shift;
 X = XYZ(:,1); Y = XYZ(:,2); Z = XYZ(:,3);
-return;
+end

@@ -36,4 +36,4 @@ for k = 1:K
   tmpcon = sscanf(line, '%lf');
   EToV(k,1:4) = tmpcon(4:7);
 end
-return
+end

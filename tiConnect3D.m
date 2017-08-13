@@ -36,4 +36,4 @@ matchR = [sorted(indices+1,:) ;sorted(indices,:)];
 
 % insert matches
 EToE(matchL(:,2)) = matchR(:,3); EToF(matchL(:,2)) = matchR(:,4);
-return;
+end

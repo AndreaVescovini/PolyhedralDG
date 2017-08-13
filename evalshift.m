@@ -22,4 +22,4 @@ warp3 = blend3.*warpfactor3.*(1 + (pval*L3).^2);
 % 5) evaluate shift in equilateral triangle
 dx = 1*warp1 + cos(2*pi/3)*warp2 + cos(4*pi/3)*warp3;
 dy = 0*warp1 + sin(2*pi/3)*warp2 + sin(4*pi/3)*warp3;
-return;
+end

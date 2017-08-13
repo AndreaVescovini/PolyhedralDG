@@ -1,4 +1,4 @@
-function [X,Y,Z] = EquinNdes3D(N)
+function [X,Y,Z] = EquiNodes3D(N)
 
 % function [X,Y,Z] = EquinNdes3D(N)
 % Purpose: compute the equidistributed nodes on the reference tetrahedron
@@ -18,4 +18,4 @@ for n=1:N+1
     end
   end
 end
-return;
+end
