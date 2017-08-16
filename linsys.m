@@ -14,12 +14,10 @@ bs = zeros(K*Np,1);
 %%%%%% DIPENDE DA COME CREO PRIMA r s t, CHE TRAMITE EToV MAPPANO x y z,
 %%%%%% POTREI PER ESEMPIO METTERE I VERTICI SUBITO NEI PRIMI NODI.
 [J, Jcof, Jdet, trasl] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
-[areas, maps2D] = metric2D(x, y, z, Nfaces);
+[areas, normals, maps2D] = metric2D(x, y, z, Nfaces);
 [nod2, wei2, nod3, wei3] = quadrature;
-[phi, dphi, phi_bordo] = basis_evaluation(nod3, nod2, maps2D);
+[phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, maps2D);
 
-
-% gd = @(p) p(1,:).*p(2,:).*p(3,:);
 for ie = 1:K %loop on the elements
     for q = 1:5 %loop on 3D quadrature points
         for i = 1:Np %loop on the basis functions
@@ -36,26 +34,29 @@ for ie = 1:K %loop on the elements
         for q = 1:4 %loop on 2D quadrature nodes
             for i = 1:Np
                 igl = (ie-1)*Np + i;
-%                 for j = 1:Np
-%                     jgl = (ie-1)*Np + j;
-%                     if EToE(ie, e) == ie % if true then e is a boundary face
-%                 
-%                     else
-%                     
-%                     end
-%                 end
+                for j = 1:Np
+                    jgl = (ie-1)*Np + j;
+                    if EToE(ie, e) == ie % if true then e is a boundary face
+                        S(igl, jgl) = S(igl, jgl) + sigma*wei2(q)*phi_bordo(q, e, i)*phi_bordo(q, e, j)*areas(e, ie);
+                        I(igl, jgl) = I(igl, jgl) + wei2(q)*(normals(:,e,ie)'*Jcof(:,:,ie)*grad_bordo(:,q,e,i)/Jdet(ie))*phi_bordo(q,e,j)*areas(e,ie);      
+                    else
+                        jneigh = (EToE(ie, e)-1)*Np + j; %column index corresponding to the neighbooring element
+                        S(igl, jgl) = S(igl, jgl) + sigma*wei2(q)*phi_bordo(q, e, i)*phi_bordo(q, e, j)*areas(e, ie);
+                        S(igl, jneigh) = S(igl, jneigh) - sigma*wei2(q)*phi_bordo(q, e, i)*phi_bordo(q, EToF(ie, e), j)*areas(e, ie);
+                        I(igl, jgl) = I(igl, jgl) + 0.5*wei2(q)*(normals(:,e,ie)'*Jcof(:,:,ie)*grad_bordo(:,q,e,i)/Jdet(ie))*phi_bordo(q,e,j)*areas(e,ie);
+                        I(igl, jneigh) = I(igl, jneigh) - 0.5*wei2(q)*(normals(:,e,ie)'*Jcof(:,:,ie)*grad_bordo(:,q,e,i)/Jdet(ie))*phi_bordo(q,EToF(ie,e),j)*areas(e,ie);  
+                    end
+                end
                 if EToE(ie, e) == ie % boundary face
-                    %bi(igl) = bi(igl) + 
-                    bs(igl) = bs(igl) + sigma*wei2(q)*gd(trasl(:,ie)+J(:,:,ie)*maps2D(:,:,e)*nod2(:,q))*phi_bordo(e,q,i)*areas(e,ie);
+                    % valuto il dato al bordo gd nei nodi fisici
+                    bs(igl) = bs(igl) + sigma*wei2(q)*gd(trasl(:,ie)+J(:,:,ie)*maps2D(:,:,e)*nod2(:,q))*phi_bordo(q,e,i)*areas(e,ie);
+                    bi(igl) = bi(igl) + wei2(q)*gd(trasl(:,ie)+J(:,:,ie)*maps2D(:,:,e)*nod2(:,q))*(normals(:,e,ie)'*Jcof(:,:,ie)*grad_bordo(:,q,e,i)/Jdet(ie))*areas(e,ie);
                 end              
             end       
         end
     end
-        
+
 end
-
-bs
-
 
 % sum up the contributions
 A = A + S - I - transpose(I);

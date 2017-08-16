@@ -32,4 +32,6 @@ z = (-(-1+r+s+t)*VZ(va)+(r)*VZ(vb)+(s)*VZ(vc)+(t)*VZ(vd));
 [A, b] = linsys(f, gd, sigma, K, Np, Nfaces, x, y, z, r, s, t, EToE, EToF);
 
 % solve the linear system
-%u = A\b;
+u = A\b;
+
+%sembra che ci sia manchi una moltiplicazione per due
