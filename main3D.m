@@ -18,7 +18,8 @@ sigma = 10;
 [EToE, EToF] = tiConnect3D(EToV);
 
 % compute dof
-[x,y,z] = Nodes3D(N); [r,s,t] = xyztorst(x,y,z);
+%[x,y,z] = Nodes3D(N); [r,s,t] = xyztorst(x,y,z);
+[r, s, t] = set_dof_lin;
 va = EToV(:,1)'; vb = EToV(:,2)'; vc = EToV(:,3)'; vd = EToV(:,4)';
 x = (-(-1+r+s+t)*VX(va)+(r)*VX(vb)+(s)*VX(vc)+(t)*VX(vd));
 y = (-(-1+r+s+t)*VY(va)+(r)*VY(vb)+(s)*VY(vc)+(t)*VY(vd));
