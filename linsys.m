@@ -19,7 +19,7 @@ bs = zeros(K*Np,1);
 [phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, maps2D);
 
 for ie = 1:K %loop on the elements
-    for q = 1:5 %loop on 3D quadrature points
+    for q = 1:length(wei3) %loop on 3D quadrature points
         for i = 1:Np %loop on the basis functions
             igl = (ie-1)*Np + i; %global node number
             for j = 1:Np
@@ -31,7 +31,7 @@ for ie = 1:K %loop on the elements
     end
     
     for e = 1:Nfaces
-        for q = 1:4 %loop on 2D quadrature nodes
+        for q = 1:length(wei2) %loop on 2D quadrature nodes
             for i = 1:Np
                 igl = (ie-1)*Np + i;
                 for j = 1:Np
