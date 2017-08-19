@@ -24,15 +24,19 @@ maps2D(:,:,4) = [1  0 0;
 
 areas = zeros(Nfaces,K); % sfruttando EToE e EToF potrei non calcolare le aree che così calcolo due volte
 normals = zeros(3,Nfaces,K);
-for k = 1:K        
+for k = 1:K
+        %face 1, clockwise numeration
         areas(1,k) = norm(cross([x(1,k)-x(2,k) y(1,k)-y(2,k) z(1,k)-z(2,k)],[x(1,k)-x(3,k) y(1,k)-y(3,k) z(1,k)-z(3,k)]));
-        normals(:,1,k) = cross([x(1,k)-x(2,k) y(1,k)-y(2,k) z(1,k)-z(2,k)],[x(1,k)-x(3,k) y(1,k)-y(3,k) z(1,k)-z(3,k)])./areas(1,k);
+        normals(:,1,k) = cross([x(1,k)-x(2,k) y(1,k)-y(2,k) z(1,k)-z(2,k)],[x(3,k)-x(2,k) y(3,k)-y(2,k) z(3,k)-z(2,k)])./areas(1,k);
+        %face 2, counter-clockwise numeration
         areas(2,k) = norm(cross([x(2,k)-x(1,k) y(2,k)-y(1,k) z(2,k)-z(1,k)],[x(2,k)-x(4,k) y(2,k)-y(4,k) z(2,k)-z(4,k)]));
-        normals(:,2,k) = cross([x(2,k)-x(1,k) y(2,k)-y(1,k) z(2,k)-z(1,k)],[x(2,k)-x(4,k) y(2,k)-y(4,k) z(2,k)-z(4,k)])./areas(2,k);
+        normals(:,2,k) = cross([x(2,k)-x(1,k) y(2,k)-y(1,k) z(2,k)-z(1,k)],[x(4,k)-x(1,k) y(4,k)-y(1,k) z(4,k)-z(1,k)])./areas(2,k);
+        %face 3, clockwise numeration
         areas(3,k) = norm(cross([x(3,k)-x(1,k) y(3,k)-y(1,k) z(3,k)-z(1,k)],[x(3,k)-x(4,k) y(3,k)-y(4,k) z(3,k)-z(4,k)]));
-        normals(:,3,k) = cross([x(3,k)-x(1,k) y(3,k)-y(1,k) z(3,k)-z(1,k)],[x(3,k)-x(4,k) y(3,k)-y(4,k) z(3,k)-z(4,k)])./areas(3,k);
+        normals(:,3,k) = cross([x(4,k)-x(1,k) y(4,k)-y(1,k) z(4,k)-z(1,k)],[x(3,k)-x(1,k) y(3,k)-y(1,k) z(3,k)-z(1,k)])./areas(3,k);
+        %face 4, counter-clockwise numeration
         areas(4,k) = norm(cross([x(4,k)-x(2,k) y(4,k)-y(2,k) z(4,k)-z(2,k)],[x(4,k)-x(3,k) y(4,k)-y(3,k) z(4,k)-z(3,k)]));
-        normals(:,4,k) = cross([x(4,k)-x(2,k) y(4,k)-y(2,k) z(4,k)-z(2,k)],[x(4,k)-x(3,k) y(4,k)-y(3,k) z(4,k)-z(3,k)])./areas(4,k);
+        normals(:,4,k) = cross([x(4,k)-x(3,k) y(4,k)-y(3,k) z(4,k)-z(3,k)],[x(2,k)-x(3,k) y(2,k)-y(3,k) z(2,k)-z(3,k)])./areas(4,k);
 end
 
 end
