@@ -1,11 +1,7 @@
-function [phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, maps2D)
-%basis_evaluation. Gives the evaluation of the P1 basis functions and their gradient
-%at the 3D quadrature nodes.
-
-% phi_func = {@(p) (-0.5*(p(1,:)+p(2,:)+p(3,:)+1));
-%             @(p) (0.5*(p(1,:)+1));
-%             @(p) (0.5*(p(2,:)+1));
-%             @(p) (0.5*(p(3,:)+1))};
+function [phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, node_maps)
+%[phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, node_maps)
+%Gives the evaluation of the P1 basis functions and their gradient
+%at the 3D quadrature nodes and 2D face quadrature nodes.
 
 phi_func = {@(p) (-p(1,:)-p(2,:)-p(3,:)+1);
             @(p) (p(1,:));
@@ -32,7 +28,7 @@ for f = 1:4
     dphi(:,:,f) = repmat(grad_phi_func(:,f), [1 nq3]);
     for e = 1:4
         grad_bordo(:,:,e,f) = repmat(grad_phi_func(:,f), [1 nq2]);
-        phi_bordo(:,e,f) = phi_func{f}(maps2D(:,:,e)*nod2);
+        phi_bordo(:,e,f) = phi_func{f}(node_maps(:,:,e)*nod2);
     end
 end
 

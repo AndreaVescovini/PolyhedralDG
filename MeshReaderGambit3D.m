@@ -1,7 +1,8 @@
-function [Nv, VX, VY, VZ, K, EToV] = MeshReaderGambit3D(FileName)
+function [mesh] = MeshReaderGambit3D(FileName)
 
-% function [Nv, VX, VY, VZ, K, EToV] = MeshReaderGambit3D(FileName)
-% Purpose  : Read in basic grid information to build grid
+% function [mesh] = MeshReaderGambit3D(FileName)
+% Purpose  : Read in basic grid information to build grid and build
+% connectivity matrices.
 % NOTE     : gambit *.neu format is assumed
 
 Fid = fopen(FileName, 'rt');
@@ -25,6 +26,11 @@ xyz = fscanf(Fid, '%lf', [4, Nv]);
 xyz = xyz(2:4, :);
 VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);
 
+% eventually translate the domain
+% VX = (VX+ones(1,Nv))/2;
+% VY = (VY+ones(1,Nv))/2;
+% VZ = (VZ+ones(1,Nv))/2;
+
 for i=1:3 
   line = fgetl(Fid);
 end
@@ -36,4 +42,17 @@ for k = 1:K
   tmpcon = sscanf(line, '%lf');
   EToV(k,1:4) = tmpcon(4:7);
 end
+
+% connectivity matrices
+[EToE, EToF] = tiConnect3D(EToV);
+
+mesh = struct('Nv', Nv,...
+              'VX', VX,...
+              'VY', VY,...
+              'VZ', VZ,...
+              'K', K,...
+              'EToV', EToV,...
+              'EToE', EToE,...
+              'EToF', EToF);
+
 end

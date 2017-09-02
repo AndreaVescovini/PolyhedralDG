@@ -1,43 +1,24 @@
-function [areas, normals, maps2D] = metric2D(x, y, z, Nfaces)
-%metric2D. Function that computes for every face of every element the area
-%doubled, the normal vector and the mappings from the 2D refence triangle
-%to the faces of the 3D reference tetrahedron.
+function [areas, normals] = metric2D(x, y, z, Nfaces)
+%[areas, normals] = metric2D(x, y, z, Nfaces).
+%Function that computes for every face of every element the area doubled
+%and the normal vector.
 
-K = size(x,2);
-maps2D = zeros(3,3,Nfaces);
+areas = zeros(Nfaces); % sfruttando EToE e EToF potrei non calcolare le aree che così calcolo due volte
+normals = zeros(3,Nfaces);
 
-maps2D(:,:,1) = [0 1 0;
-                 1 0 0;
-                 0 0 0];
-             
-maps2D(:,:,2) = [1 0 0;
-                 0 0 0;
-                 0 1 0];
-             
-maps2D(:,:,3) = [0 0 0;
-                 0 1 0;
-                 1 0 0];
-             
-maps2D(:,:,4) = [1  0 0;
-                 0  1 0;
-                -1 -1 1];
 
-areas = zeros(Nfaces,K); % sfruttando EToE e EToF potrei non calcolare le aree che così calcolo due volte
-normals = zeros(3,Nfaces,K);
-for k = 1:K
-        %face 1, clockwise numeration
-        areas(1,k) = norm(cross([x(1,k)-x(2,k) y(1,k)-y(2,k) z(1,k)-z(2,k)],[x(1,k)-x(3,k) y(1,k)-y(3,k) z(1,k)-z(3,k)]));
-        normals(:,1,k) = cross([x(1,k)-x(2,k) y(1,k)-y(2,k) z(1,k)-z(2,k)],[x(3,k)-x(2,k) y(3,k)-y(2,k) z(3,k)-z(2,k)])./areas(1,k);
-        %face 2, counter-clockwise numeration
-        areas(2,k) = norm(cross([x(2,k)-x(1,k) y(2,k)-y(1,k) z(2,k)-z(1,k)],[x(2,k)-x(4,k) y(2,k)-y(4,k) z(2,k)-z(4,k)]));
-        normals(:,2,k) = cross([x(2,k)-x(1,k) y(2,k)-y(1,k) z(2,k)-z(1,k)],[x(4,k)-x(1,k) y(4,k)-y(1,k) z(4,k)-z(1,k)])./areas(2,k);
-        %face 3, clockwise numeration
-        areas(3,k) = norm(cross([x(3,k)-x(1,k) y(3,k)-y(1,k) z(3,k)-z(1,k)],[x(3,k)-x(4,k) y(3,k)-y(4,k) z(3,k)-z(4,k)]));
-        normals(:,3,k) = cross([x(4,k)-x(1,k) y(4,k)-y(1,k) z(4,k)-z(1,k)],[x(3,k)-x(1,k) y(3,k)-y(1,k) z(3,k)-z(1,k)])./areas(3,k);
-        %face 4, counter-clockwise numeration
-        areas(4,k) = norm(cross([x(4,k)-x(2,k) y(4,k)-y(2,k) z(4,k)-z(2,k)],[x(4,k)-x(3,k) y(4,k)-y(3,k) z(4,k)-z(3,k)]));
-        normals(:,4,k) = cross([x(4,k)-x(3,k) y(4,k)-y(3,k) z(4,k)-z(3,k)],[x(2,k)-x(3,k) y(2,k)-y(3,k) z(2,k)-z(3,k)])./areas(4,k);
-end
+%face 1, clockwise numeration
+areas(1) = norm(cross([x(1)-x(2) y(1)-y(2) z(1)-z(2)],[x(3)-x(2) y(3)-y(2) z(3)-z(2)]));
+normals(:,1) = cross([x(1)-x(2) y(1)-y(2) z(1)-z(2)],[x(3)-x(2) y(3)-y(2) z(3)-z(2)])./areas(1);
+%face 2, counter-clockwise numeration
+areas(2) = norm(cross([x(2)-x(1) y(2)-y(1) z(2)-z(1)],[x(4)-x(1) y(4)-y(1) z(4)-z(1)]));
+normals(:,2) = cross([x(2)-x(1) y(2)-y(1) z(2)-z(1)],[x(4)-x(1) y(4)-y(1) z(4)-z(1)])./areas(2);
+%face 3, clockwise numeration
+areas(3) = norm(cross([x(4)-x(1) y(4)-y(1) z(4)-z(1)],[x(3)-x(1) y(3)-y(1) z(3)-z(1)]));
+normals(:,3) = cross([x(4)-x(1) y(4)-y(1) z(4)-z(1)],[x(3)-x(1) y(3)-y(1) z(3)-z(1)])./areas(3);
+%face 4, counter-clockwise numeration
+areas(4) = norm(cross([x(4)-x(3) y(4)-y(3) z(4)-z(3)],[x(2)-x(3) y(2)-y(3) z(2)-z(3)]));
+normals(:,4) = cross([x(4)-x(3) y(4)-y(3) z(4)-z(3)],[x(2)-x(3) y(2)-y(3) z(2)-z(3)])./areas(4);
 
 end
 
