@@ -3,7 +3,7 @@ function [u, x, y, z] = linsys(mesh, f, gd, N, sigma)
 %Function that computes the matrix A and the vector b of the linear
 %system that solves the problem.
 
-Np = (N+1)*(N+2)*(N+3)/6; %number of points for every element
+Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
 Nfaces = 4; % number of faces for every element
 
 % dof in the reference simplex
@@ -81,5 +81,5 @@ b = b + bs - bi;
 
 % solve the linear system
 u = A\b;
-
+u = reshape(u, [Np, mesh.K]);
 end
