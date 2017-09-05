@@ -33,7 +33,6 @@ for ie = 1:mesh.K %loop on the elements
     %%%%%% POTREI PER ESEMPIO METTERE I VERTICI SUBITO NEI PRIMI NODI.
     [J, Jcof, Jdet, trasl] = jacobians(x(:,ie),y(:,ie),z(:,ie),r,s,t); % del determinante dovro' poi prenderne il valore assoluto
     [areas, normals] = metric2D(x(:,ie), y(:,ie), z(:,ie), Nfaces);
-        
     for q = 1:length(wei3) %loop on 3D quadrature points
         for i = 1:Np %loop on the basis functions
             igl = (ie-1)*Np + i; %global node number
