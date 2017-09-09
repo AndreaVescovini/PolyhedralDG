@@ -27,9 +27,9 @@ xyz = xyz(2:4, :);
 VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);
 
 % eventually translate the domain
-% VX = (VX+ones(1,Nv))/2;
-% VY = (VY+ones(1,Nv))/2;
-% VZ = (VZ+ones(1,Nv))/2;
+VX = (VX+ones(1,Nv))/2;
+VY = (VY+ones(1,Nv))/2;
+VZ = (VZ+ones(1,Nv))/2;
 
 for i=1:3 
   line = fgetl(Fid);

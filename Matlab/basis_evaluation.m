@@ -1,5 +1,5 @@
-function [phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(nod3, nod2, node_maps, N, Np)
-%[phi, dphi, phi_bordo, grad_bordo] = basis_evaluation(N, nod3, nod2, node_maps, N, Np)
+function [phi, dphi, phi_bordo, grad_bordo, phi_func] = basis_evaluation(nod3, nod2, node_maps, N, Np)
+%[phi, dphi, phi_bordo, grad_bordo, phi_func] = basis_evaluation(N, nod3, nod2, node_maps, N, Np)
 %Gives the evaluation of the P1 or P2 basis functions and their gradient
 %at the 3D quadrature nodes and 2D face quadrature nodes.
 

@@ -16,10 +16,10 @@ uex_grad = @(p) [3*p(1,:).^2; 10*p(3,:).^2; 20*p(2,:).*p(3,:)];
 gd = uex;
 N = 2; % degree of finite finite elements
 sigma = 18; % penalty coefficient
-epsilon = 1; % SIP
+epsilon = -1; % SIP
 
-file_names = {'meshes\cube_str6.mesh'; 'meshes\cube_str48.mesh';...
-              'meshes\cube_str384.mesh'; 'meshes\cube_str3072.mesh'};
+file_names = {'..\meshes\cube_str6.mesh'; '..\meshes\cube_str48.mesh';...
+              '..\meshes\cube_str384.mesh'; '..\meshes\cube_str3072.mesh'};
 
 n_it = 3;
 err_L2 = zeros(1,n_it);
