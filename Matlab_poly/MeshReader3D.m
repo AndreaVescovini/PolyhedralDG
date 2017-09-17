@@ -6,7 +6,7 @@ function [mesh] = MeshReader3D(FileName)
 Fid = fopen(FileName, 'rt');
 
 % read intro 
-for i=1:5
+for k = 1:5
   line = fgetl(Fid);
 end
 
@@ -23,7 +23,7 @@ VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);
 % VY = (VY+ones(1,Nv))/2;
 % VZ = (VZ+ones(1,Nv))/2;
 
-for i=1:3 
+for k = 1:3 
   line = fgetl(Fid);
 end
 

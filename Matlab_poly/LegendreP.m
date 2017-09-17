@@ -22,8 +22,8 @@ PL(1,:) = 1.0;
 PL(2,:) = xp;
 
 % Forward recurrence using the symmetry of the recurrence.
-for i = 2:N
-  PL(i+1,:) = -(i-1)/i*PL(i-1,:) + (2*i-1)/i*xp.*PL(i,:);
+for k = 2:N
+  PL(k+1,:) = -(k-1)/k*PL(k-1,:) + (2*k-1)/k*xp.*PL(k,:);
 end
 
 for k = 0:1:floor((N-1)/2)

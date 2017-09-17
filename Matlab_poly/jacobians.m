@@ -1,4 +1,4 @@
-function [Fk, Jcof, Jdet] = jacobians(x, y, z)
+function [Fk, Jinv, Jdet] = jacobians(x, y, z)
 %[Fk, Jcof, Jdet] = jacobians(x, y, z)
 %Functions that computes for every element the map Fk, the determinant of
 %the jacobian and the matrix jcof wrt the simplex (0,0,0),(1,0,0),(0,1,0),(0,0,1)
@@ -7,7 +7,7 @@ function [Fk, Jcof, Jdet] = jacobians(x, y, z)
 
 K = size(x,2);
 Fk = zeros(3,4,K);
-Jcof = zeros(3,3,K);
+Jinv = zeros(3,3,K);
 Jdet = zeros(1,K);
 
 % vertices in the reference tetrahedron plus ones(4,1)
@@ -23,7 +23,7 @@ for ie = 1:K
     Fk(3,:,ie) = Mat\z(:,ie);
     
     Jdet(ie) = det(Fk(:,1:3,ie));
-    Jcof(:,:,ie) = Jdet(ie)*inv(Fk(:,1:3,ie)');
+    Jinv(:,:,ie) = inv(Fk(:,1:3,ie));
 end
    
 end

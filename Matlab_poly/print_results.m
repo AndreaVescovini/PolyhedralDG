@@ -20,11 +20,11 @@ for N = 2:2
         err_H10 = zeros(1,n_it);
         hh = zeros(1,n_it);
 
-        for i = 1:n_it
-            mesh = MeshReader3D(file_names{i});
-            hh(i) = sqrt(3)/(mesh.K/6)^(1/3);
+        for ii = 1:n_it
+            mesh = MeshReader3D(file_names{ii});
+            hh(ii) = sqrt(3)/(mesh.K/6)^(1/3);
             [u, x, y, z] = linsys(mesh, f, gd, N, sigma, epsilon);
-            [err_L2(i), err_H10(i)] = errors(uex, uex_grad, u, x, y, z, N);
+            [err_L2(ii), err_H10(ii)] = errors(uex, uex_grad, u, x, y, z, N);
         end
         fprintf(res, 'N: %d, eps: %d, errl2: %.4e, errh10: %.4e \n', N, epsilon, err_L2(end), err_H10(end));
         
@@ -48,11 +48,11 @@ for N = 1:2
         err_H10 = zeros(1,n_it);
         hh = zeros(1,n_it);
 
-        for i = 1:n_it
-            mesh = MeshReader3D(file_names{i});
-            hh(i) = sqrt(3)/(mesh.K/6)^(1/3);
+        for ii = 1:n_it
+            mesh = MeshReader3D(file_names{ii});
+            hh(ii) = sqrt(3)/(mesh.K/6)^(1/3);
             [u, x, y, z] = linsys(mesh, f, gd, N, sigma, epsilon);
-            [err_L2(i), err_H10(i)] = errors(uex, uex_grad, u, x, y, z, N);
+            [err_L2(ii), err_H10(ii)] = errors(uex, uex_grad, u, x, y, z, N);
         end
         fprintf(res, 'N: %d, eps: %d, errl2: %.4e, errh10: %.4e \n', N, epsilon, err_L2(end), err_H10(end));
         
