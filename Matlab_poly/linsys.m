@@ -8,12 +8,8 @@ Nfaces = 4; % number of faces for every element
 
 blist = basis_list(N, Np);
 
-% vertices
-[r, s, t] = set_dof;
-va = mesh.EToV(:,1)'; vb = mesh.EToV(:,2)'; vc = mesh.EToV(:,3)'; vd = mesh.EToV(:,4)';
-x = (1-r-s-t)*mesh.VX(va)+r*mesh.VX(vb)+s*mesh.VX(vc)+t*mesh.VX(vd);
-y = (1-r-s-t)*mesh.VY(va)+r*mesh.VY(vb)+s*mesh.VY(vc)+t*mesh.VY(vd);
-z = (1-r-s-t)*mesh.VZ(va)+r*mesh.VZ(vb)+s*mesh.VZ(vc)+t*mesh.VZ(vd);
+% set vertices
+[x, y, z] = set_vertices(mesh.EToV, mesh.VX, mesh.VY, mesh.VZ);
 
 A = zeros(mesh.K*Np);
 % A = spalloc(mesh.K*Np, mesh.K*Np, mesh.K*Np*Np);
@@ -21,7 +17,7 @@ b = zeros(mesh.K*Np,1);
 
 [nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(Nfaces);
 % compute the jacobians
-[Fk, Jcof, Jdet] = jacobians(x,y,z,r,s,t); % del determinante dovro' poi prenderne il valore assoluto
+[Fk, Jcof, Jdet] = jacobians(x,y,z); % del determinante dovro' poi prenderne il valore assoluto
 bb = box(x,y,z);
 [phi, dphi, phi_bordo, grad_bordo] = basis(bb, blist, Fk, nod3, node_maps, nod2);
 

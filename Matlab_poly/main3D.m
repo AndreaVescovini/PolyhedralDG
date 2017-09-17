@@ -13,7 +13,7 @@ uex_grad = @(p) [3*p(1,:).^2; 10*p(3,:).^2; 20*p(2,:).*p(3,:)];
 % uex = @(p) p(1,:).*p(2,:);
 % f = @(p) 0;
 % uex_grad = @(p) [p(2,:); p(1,:); 0];
-% 
+ 
 % uex = @(p) p(1,:);
 % f = @(p) 0;
 % uex_grad = @(p) [1; 0; 0];
@@ -29,8 +29,8 @@ epsilon = -1; % method
 
 % generate the mesh and connectivity matrices
 % mesh = MeshReader3D('../meshes/cube_str48p.mesh');
-% mesh = MeshReader3D('../meshes/cube_str6.mesh');
-mesh = MeshReaderGambit3D('../meshes/cubeK86.neu');
+mesh = MeshReader3D('../meshes/cube_str48.mesh');
+% mesh = MeshReaderGambit3D('../meshes/cubeK5.neu');
 
 % build the linear system and solve the problem
 [u, x, y, z] = linsys(mesh, f, gd, N, sigma, epsilon);

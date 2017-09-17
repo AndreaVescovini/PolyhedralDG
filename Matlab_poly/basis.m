@@ -16,38 +16,39 @@ grad_bordo = zeros(3, nq2, 4, Np, K);
 phi_bordo = zeros(nq2, 4, Np, K);
 
 for ie = 1:K
-
-for q = 1:nq3
-    pt = Fk(:,:,ie)*nod3(:,q);
+    
+    pt = Fk(:,:,ie)*nod3;
     for f = 1:Np
-        valx = LegendreP(pt(1), blist(f,1), bb(1,:,ie));
-        valy = LegendreP(pt(2), blist(f,2), bb(2,:,ie));
-        valz = LegendreP(pt(3), blist(f,3), bb(3,:,ie));
-        
-        phi(q,f,ie) = valx*valy*valz;
-        dphi(1,q,f,ie) = LegendrePder(pt(1), blist(f,1), bb(1,:,ie))*valy*valz;
-        dphi(2,q,f,ie) = valx*LegendrePder(pt(2), blist(f,2), bb(2,:,ie))*valz;
-        dphi(3,q,f,ie) = valx*valy*LegendrePder(pt(3), blist(f,3), bb(3,:,ie));
+    
+        [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,ie));
+        [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,ie));
+        [valz, dvalz] = LegendreP(pt(3,:), blist(f,3), bb(3,:,ie));
+%         dvalx = LegendrePder(pt(1,:), blist(f,1), bb(1,:,ie));
+%         dvaly = LegendrePder(pt(2,:), blist(f,2), bb(2,:,ie));
+%         dvalz = LegendrePder(pt(3,:), blist(f,3), bb(3,:,ie));
+       
+        phi(:,f,ie) = (valx.*valy.*valz)';
+        dphi(1,:,f,ie) = dvalx.*valy.*valz;
+        dphi(2,:,f,ie) = valx.*dvaly.*valz;
+        dphi(3,:,f,ie) = valx.*valy.*dvalz;
     end
-end
 
-for q = 1:nq2
     for e = 1:4
-        pt = Fk(:,:,ie)*node_maps(:,:,e)*nod2(:,q);
+        pt = Fk(:,:,ie)*node_maps(:,:,e)*nod2;
         for f = 1:Np
-            valx = LegendreP(pt(1), blist(f,1), bb(1,:,ie));
-            valy = LegendreP(pt(2), blist(f,2), bb(2,:,ie));
-            valz = LegendreP(pt(3), blist(f,3), bb(3,:,ie));
-        
-            phi_bordo(q,e,f,ie) = valx*valy*valz;
-            grad_bordo(1,q,e,f,ie) = LegendrePder(pt(1), blist(f,1), bb(1,:,ie))*valy*valz;
-            grad_bordo(2,q,e,f,ie) = valx*LegendrePder(pt(2), blist(f,2), bb(2,:,ie))*valz;
-            grad_bordo(3,q,e,f,ie) = valx*valy*LegendrePder(pt(3), blist(f,3), bb(3,:,ie));
-            
-            
+        [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,ie));
+        [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,ie));
+        [valz, dvalz] = LegendreP(pt(3,:), blist(f,3), bb(3,:,ie));
+%         dvalx = LegendrePder(pt(1,:), blist(f,1), bb(1,:,ie));
+%         dvaly = LegendrePder(pt(2,:), blist(f,2), bb(2,:,ie));
+%         dvalz = LegendrePder(pt(3,:), blist(f,3), bb(3,:,ie));
+    
+            phi_bordo(:,e,f,ie) = (valx.*valy.*valz)';
+            grad_bordo(1,:,e,f,ie) = dvalx.*valy.*valz;
+            grad_bordo(2,:,e,f,ie) = valx.*dvaly.*valz;
+            grad_bordo(3,:,e,f,ie) = valx.*valy.*dvalz;
         end
     end
-end
 
 end
 

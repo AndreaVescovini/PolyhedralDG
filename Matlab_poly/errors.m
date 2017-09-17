@@ -4,12 +4,11 @@ function [err_L2, err_H10] = errors(uex, uex_grad, u, x, y, z, N)
 
 Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
 Nfaces = 4; % number of faces for every element
-[r, s, t] = set_dof; % dof on the reference tetrahedron
 
 [nod2, ~, nod3, wei3, node_maps, ~] = quadrature(Nfaces);
 blist = basis_list(N, Np);
 bb = box(x,y,z);
-[Fk, ~, Jdet] = jacobians(x,y,z,r,s,t);
+[Fk, ~, Jdet] = jacobians(x,y,z);
 [phi, dphi, ~, ~] = basis(bb, blist, Fk, nod3, node_maps, nod2);
 
 err_L2 = 0;
