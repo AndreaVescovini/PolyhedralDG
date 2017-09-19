@@ -3,9 +3,8 @@ function [err_L2, err_H10] = errors(uex, uex_grad, u, x, y, z, N)
 %   Compute L2 norm and H1 seminorm of the error u-uex
 
 Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
-Nfaces = 4; % number of faces for every element
 
-[~, ~, nod3, wei3, ~, ~] = quadrature(N,Nfaces);
+[~, ~, nod3, wei3, ~, ~] = quadrature(N);
 blist = basis_list(N, Np);
 bb = box(x,y,z);
 [Fk, ~, Jdet] = jacobians(x,y,z);
@@ -13,7 +12,6 @@ bb = box(x,y,z);
 
 err_L2 = 0;
 err_H10 = 0;
-
 
 for ie = 1:size(x,2)  
     for q = 1:length(wei3)

@@ -4,18 +4,17 @@ function [u, x, y, z] = linsys(mesh, f, gd, N, sigma, epsilon)
 %system that solves the problem.
 
 Np = (N+1)*(N+2)*(N+3)/6; %number of dof for every element
-Nfaces = 4; % number of faces for every element
-
 blist = basis_list(N, Np);
 
-% set vertices
+% set vertices and faces
 [x, y, z] = set_vertices(mesh.EToV, mesh.VX, mesh.VY, mesh.VZ);
+[faces, faces_neig, elem_faces] = read_faces(mesh);
 
-A = zeros(mesh.K*Np);
-% A = spalloc(mesh.K*Np, mesh.K*Np, mesh.K*Np*Np);
+% A = zeros(mesh.K*Np);
+A = spalloc(mesh.K*Np, mesh.K*Np, mesh.K*Np*Np);
 b = zeros(mesh.K*Np,1);
 
-[nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N,Nfaces);
+[nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N);
 % compute the jacobians
 [Fk, Jinv, Jdet] = jacobians(x,y,z); % del determinante dovro' poi prenderne il valore assoluto
 bb = box(x,y,z);
@@ -24,50 +23,59 @@ bb = box(x,y,z);
 
 for ie = 1:mesh.K %loop on the elements
     
-    [areas, normals] = metric2D(x(:,ie), y(:,ie), z(:,ie), Nfaces);
     index = (ie-1)*Np+1:ie*Np;
     
     for q = 1:length(wei3) %loop on 3D quadrature points
         A(index, index) = A(index, index) + (wei3(q)*abs(Jdet(ie)))*(dphi(:,:,q,ie)'*dphi(:,:,q,ie));
         b(index) = b(index) + abs(Jdet(ie))*wei3(q)*f(Fk(:,:,ie)*nod3(:,q))*phi(:,q,ie);
     end
+end
+
+for e = 1:size(faces,1)
     
-    for e = 1:Nfaces
-        sig = sigma/(areas(e)/2)^0.5;
-        
-        for q = 1:length(wei2) %loop on 2D quadrature nodes
-            nei_q = node_maps_inv(:,:,mesh.EToF(ie,e))*Jinv(:,:,mesh.EToE(ie,e))*(-Fk(:,4,mesh.EToE(ie,e))+Fk(:,:,ie)*node_maps(:,:,e)*nod2(:,q));
-%             nei_q = Jcof(:,:,mesh.EToE(ie,e))'/Jdet(mesh.EToE(ie,e))*(-trasl(:,mesh.EToE(ie,e))+trasl(:,ie)+J(:,:,ie)*node_maps(:,:,e)*nod2(:,q));
-            q_star = find((nei_q(1)+0.0001 > nod2(1,:)) & (nod2(1,:) > nei_q(1)-0.0001) & (nei_q(2)+0.0001 > nod2(2,:)) & (nod2(2,:) > nei_q(2)-0.0001));
-            
-            if mesh.EToE(ie, e) == ie % if true then e is a boundary face
+    E1 = faces_neig(e,1);
+    e_E1 = faces_neig(e,2);
+    E2 = faces_neig(e,3);
+    e_E2 = faces_neig(e,4);
+    [area, normal] = metric2D(mesh.VX(faces(e,:)), mesh.VY(faces(e,:)), mesh.VZ(faces(e,:)), e_E1);
+    sig = sigma/(area/2)^0.5;
+    
+    index1 = (E1-1)*Np+1:E1*Np;
+       
+    for q = 1:length(wei2) %loop on 2D quadrature nodes         
+        if E2 == 0 % if true then e is a boundary face
                         
-                A(index, index) = A(index, index) + sig*wei2(q)*phi_bordo(:,q,e,ie)*phi_bordo(:,q,e,ie)'*areas(e)...; % S
-                            + epsilon*wei2(q)*(grad_bordo(:,:,q,e,ie)'*normals(:,e))*phi_bordo(:,q,e,ie)'*areas(e)... % I
-                            - wei2(q)*phi_bordo(:,q,e,ie)*(normals(:,e)'*grad_bordo(:,:,q,e,ie))*areas(e); % I'
+            A(index1, index1) = A(index1, index1) + sig*wei2(q)*phi_bordo(:,q,e_E1,E1)*phi_bordo(:,q,e_E1,E1)'*area...; % S
+                        + epsilon*wei2(q)*(grad_bordo(:,:,q,e_E1,E1)'*normal)*phi_bordo(:,q,e_E1,E1)'*area... % I
+                        - wei2(q)*phi_bordo(:,q,e_E1,E1)*(normal'*grad_bordo(:,:,q,e_E1,E1))*area; % I'
+                    
+            % evaluate gd on the physical quadrature nodes on the boundary
+                  b(index1) = b(index1) + sig*wei2(q)*gd(Fk(:,:,E1)*node_maps(:,:,e_E1)*nod2(:,q))*phi_bordo(:,q,e_E1,E1)*area... % bs
+                                  + epsilon*wei2(q)*gd(Fk(:,:,E1)*node_maps(:,:,e_E1)*nod2(:,q))*(grad_bordo(:,:,q,e_E1,E1)'*normal)*area; % bi
                         
-            else
-                index_neig = (mesh.EToE(ie, e)-1)*Np+1:mesh.EToE(ie, e)*Np; %column index corresponding to the neighbooring element
+        else
+            index2 = (E2-1)*Np+1:E2*Np;
+            q_star = node_maps_inv(:,:,e_E2)*Jinv(:,:,E2)*(-Fk(:,4,E2)+Fk(:,:,E1)*node_maps(:,:,e_E1)*nod2(:,q));
+            q_2 = find((q_star(1)+0.0001 > nod2(1,:)) & (nod2(1,:) > q_star(1)-0.0001) & (q_star(2)+0.0001 > nod2(2,:)) & (nod2(2,:) > q_star(2)-0.0001));
                        
-                A(index, index) = A(index, index) + sig*wei2(q)*phi_bordo(:,q,e,ie)*phi_bordo(:,q,e,ie)'*areas(e)... % S
-                            + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,ie)'*normals(:,e))*phi_bordo(:,q,e,ie)'*areas(e)... % I
-                            - 0.5*wei2(q)*phi_bordo(:,q,e,ie)*(normals(:,e)'*grad_bordo(:,:,q,e,ie))*areas(e); % I'
+            A(index1, index1) = A(index1, index1) + sig*wei2(q)*phi_bordo(:,q,e_E1,E1)*phi_bordo(:,q,e_E1,E1)'*area... % S1
+                              + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e_E1,E1)'*normal)*phi_bordo(:,q,e_E1,E1)'*area... % I1
+                              - 0.5*wei2(q)*phi_bordo(:,q,e_E1,E1)*(normal'*grad_bordo(:,:,q,e_E1,E1))*area; % I'1
+                    
+            A(index2, index2) = A(index2, index2) + sig*wei2(q)*phi_bordo(:,q_2,e_E2,E2)*phi_bordo(:,q_2,e_E2,E2)'*area... % S2
+                              + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q_2,e_E2,E2)'*(-normal))*phi_bordo(:,q_2,e_E2,E2)'*area... % I2
+                              - 0.5*wei2(q)*phi_bordo(:,q_2,e_E2,E2)*(-normal'*grad_bordo(:,:,q_2,e_E2,E2))*area; % I'2
 
-                A(index, index_neig) = A(index, index_neig) - sig*wei2(q)*phi_bordo(:,q,e,ie)*phi_bordo(:,q_star,mesh.EToF(ie,e),mesh.EToE(ie,e))'*areas(e)... % S
-                               - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,ie)'*normals(:,e))*phi_bordo(:,q_star,mesh.EToF(ie,e),mesh.EToE(ie,e))'*areas(e); % I
-                A(index_neig, index) = A(index_neig, index) + 0.5*wei2(q)*phi_bordo(:,q_star,mesh.EToF(ie,e),mesh.EToE(ie,e))*(normals(:,e)'*grad_bordo(:,:,q,e,ie))*areas(e); % I'
+            A(index1, index2) = A(index1, index2) - sig*wei2(q)*phi_bordo(:,q,e_E1,E1)*phi_bordo(:,q_2,e_E2,E2)'*area... % S1
+                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e_E1,E1)'*normal)*phi_bordo(:,q_2,e_E2,E2)'*area... % I1
+                              + 0.5*wei2(q)*phi_bordo(:,q,e_E1,E1)*(-normal'*grad_bordo(:,:,q_2,e_E2,E2))*area; % I'2
+                       
+            A(index2, index1) = A(index2, index1) - sig*wei2(q)*phi_bordo(:,q_2,e_E2,E2)*phi_bordo(:,q,e_E1,E1)'*area... % S2
+                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q_2,e_E2,E2)'*(-normal))*phi_bordo(:,q,e_E1,E1)'*area... % I2
+                              + 0.5*wei2(q)*phi_bordo(:,q_2,e_E2,E2)*(normal'*grad_bordo(:,:,q,e_E1,E1))*area; % I'1
 
-            end
- 
-            if mesh.EToE(ie, e) == ie % boundary face
-                    % evaluate gd on the physical quadrature nodes on the boundary
-                      b(index) = b(index) + sig*wei2(q)*gd(Fk(:,:,ie)*node_maps(:,:,e)*nod2(:,q))*phi_bordo(:,q,e,ie)*areas(e)... % bs
-                                      + epsilon*wei2(q)*gd(Fk(:,:,ie)*node_maps(:,:,e)*nod2(:,q))*(grad_bordo(:,:,q,e,ie)'*normals(:,e))*areas(e); % bi
-                   
-            end      
-        end
+        end     
     end
-
 end
 
 % sum up the contributions
