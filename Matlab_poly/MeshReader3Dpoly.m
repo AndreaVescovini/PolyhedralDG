@@ -36,9 +36,14 @@ for ii = 1:3
   line = fgetl(Fid);
 end
 
-% read element to tetrahedron connectivity
-K = fscanf(Fid, '%d', 1);
-E2P = fscanf(Fid, '%d', Ntet);
+if strcmp(line,'Polyhedra')
+    % read element to tetrahedron connectivity
+    K = fscanf(Fid, '%d', 1);
+    E2P = fscanf(Fid, '%d', Ntet);
+else
+    K = Ntet;
+    E2P = 1:Ntet;
+end
 
 fclose(Fid);
 

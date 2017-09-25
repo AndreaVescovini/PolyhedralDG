@@ -6,7 +6,7 @@ Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
 
 [~, ~, nod3, wei3, ~, ~] = quadrature(N);
 blist = basis_list(N, Np);
-bb = box(x,y,z,E2P,K);
+[bb, ~] = bbox(x,y,z,E2P,K);
 [Fk, ~, Jdet] = jacobians(x,y,z);
 [phi, dphi] = basis(bb, E2P, blist, Fk, nod3);
 

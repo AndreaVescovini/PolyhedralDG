@@ -15,7 +15,7 @@ end
 % find number of vertices and number of elements
 dims = fscanf(Fid, '%d');
 
-Nv = dims(1); K = dims(2);
+Nv = dims(1); Ntet = dims(2);
 
 for ii = 1:2 
   line = fgetl(Fid);
@@ -36,11 +36,11 @@ for ii = 1:3
 end
 
 % read element to node connectivity
-EToV = zeros(K, 4);
-for ii = 1:K
+E2V = zeros(Ntet, 4);
+for ii = 1:Ntet
   line   = fgetl(Fid);
   tmpcon = sscanf(line, '%lf');
-  EToV(ii,1:4) = tmpcon(4:7);
+  E2V(ii,1:4) = tmpcon(4:7);
 end
 
 fclose(Fid);
@@ -49,7 +49,7 @@ mesh = struct('Nv', Nv,...
               'VX', VX,...
               'VY', VY,...
               'VZ', VZ,...
-              'K', K,...
-              'EToV', EToV);
+              'Ntet', Ntet,...
+              'E2V', E2V);
 
 end

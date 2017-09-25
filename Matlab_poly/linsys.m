@@ -7,7 +7,7 @@ function [u, x, y, z] = linsys(mesh, f, gd, N, sigma, epsilon)
 % of polyhedra.
 [faces, faces_neig] = read_faces(mesh);
 [x, y, z] = set_vertices(mesh.E2V, mesh.VX, mesh.VY, mesh.VZ);
-bb = box(x,y,z, mesh.E2P, mesh.K);
+[bb, hk] = bbox(x,y,z, mesh.E2P, mesh.K);
 
 [Fk, Jinv, Jdet] = jacobians(x,y,z); % del determinante dovro' poi prenderne il valore assoluto
 
@@ -43,7 +43,11 @@ for e = 1:size(faces,1) % loop over faces
     
     % Calulate the area of e and the normal in the direction E1 -> E2
     [area, normal] = metric2D(mesh.VX(faces(e,:)), mesh.VY(faces(e,:)), mesh.VZ(faces(e,:)), e_E1);
-    sig = sigma/(area/2)^0.5;
+    if E2 == 0
+        sig = sigma*N^2/hk(mesh.E2P(E1));
+    else
+        sig = sigma*N^2/min(mesh.E2P([E1, E2]));
+    end
     
     % Recover the indexes relative to the element inside which E1 is.
     index1 = (mesh.E2P(E1)-1)*Np+1:mesh.E2P(E1)*Np;

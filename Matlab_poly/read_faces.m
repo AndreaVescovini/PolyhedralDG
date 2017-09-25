@@ -1,6 +1,10 @@
 function [faces, faces_neig] = read_faces(mesh)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%function [faces, faces_neig] = read_faces(mesh)
+% This function makes a list of faces of interfaces of the polyhedral mesh,
+% each faces is defined by 3 vertices. In faces_neig there are the first
+% tetrahedron sharing the face, the local number of that face for that
+% tetrahedron, the second tetrahedron sharing that face and its local
+% number of the face.
 
 % I make a preallocation by excess
 tot_faces = mesh.Ntet*4;
