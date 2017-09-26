@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Two parameters are required
+# $1 is the mesh file to be partitioned
+# $2 is the number of partition I want metis to do
+
+# extract E2V connectivity matrix needed by metis
+sed -n '/Tetrahedra/,/Triangles/p' $1 | sed '1d;$d' | sed '$d' | sed 's/ 0//' > metis_input
+
+# launch metis
+mpmetis -ncommon=3 -contig metis_input $2
+
+# create the file with the final mesh
+final_name="$(echo $1 | cut -f 1 -d '.')p.mesh"
+sed '/Triangles/,/-End/d' $1 > $final_name
+
+# add metis output
+echo "Polyhedra" >> $final_name
+echo $2 >> $final_name
+cat metis_input.epart.$2 >> $final_name
+echo "" >> $final_name
+echo End >> $final_name
+
+# delete metis output files
+rm metis_input.npart.$2
+rm metis_input.epart.$2
+rm metis_input
