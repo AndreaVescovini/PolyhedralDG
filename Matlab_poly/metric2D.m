@@ -12,4 +12,3 @@ area = norm(normal);
 normal = normal./area;
 
 end
-

@@ -8,10 +8,10 @@
 sed -n '/Tetrahedra/,/Triangles/p' $1 | sed '1d;$d' | sed '$d' | sed 's/ 0//' > metis_input
 
 # launch metis
-mpmetis -ncommon=3 -contig metis_input $2
+mpmetis -ncommon=3 -minconn -contig metis_input $2
 
 # create the file with the final mesh
-final_name="$(echo $1 | cut -f 1 -d '.')p.mesh"
+final_name="$(echo $1 | cut -f 1 -d '.')_metis.mesh"
 sed '/Triangles/,/-End/d' $1 > $final_name
 
 # add metis output

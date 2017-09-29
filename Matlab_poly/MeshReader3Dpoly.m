@@ -40,7 +40,9 @@ if strcmp(line,'Polyhedra')
     % read element to tetrahedron connectivity
     K = fscanf(Fid, '%d', 1);
     E2P = fscanf(Fid, '%d', Ntet);
-    E2P = E2P+1;
+    if min(E2P) == 0
+        E2P = E2P+1;
+    end
 else
     K = Ntet;
     E2P = 1:Ntet;
