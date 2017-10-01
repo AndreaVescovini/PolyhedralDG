@@ -1,15 +1,11 @@
-function [err_L2, err_H10, r_L2, r_H10] = hconvergence_ratio(uex, f, uex_grad, N)
-%function [err_L2, err_H10, r_L2, r_H10] = convergence_ratio(uex, f, uex_grad, N)
+function [err_L2, err_H10, r_L2, r_H10] = hconvergence_ratio(uex, f, uex_grad, N, file_names)
+%function [err_L2, err_H10, r_L2, r_H10] = convergence_ratio(uex, f, uex_grad, N, file_names)
 % Test for the convergence ratio on the unitary cubic domain
 
 % problem data
 gd = uex;
 sigma = 10; % penalty coefficient
 epsilon = -1; % SIP
-
-file_names = {'..\meshes\cube_str48p.mesh';...
-              '..\meshes\cube_str384p.mesh';...
-              '..\meshes\cube_str3072p.mesh'};
 
 n_it = 3;
 err_L2 = zeros(1,n_it);

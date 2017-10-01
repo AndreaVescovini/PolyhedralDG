@@ -1,7 +1,7 @@
 % Partition tetrahedral stuctured grid into hexahedral structured grid
 
 % read input file and elaborate the mesh
-file_input = 'cube_str3072.mesh';
+file_input = '..\meshes\cube_str48.mesh';
 mesh = MeshReader3Dpoly(file_input);
 [x, y, z] = set_vertices(mesh.E2V, mesh.VX, mesh.VY, mesh.VZ);
 [bb, ~] = bbox(x,y,z, mesh.E2P, mesh.K);
@@ -9,8 +9,8 @@ mesh.K = mesh.Ntet/6;
 lato = round((mesh.K)^(1/3));
 
 % open output file 
-[~, name_out, ~] = fileparts(file_input);
-file_output = strcat(name_out, 'p.mesh');
+[path, name_out, ~] = fileparts(file_input);
+file_output = strcat(path, '\',name_out, 'p.mesh');
 fo = fopen(file_output, 'wt');
 fi = fopen(file_input, 'rt');
 
