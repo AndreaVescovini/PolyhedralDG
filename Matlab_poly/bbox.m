@@ -7,7 +7,7 @@ bb = zeros(3,2, K);
 hk = zeros(K,1);
 
 for ie = 1:K % loop over polyhedra
-    
+
     index = find(E2P == ie); % find tetrahedra that compose ie
     vx = x(:, index);
     vy = y(:, index);
