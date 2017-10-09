@@ -1,0 +1,91 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[british]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+\title{\textbf{Convergence tests}}
+\author{Andrea Vescovini}
+\date{\today}
+
+\begin{document}
+	\maketitle
+
+\section{Short introduction}
+I solved the Poisson problem with Dirichlet boundary conditions
+\begin{align}
+	-\Delta u = f &\mbox{ in } \Omega\\
+	u = g_{D} & \mbox{ on } \partial\Omega
+\end{align}
+in a cubic domain $\Omega = [0,1]^{3} \subset \mathbb{R}^{3} $ partitioned in $M$ disjoint tetrahedral elements $\Omega_{m}$ such that. $\bigcup\limits_{m=1}^{M} \Omega_{m} $.
+The source $f$ belongs to $L^2(\Omega)$ and Dirichlet datum $ g_{D}$ belongs to $H^{\frac{1}{2}}(\partial \Omega) $.\\
+The DG-FEM variational formulation comes to be: find $u_{h} \in W_{h}$ such that
+\begin{multline}
+	\sum_{m = 1}^{M} \int_{\Omega_{m}} \nabla u_{h} \cdot \nabla v
+	+ \sum_{e\in \Gamma_{h} \cup \Gamma_{D}} \bigg( \epsilon \int_{e} \{\!\!\{ \nabla v \}\!\!\} \cdot [ u_{h} ]
+	- \int_{e} \{\!\!\{ \nabla u_{h} \}\!\!\} \cdot [v]
+	+ \frac{\sigma}{|e|^{\beta_{0}}} \int_{e} [u_h] \cdot [v] \bigg)\\
+	= \sum_{m=1}^{M} \int_{\Omega_{m}} fv
+	+ \sum_{e \in \Gamma_{D}} \bigg( \epsilon \int_{e} g_{D} \nabla v \cdot n_{e} + \frac{\sigma}{|e|^{\beta_{0}}} \int_{e} g_{D} v  \bigg),
+	\forall v \in W_{h}
+\end{multline}
+with
+\begin{itemize}
+\item $ W_{h} = \left\{ v \in L^{2}(\Omega) : v|_{\Omega_{m}} \in \mathbb{P}_{r},  \forall m = 1,\dots, M \right\} $
+\item $ \Gamma_{D} = \partial \Omega $ and $ \Gamma_{h} $ is the set of interior interfaces
+\item $ \{\!\!\{ \mathbf{v} \}\!\!\} = \frac{1}{2} (\mathbf{v}^{+}+\mathbf{v}^{-}) $, $ [v] = v^{+} \mathbf{n}^{+} + v^{-} \mathbf{n}^{-} $
+\item $ \sigma \in \mathbb{R} $ bounded below, $ \beta_{0} \geq \frac{1}{2} $
+\item $ \epsilon \in \{-1, 0, 1\} $
+\end{itemize}
+\section{Numerical experiments}
+From the error analysis we know, under suitable hypothesis of regularity, that with finite elements of degree $r$, if $ u \in H^{s}(\Omega) $ then $ \exists C > 0 $ such that:
+\begin{equation}
+h| u - u_{h} |_{H^{1}(\Omega)} + || u - u_{h} || _{L^{2}(\Omega)} \leq C h^{min(r+1, s)} |u|_{H^{r+1}(\Omega)}.
+\end{equation}
+I solved the problem over 4 structured meshes of 6, 48, 384, 3072 elements with $ \sigma = 10 $, varying the polynomial degree from $ r = 1,2$ and the method with $ \epsilon = -1$ (SIP), $\epsilon = 0$ (IIP), $\epsilon=1$ (NIP).\\
+Let $e_{h} = u - u_{h}$ be the approximation error, in the tables are reported the $L^{2}$-norm, the $H^{1}$-seminorm and the respective convergence rates.
+\begin{table}[h]
+	\centering
+\[
+\begin{array}{cccccc}
+	\toprule
+	\text{Method} & r & ||e_{h}||_{L^2} & \text{Rate} & |e_{h}|_{H^1} & \text{Rate} \\ 
+	\midrule
+	\text{SIP} & 1 & 1.6404 \times 10^{-2} & 1.910612 & 8.2033 \times 10^{-1} & 0.981426\\
+			   & 2 & 1.4879 \times 10^{-4} & 2.937935 & 1.9269 \times 10^{-2} & 2.012066\\
+	\midrule
+	\text{IIP} & 1 & 1.4077 \times 10^{-2} & 1.968225 & 8.0961 \times 10^{-1} & 0.971916\\
+		       & 2 & 1.3613 \times 10^{-4} & 2.920916 & 1.7659 \times 10^{-2} & 1.991867\\
+	\midrule
+	\text{NIP} & 1 & 1.2877 \times 10^{-2} & 1.998182 & 8.0205 \times 10^{-1} & 0.965349\\
+			   & 2 & 1.3212 \times 10^{-4} & 2.944734 & 1.6958 \times 10^{-2} & 1.990291\\
+	\bottomrule
+\end{array}
+\]
+\caption{Errors computed with $u(x,y,z) = x^{3}+10xz^{2}$.}
+\end{table}
+\begin{table}[h]
+	\centering
+	\[
+	\begin{array}{cccccc}
+	\toprule
+	\text{Method} & r & ||e_{h}||_{L^2} & \text{Rate} & |e_{h}|_{H^1} & \text{Rate} \\ 
+	\midrule
+	\text{SIP} & 1 & 5.1917 \times 10^{-3} & 1.846221 & 2.9428 \times 10^{-1} & 0.966844\\
+	& 2 & 1.0673 \times 10^{-4} & 2.885502 & 1.4571\times 10^{-2} & 1.996647\\
+	\midrule
+	\text{IIP} & 1 & 4.4395 \times 10^{-3} & 1.932269 & 2.8815 \times 10^{-1} & 0.958401\\
+	& 2 & 1.9547 \times 10^{-4} & 2.445094 & 1.2744 \times 10^{-2} & 1.957166\\
+	\midrule
+	\text{NIP} & 1 & 4.2304 \times 10^{-3} & 1.962074 & 2.8408 \times 10^{-1} & 0.952609\\
+	& 2 & 2.6351 \times 10^{-4} & 2.316781 & 1.2252 \times 10^{-2} & 1.954527\\
+	\bottomrule
+	\end{array}
+	\]
+	\caption{Errors computed with $u(x,y,z) = e^{x-y+z^{2}}$.}
+\end{table}
+
+The rates correspond to theoretical rates; for the SIP method they are always optimal, while for NIP and IIP they are suboptimal for $u(x,y,z) = e^{x-y+z^{2}}$ when $r$ is even ($r=2$).
+
+\end{document}
