@@ -6,6 +6,7 @@
 \usepackage{booktabs}
 \usepackage{pgfplots}
 \usepackage[en-US]{datetime2}
+\usepackage[hidelinks]{hyperref}
 \pgfplotsset{/pgf/number format/use comma,compat=newest}
 
 \title{\textbf{Discontinuous Galerkin FE approximation of elliptic problems on polyhedral grids}}
@@ -18,24 +19,119 @@
 \maketitle
 \newpage
 \begin{abstract}
-	ciaoo
+	The main goal of this project is to implement a Discontinuous Galerkin (DG) method for solving a three-dimensional Poisson problem with Dirichlet boundary conditions, employing a general polyhedral mesh.\\
+	DG methods have shown to be very flexible and have been successfully applied to hyperbolic, elliptic and parabolic problem arising from many different fields of application.
+	Moreover one of the main advantages with respect to the continuous framework is the possibility of handling meshes with hanging nodes and made of general-shaped elements without too many difficulties.\\
+	In section~\ref{sec:DG} we recover the main results about standard DG methods, then in section~\ref{sec:poly} we develop the theory in order to handle polyhedral grids. Subsequently in section~\ref{sec:imp} we explain our main choices for the algorithm implementation and in section~\ref{sec:res} we present the numerical results we obtained in some prototypal cases.
 \end{abstract}
+\phantomsection
 \tableofcontents
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%\section*{Introduction}
+%Introduzione sì o introduzione no?
 
-\section*{Introduction}
+\section{DG finite elments methods}\label{sec:DG}
+In this section we follow mainly chapter 2 of \cite{riviere} and chapter 11 of \cite{quart}.
+\subsection{Model problem}
+Let's consider a Poisson problem with Dirichlet boundary conditions
+\begin{align} \label{eq:poisson}
+	-\Delta u = f & \mbox{ in } \Omega\\
+			u = g & \mbox{ on } \partial \Omega
+\end{align}
+where $\Omega \subset \mathbf{R}^3$ is a bounded polyhedral domain with a Lipschitz boundary $\partial \Omega$, the source $f$ belongs to $L^2(\Omega)$ and Dirichlet datum $g$ belongs to $H^{1/2}(\partial \Omega)$.
+The usual weak formulation is:\\
+Find $u \in H^1(\Omega)$ such that $u = \tilde{u} + R_g$, with $\tilde{u} \in H^1_0(\Omega)$ such that:
+\begin{equation} \label{eq:wform}
+	\int_\Omega \nabla u \cdot \nabla v
+	= \int_\Omega fv - \int_\Omega \nabla R_g \cdot \nabla v, \;\; \forall v \in H^1_0,
+\end{equation}
+and $R_g \in H^1(\Omega)$ is a lifting of $g$, i.e. $R_g|_{\partial \Omega} = g$.\\
+DG methods make use of a variational formulation different from the usual one so we have to introduce new spaces in which we will look for the solution.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Broken Sobolev spaces}
+Let $\mathcal{T}$ be a subdivision of $\Omega$ into disjoint elements $\kappa$ such that $ \bar{\Omega} = \bigcup\limits_{\kappa \in \mathcal{T}} \bar{\kappa}$, let $h_\kappa$ be the diameter of the element $\kappa$ i.e. $h_\kappa = \min\limits_{x, y \in \kappa} |x-y|$ and let $\rho_\kappa$ be the maximum diameter of a ball inscribed in $\kappa$. For the moment we assume $\mathcal{T}$ to be regular, i.e. that $\exists C > 0$ such that:
+\begin{equation*}
+	\frac{h_\kappa}{\rho_\kappa} < C, \; \; \forall \kappa \in \mathcal{T}.
+\end{equation*}
+We define for every real number $s$ the broken Sobolev space:
+\begin{equation*}
+	H^s(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in H^s(\kappa), \forall \kappa \in \mathcal{T} \},
+\end{equation*}
+with the norm:
+\begin{equation*}
+	|||v|||_{H^s(\mathcal{T})} = \bigg( \sum_{\kappa \in \mathcal{T}} ||v||_{H^s(\kappa)}^2 \bigg)^{1/2}.
+\end{equation*}
+We denote by $\Gamma_h$ the set of interior faces and by $\Gamma_D$ the set of faces that are on the boundary $\partial \Omega$. For every face $e \in \Gamma_h$ there are two elements $\kappa^+$ and $\kappa^-$ that share it and they both have their outward normal $\mathbf{n}^+$ and $\mathbf{n}^-$.\\
+Since every function $v$ of $H^s(\mathcal{T})$ is well defined along any side of every $\kappa$, if $e \in \Gamma_h$ there are two different traces of $v$ along $e$ and we denote them by $v^+$ and $v^-$; it will be useful to introduce jumps and average of these traces so we can define:
+\begin{align*}
+	\{v\} = \frac{1}{2} (v^+ + v^-) ,
+	& \;\; [v] = v^+ \mathbf{n}^+ + v^- {n}^-,\\
+	\{\!\!\{ \mathbf{v} \}\!\!\} = \frac{1}{2} (\mathbf{v}^+ +\mathbf{v}^-),
+	& \;\; [\![ \mathbf{v} ]\!] = \mathbf{v}^+ \cdot \mathbf{n}^+ + \mathbf{v}^- \cdot \mathbf{n}^-,
+\end{align*}
+that can be extended to $e \in \Gamma_D$ through:
+\begin{equation*}
+	\{v\} = v, \;\; [v] = v \mathbf{n}^,
+	\;\; \{\!\!\{ \mathbf{v} \}\!\!\} = \mathbf{v}, \;\; [\![ \mathbf{v} ]\!] = \mathbf{v} \cdot \mathbf{n}.
+\end{equation*}
+Notice that the above definitions are independent of which element is called "$^+$" and which "$^-$".
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variational formulation}
+In what follows we assume that the weak solution $u$ of the Poisson problem~ \eqref{eq:wform} belongs to $H^s(\mathcal{T})$ with $s > 3/2$, so that the following calculations will be meaningful.\\
+Integrating \eqref{eq:poisson} by parts we can obtain:
+\begin{equation} \label{eq:green}
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa -\Delta u \; v
+	= \sum_{\kappa \in \mathcal{T}} \bigg( \int_\kappa \nabla u \cdot \nabla v
+	- \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} \bigg), \;\; \forall v \in H^s(\mathcal{T}).
+\end{equation}
+With some manipulations, we can see that:
+\begin{equation} \label{eq:jumps}
+\begin{split}
+	\sum_{\kappa \in \mathcal{T}} \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} &= \sum_{e \in \Gamma_h \cup \Gamma_D} \int_e (v^+ \nabla u^+ \cdot \mathbf{n}^+ + v^- \nabla u^- \cdot \mathbf{n}^- )\\
+	&= \sum_{e \in \Gamma_h \cup \Gamma_D} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ), \;\; \forall v \in H^s(\mathcal{T}).
+\end{split}
+\end{equation}
+Then inserting~\eqref{eq:jumps} into~\eqref{eq:green} we can obtain that the solution of the Poisson problem~\eqref{eq:pois} is $u \in H^s(\mathcal{T})$ such that:
+\begin{equation} \label{eq:firstform}
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v -
+	\sum_{e \in \Gamma_h \cup \Gamma_D} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ) =
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa fv, \; \forall v \in H^s(\mathcal{T}).
+\end{equation}
+At this point we have to remember that if the exact solution $u \in H^s(\mathcal{T})$, then $[\![\nabla u]\!] = 0$ and $[u] = 0$ on every internal face $e \in \Gamma_h$, so in~\eqref{eq:firstform} the term~$[\![ \nabla u ]\!] \{v\}$ is null and we can add on the left hand side two tunable term that will give to the formulation more stability:
+\begin{equation*}
+	\epsilon \sum_{e \in \Gamma_h} \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\},
+\end{equation*}
+\begin{equation*}
+	\sum_{e \in \Gamma_h} \frac{\sigma_e}{|e|^\beta} \int_e [u][v],
+\end{equation*}
+where $\epsilon = \{-1, 0, 1\}$ is a parameter that will affect the symmetry of the formulation, $|e|$ is the 2D-measure of the face $e$, $\sigma_e$ and $\beta$ are two parameters that will be specified later and will be important for the well posedness of the problem.\\
+Finally we impose the Dirichlet boundary condition in a weak way, as it is more natural for a DG method, so we add on the left:
+\begin{equation*}
+	\epsilon \sum_{e \in \Gamma_D} \int_e (u-g) \nabla v \cdot \mathbf{n}
+	+ \sum_{e \in \Gamma_D} \frac{\sigma_e}{|e|^\beta} \int_e (u-g)v.
+\end{equation*}
+We have obtained the general DG variational formulation:\\
+Find $u \in H^s(\mathcal{T}), s>3/2$, such that:
+\begin{multline} \label{eq:dgvarform}
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v
+	-\sum_{e \in \Gamma_h \cup \Gamma_D} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
+	-\epsilon \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\}
+	+ \frac{\sigma_e}{|e|^\beta} \int_e [u][v] \bigg)\\
+	= \sum_{\kappa \in \mathcal{T}} \int_\kappa fv
+	+ \sum_{e \in \Gamma_D} \bigg( \epsilon \int_e g \nabla v \cdot \mathbf{n}
+	+ \frac{\sigma_e}{|e|^\beta} \int_e gv \bigg), \;\; \forall v \in H^s(\mathcal{T}).
+\end{multline}
 
-\section{DG finite elments}
+\section{Polyhedral grids}\label{sec:poly}
 
-\section{Polyhedral grids}
-
-\section{Implementation}
+\section{Implementation}\label{sec:imp}
 	
-\section{Numerical results}
+\section{Numerical results}\label{sec:res}
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -59,7 +155,7 @@
 	Giani S., Houston P.: Domain decomposition preconditioners for discontinuous Galerkin discretizations of compressible fluid flows. \emph{Numerical Mathematics: Theory, Methods and
 	Applications}, 7(2), 123-128 (2014).
 	
-	\bibitem{Quart}
+	\bibitem{quart}
 	Quarteroni A.: \emph{Numerical Models for Differetial Problems}. MS\&A, Springer-Verlag Italia, Milan (2014).
 	
 	\bibitem{riviere}
