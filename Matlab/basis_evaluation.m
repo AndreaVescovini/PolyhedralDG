@@ -45,26 +45,26 @@ nq3 = size(nod3, 2);
 nq2 = size(nod2, 2);
 
 %three derivatives, nq3 quadrature points and Np functions
-dphi = zeros(3,nq3,Np);
-phi = zeros(nq3,Np);
+dphi = zeros(3,Np,nq3);
+phi = zeros(Np,nq3);
     
 %evaluation on 3 derivatives, nq2 quadrature boundary points, 4 faces, Np functions.
-grad_bordo = zeros(3,nq2,4,Np);
-phi_bordo = zeros(nq2,4,Np);
+grad_bordo = zeros(3,Np,nq2,4);
+phi_bordo = zeros(Np,nq2,4);
 
 for f = 1:Np
-    phi(:,f) = phi_func{f}(nod3)';
+    phi(f,:) = phi_func{f}(nod3)';
     for q = 1:nq3
-        dphi(:,q,f) = grad_phi_func{f}(nod3(:,q));
+        dphi(:,f,q) = grad_phi_func{f}(nod3(:,q));
     end
     
     
     %dphi(:,:,f) = repmat(grad_phi_func(:,f), [1 nq3]);
     for e = 1:4
         for q = 1:nq2
-            grad_bordo(:,q,e,f) = grad_phi_func{f}(node_maps(:,:,e)*nod2(:,q));
+            grad_bordo(:,f,q,e) = grad_phi_func{f}(node_maps(:,:,e)*nod2(:,q));
         end
-        phi_bordo(:,e,f) = phi_func{f}(node_maps(:,:,e)*nod2);
+        phi_bordo(f,:,e) = phi_func{f}(node_maps(:,:,e)*nod2);
     end
 end
 

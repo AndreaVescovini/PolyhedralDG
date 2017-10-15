@@ -18,10 +18,10 @@ for ie = 1:size(x,2)
     
     for q = 1:length(wei3)
         % evaluation of the dg-fem solution and its gradient at the quadrature node
-        u_h = phi(q,:)*u(:,ie);
-        grad_uh = 0;
-        for i = 1:Np
-            grad_uh = grad_uh + dphi(:,q,i)*u(i,ie);
+        u_h = phi(:,q)'*u(:,ie);
+        grad_uh = zeros(3,1);
+        for ii = 1:3
+            grad_uh(ii) = dphi(ii,:,q)*u(:,ie);
         end
         
         point_diff = uex_grad(trasl(:,ie)+J(:,:,ie)*nod3(:,q)) - Jcof(:,:,ie)*grad_uh./Jdet(ie);

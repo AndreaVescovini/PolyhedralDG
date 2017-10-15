@@ -30,12 +30,12 @@ uex_grad = @(p) [uex(p).*p(2,:).*p(3,:); uex(p).*p(1,:).*p(3,:); uex(p).*p(1,:).
 
 % problem data
 gd = uex;
-N = 1; % degree of finite finite elements
+N = 2; % degree of finite finite elements
 sigma = 10; % penalty coefficient
 epsilon = -1; % method
 
 % generate the mesh and connectivity matrices
-mesh = MeshReader3Dpoly('..\meshes\cube_str384h.mesh');
+mesh = MeshReader3Dpoly('..\meshes\cube_str384ht.mesh');
 
 % elaborate geometric information
 geom = geometric_elaboration(mesh);

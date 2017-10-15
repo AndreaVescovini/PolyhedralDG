@@ -84,7 +84,7 @@ end
 % sum up the contributions
 % A = A + S + epsilon.*I - transpose(I);
 % b = b + bs + epsilon.*bi;
-
+spy(A)
 % solve the linear system
 u = A\b;
 u = reshape(u, [Np, geom.K]);
