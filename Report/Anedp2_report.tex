@@ -3,11 +3,21 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{pgfplots}
 \usepackage[en-US]{datetime2}
 \usepackage[hidelinks]{hyperref}
 \pgfplotsset{/pgf/number format/use comma,compat=newest}
+
+\theoremstyle{definition}
+\newtheorem{ipotesi}{Assumption}
+
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{plain}
+\newtheorem{teor}{Theorem}
 
 \title{\textbf{Discontinuous Galerkin FE approximation of elliptic problems on polyhedral grids}}
 \author{Andrea Vescovini\\[1cm]{\small Supervisor: Prof. P. Antonietti}}
@@ -41,18 +51,18 @@ Let's consider a Poisson problem with Dirichlet boundary conditions
 	-\Delta u = f & \mbox{ in } \Omega\\
 			u = g & \mbox{ on } \partial \Omega
 \end{align}
-where $\Omega \subset \mathbf{R}^3$ is a bounded polyhedral domain with a Lipschitz boundary $\partial \Omega$, the source $f$ belongs to $L^2(\Omega)$ and Dirichlet datum $g$ belongs to $H^{1/2}(\partial \Omega)$.
+where $\Omega \subset \mathbb{R}^3$ is a bounded polyhedral domain with a Lipschitz boundary $\partial \Omega$, the source $f$ belongs to $L^2(\Omega)$ and Dirichlet datum $g$ belongs to $H^{1/2}(\partial \Omega)$.
 The usual weak formulation is:\\
 Find $u \in H^1(\Omega)$ such that $u = \tilde{u} + R_g$, with $\tilde{u} \in H^1_0(\Omega)$ such that:
 \begin{equation} \label{eq:wform}
 	\int_\Omega \nabla u \cdot \nabla v
-	= \int_\Omega fv - \int_\Omega \nabla R_g \cdot \nabla v, \;\; \forall v \in H^1_0,
+	= \int_\Omega fv - \int_\Omega \nabla R_g \cdot \nabla v, \quad \forall v \in H^1_0,
 \end{equation}
 and $R_g \in H^1(\Omega)$ is a lifting of $g$, i.e. $R_g|_{\partial \Omega} = g$.\\
 DG methods make use of a variational formulation different from the usual one so we have to introduce new spaces in which we will look for the solution.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Broken Sobolev spaces}
-Let $\mathcal{T}$ be a subdivision of $\Omega$ into disjoint elements $\kappa$ such that $ \bar{\Omega} = \bigcup\limits_{\kappa \in \mathcal{T}} \bar{\kappa}$, let $h_\kappa$ be the diameter of the element $\kappa$ i.e. $h_\kappa = \min\limits_{x, y \in \kappa} |x-y|$ and let $\rho_\kappa$ be the maximum diameter of a ball inscribed in $\kappa$. For the moment we assume $\mathcal{T}$ to be regular, i.e. that $\exists C > 0$ such that:
+Let $\mathcal{T}$ be a subdivision of $\Omega$ into disjoint open tetrahedral elements $\kappa$ such that $\bar{\Omega} = \bigcup\limits_{\kappa \in \mathcal{T}} \bar{\kappa}$, let $h_\kappa$ be the diameter of the element $\kappa$ i.e. $h_\kappa = \min\limits_{x, y \in \kappa} |x-y|$ and let $\rho_\kappa$ be the maximum diameter of a ball inscribed in $\kappa$. For the moment we assume $\mathcal{T}$ to be regular, i.e. that $\exists C > 0$ such that:
 \begin{equation*}
 	\frac{h_\kappa}{\rho_\kappa} < C, \; \; \forall \kappa \in \mathcal{T}.
 \end{equation*}
@@ -62,20 +72,24 @@ We define for every real number $s$ the broken Sobolev space:
 \end{equation*}
 with the norm:
 \begin{equation*}
-	|||v|||_{H^s(\mathcal{T})} = \bigg( \sum_{\kappa \in \mathcal{T}} ||v||_{H^s(\kappa)}^2 \bigg)^{1/2}.
+	|\!|\!|v|\!|\!|_{H^s(\mathcal{T})} = \bigg( \sum_{\kappa \in \mathcal{T}} |\!|v|\!|_{H^s(\kappa)}^2 \bigg)^{1/2}.
 \end{equation*}
-We denote by $\Gamma_h$ the set of interior faces and by $\Gamma_D$ the set of faces that are on the boundary $\partial \Omega$. For every face $e \in \Gamma_h$ there are two elements $\kappa^+$ and $\kappa^-$ that share it and they both have their outward normal $\mathbf{n}^+$ and $\mathbf{n}^-$.\\
+By extension $L^2(\mathcal{T})$ can be seen as $H^0(\mathcal{T})$. Moreover it holds that:
+\begin{equation*}
+	H^s(\Omega) \subset H^s(\mathcal{T}) \quad \text{ and } \quad H^{s+1}(\mathcal{T}) \subset H^s(\mathcal{T})
+\end{equation*}
+We denote by $\Gamma_h$ the set of interior faces and by $\Gamma_D$ the set of faces that are on the boundary $\partial \Omega$, we define $\Gamma = \Gamma_h \cup \Gamma_D$. For every face $e \in \Gamma_h$ there are two elements $\kappa^+$ and $\kappa^-$ that share it and they both have their outward normal $\mathbf{n}^+$ and $\mathbf{n}^-$.\\
 Since every function $v$ of $H^s(\mathcal{T})$ is well defined along any side of every $\kappa$, if $e \in \Gamma_h$ there are two different traces of $v$ along $e$ and we denote them by $v^+$ and $v^-$; it will be useful to introduce jumps and average of these traces so we can define:
 \begin{align*}
 	\{v\} = \frac{1}{2} (v^+ + v^-) ,
-	& \;\; [v] = v^+ \mathbf{n}^+ + v^- {n}^-,\\
+	& \quad [v] = v^+ \mathbf{n}^+ + v^- {n}^-,\\
 	\{\!\!\{ \mathbf{v} \}\!\!\} = \frac{1}{2} (\mathbf{v}^+ +\mathbf{v}^-),
-	& \;\; [\![ \mathbf{v} ]\!] = \mathbf{v}^+ \cdot \mathbf{n}^+ + \mathbf{v}^- \cdot \mathbf{n}^-,
+	& \quad [\![ \mathbf{v} ]\!] = \mathbf{v}^+ \cdot \mathbf{n}^+ + \mathbf{v}^- \cdot \mathbf{n}^-,
 \end{align*}
 that can be extended to $e \in \Gamma_D$ through:
 \begin{equation*}
-	\{v\} = v, \;\; [v] = v \mathbf{n}^,
-	\;\; \{\!\!\{ \mathbf{v} \}\!\!\} = \mathbf{v}, \;\; [\![ \mathbf{v} ]\!] = \mathbf{v} \cdot \mathbf{n}.
+	\{v\} = v, \quad [v] = v \mathbf{n}^,
+	\quad \{\!\!\{ \mathbf{v} \}\!\!\} = \mathbf{v}, \quad [\![ \mathbf{v} ]\!] = \mathbf{v} \cdot \mathbf{n}.
 \end{equation*}
 Notice that the above definitions are independent of which element is called "$^+$" and which "$^-$".
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,19 +99,19 @@ Integrating \eqref{eq:poisson} by parts we can obtain:
 \begin{equation} \label{eq:green}
 	\sum_{\kappa \in \mathcal{T}} \int_\kappa -\Delta u \; v
 	= \sum_{\kappa \in \mathcal{T}} \bigg( \int_\kappa \nabla u \cdot \nabla v
-	- \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} \bigg), \;\; \forall v \in H^s(\mathcal{T}).
+	- \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} \bigg), \quad \forall v \in H^s(\mathcal{T}).
 \end{equation}
 With some manipulations, we can see that:
 \begin{equation} \label{eq:jumps}
 \begin{split}
-	\sum_{\kappa \in \mathcal{T}} \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} &= \sum_{e \in \Gamma_h \cup \Gamma_D} \int_e (v^+ \nabla u^+ \cdot \mathbf{n}^+ + v^- \nabla u^- \cdot \mathbf{n}^- )\\
-	&= \sum_{e \in \Gamma_h \cup \Gamma_D} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ), \;\; \forall v \in H^s(\mathcal{T}).
+	\sum_{\kappa \in \mathcal{T}} \int_{\partial \kappa} v \nabla u \cdot \mathbf{n} &= \sum_{e \in \Gamma} \int_e (v^+ \nabla u^+ \cdot \mathbf{n}^+ + v^- \nabla u^- \cdot \mathbf{n}^- )\\
+	&= \sum_{e \in \Gamma} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ), \quad \forall v \in H^s(\mathcal{T}).
 \end{split}
 \end{equation}
-Then inserting~\eqref{eq:jumps} into~\eqref{eq:green} we can obtain that the solution of the Poisson problem~\eqref{eq:pois} is $u \in H^s(\mathcal{T})$ such that:
+Then inserting~\eqref{eq:jumps} into~\eqref{eq:green} we can obtain that the solution of the Poisson problem~\eqref{eq:poisson} is $u \in H^s(\mathcal{T})$ such that:
 \begin{equation} \label{eq:firstform}
 	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v -
-	\sum_{e \in \Gamma_h \cup \Gamma_D} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ) =
+	\sum_{e \in \Gamma} \int_e ([v] \cdot \{\!\!\{ \nabla u \}\!\!\} + [\![ \nabla u ]\!] \{v\} ) =
 	\sum_{\kappa \in \mathcal{T}} \int_\kappa fv, \; \forall v \in H^s(\mathcal{T}).
 \end{equation}
 At this point we have to remember that if the exact solution $u \in H^s(\mathcal{T})$, then $[\![\nabla u]\!] = 0$ and $[u] = 0$ on every internal face $e \in \Gamma_h$, so in~\eqref{eq:firstform} the term~$[\![ \nabla u ]\!] \{v\}$ is null and we can add on the left hand side two tunable term that will give to the formulation more stability:
@@ -105,28 +119,290 @@ At this point we have to remember that if the exact solution $u \in H^s(\mathcal
 	\epsilon \sum_{e \in \Gamma_h} \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\},
 \end{equation*}
 \begin{equation*}
-	\sum_{e \in \Gamma_h} \frac{\sigma_e}{|e|^\beta} \int_e [u][v],
+	\sum_{e \in \Gamma_h} \gamma_e \int_e [u][v], \quad \gamma_e = \frac{\sigma_e}{|e|^\beta}
 \end{equation*}
-where $\epsilon = \{-1, 0, 1\}$ is a parameter that will affect the symmetry of the formulation, $|e|$ is the 2D-measure of the face $e$, $\sigma_e$ and $\beta$ are two parameters that will be specified later and will be important for the well posedness of the problem.\\
+where $\epsilon = \{-1, 0, 1\}$ is a parameter that will affect the symmetry of the formulation, $|e|$ is the $2$-dimensional measure of the face $e$, $\sigma_e$ and $\beta$ are two parameters that will be specified later and will be important for the well~posedness of the problem.\\
 Finally we impose the Dirichlet boundary condition in a weak way, as it is more natural for a DG method, so we add on the left:
 \begin{equation*}
 	\epsilon \sum_{e \in \Gamma_D} \int_e (u-g) \nabla v \cdot \mathbf{n}
-	+ \sum_{e \in \Gamma_D} \frac{\sigma_e}{|e|^\beta} \int_e (u-g)v.
+	+ \sum_{e \in \Gamma_D} \gamma_e \int_e (u-g)v.
 \end{equation*}
 We have obtained the general DG variational formulation:\\
 Find $u \in H^s(\mathcal{T}), s>3/2$, such that:
-\begin{multline} \label{eq:dgvarform}
-	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v
-	-\sum_{e \in \Gamma_h \cup \Gamma_D} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
+\begin{multline*}
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v 
+	-\sum_{e \in \Gamma} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
 	-\epsilon \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\}
-	+ \frac{\sigma_e}{|e|^\beta} \int_e [u][v] \bigg)\\
+	- \gamma_e \int_e [u][v] \bigg)\\
 	= \sum_{\kappa \in \mathcal{T}} \int_\kappa fv
 	+ \sum_{e \in \Gamma_D} \bigg( \epsilon \int_e g \nabla v \cdot \mathbf{n}
-	+ \frac{\sigma_e}{|e|^\beta} \int_e gv \bigg), \;\; \forall v \in H^s(\mathcal{T}).
+	+ \gamma_e \int_e gv \bigg), \quad \forall v \in H^s(\mathcal{T}).
+\end{multline*}
+Viceversa it can be proved (\cite{riviere}) that if the solution $u$ of \eqref{eq:dgvarform} belongs to $H^1(\Omega) \cap H^s(\mathcal{T})$, then $u$ is the solution of the Poisson problem \eqref{eq:poisson}.\\
+We can introduce the bilinear form $a_\epsilon:~H^s(\mathcal{T})~\times~H^s(\mathcal{T})~\rightarrow~\mathbb{R}$:
+\begin{equation*}
+a_\epsilon(u, v) = \sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v
+-\sum_{e \in \Gamma} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
+-\epsilon \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\}
+- \gamma_e \int_e [u][v] \bigg)
+\end{equation*}
+and the functional $F_\epsilon:~H^s(\mathcal{T})~\rightarrow~\mathbb{R}$:
+\begin{equation*}
+	F_\epsilon(v) = \sum_{\kappa \in \mathcal{T}} \int_\kappa fv
+	+ \sum_{e \in \Gamma_D} \bigg( \epsilon \int_e g \nabla v \cdot \mathbf{n}
+	+ \gamma_e \int_e gv \bigg),
+\end{equation*}
+so that we can rewrite the variational formulation in a compact fashion:\\
+Find $u \in H^s(\mathcal{T}), s>3/2$, such that:
+\begin{equation} \label{eq:dgvarform}
+	a_\epsilon(u, v) = F_\epsilon(v), \quad \forall v \in H^s(\mathcal{T}).
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete formulation}
+We introduce now the finite dimensional subspace of $H^s(\mathcal{T})$, for $s>3/2$:
+\begin{equation} \label{eq:dgspace}
+	\mathcal{D}_r(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in \mathbb{P}_r(\kappa), \; \forall \kappa \in \mathcal{T}  \},
+\end{equation}
+where $\mathbb{P}_r(\kappa)$ denotes the space of polynomials of total degree less then or equal to $r$ over the element $\kappa$.\\
+We endow it with the so called \textit{energy norm}:
+\begin{equation*}
+	|\!|v_h|\!|_{DG} = \bigg( |\!|\nabla v_h|\!|^2_{L^2(\mathcal{T})} + \sum_{e \in \Gamma} \gamma_e \int_e [v_h]^2 \bigg)^{1/2}.
+\end{equation*}
+It's easy to see that it is a norm if $\gamma_e > 0 \quad \forall e \in \Gamma$.\\
+So the general DG finite element formulation is:\\
+Find $u_h \in \mathcal{D}_r(\mathcal{T})$ such that:
+\begin{equation} \label{eq:dgfemform}
+	a_\epsilon(u_h, v_h) = F_\epsilon(v_h), \quad \forall v_h \in \mathcal{D}_r(\mathcal{T}).
+\end{equation}
+This kind of formulation is called \textit{Interior Penalty} (IP) and as briefly mentioned before the parameter $\epsilon$ can influence the symmetry:
+\begin{itemize}
+\item
+If $\epsilon = -1$ the method is called \textit{Symmetric Interior Penalty Galerkin} (SIPG), indeed in the bilinear becomes symmetrical because the two terms involving jumps and averages appear with the same sign.
+\item
+If  $\epsilon = +1$ the method is instead called \textit{Non-symmetric Interior Penalty Galerkin} (NIPG), for an opposite reason.
+\item
+If $\epsilon = 0$ the method is called \textit{Incomplete Interior Penalty Galerkin} (IIPG).
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Well posedness}
+In order to prove the well posedness of \eqref{eq:dgfemform} we have to show coercivity and continuity of the bilinear form and continuity of the functional with respect to $\mathcal{D}_r(\mathcal{T})$ with the norm $||\cdot||_{DG}$, then apply the Lax-Milgram lemma.\\
+We will use the following inverse trace inequality for polynomials (\cite{riviere}, p. 23):
+\begin{equation} \label{eq:trineq}
+	|\!|v|\!|_{L^2(e)} \leq \frac{\bar{C}}{\sqrt{h_\kappa}} |\!|v|\!|_{L^2(\kappa)}, \quad \forall e \subset \partial \kappa, \; \forall v \in \mathbb{P}_r(\kappa)
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Coercivity}
+We have to show that $\exists \alpha > 0 $ such that:
+\begin{equation*}
+a_\epsilon(u_h, u_h) = |\!|u_h|\!|^2_{DG} + (\epsilon - 1) \sum_{e \in \Gamma} \int_e [u_h] \cdot \{\!\!\{ \nabla u_h \}\!\!\} \geq \alpha |\!|u_h|\!|^2_{DG}.
+\end{equation*}
+If $\epsilon = 1$ we get immediately the coercivity with a coercivity constant $\alpha = 1$.
+If $\epsilon = \{0,-1\}$ more care is needed: using Cauchy-Schwarz's inequality and Young's inequality we obtain $\forall \delta > 0$:
+\begin{equation} \label{pas:young}
+\bigg| \sum_{e \in \Gamma} \int_e [u_h] \cdot \{\!\!\{ \nabla u_h \}\!\!\} \bigg| \leq
+\frac{\delta}{2} \sum_{e \in \Gamma} \bigg( \frac{1}{\gamma_e} \bigg)  \big|\!\big| \{\!\!\{ \nabla u_h \}\!\!\} \big|\!\big|^2_{L^2(e)}
++ \frac{1}{2\delta} \bigg|\!\bigg| \sqrt{\gamma_e} [u_h] \bigg|\!\bigg|^2_{L^2(\Gamma)}
+\end{equation}
+Then we observe that:
+\begin{equation*}
+\big|\!\big| \{\!\!\{ \nabla u_h \}\!\!\} \big|\!\big|^2_{L^2(e)} \leq
+\begin{cases}
+\big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(e)}, & \text{if } e \in \Gamma_D\\
+\frac{1}{4} \big( \big|\!\big| \nabla u_h|_{\kappa^+} \big|\!\big|^2_{L^2(e)} + \big|\!\big| \nabla u_h|_{\kappa^-} \big|\!\big|^2_{L^2(e)} \big), & \text{if } e \in \Gamma_h
+\end{cases}
+\end{equation*}
+and use the inverse trace inequality \eqref{eq:trineq}:
+\begin{equation*}
+\big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(e)} \leq \frac{\bar{C}^2}{h_\kappa} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\kappa)}.
+\end{equation*}
+Now we exploit the fact that trivially $|e| < h_\kappa^{d-1}, \; \forall e \subset \partial \kappa$, where $d$ is the dimension in which we are working, i.e. $3$:
+\begin{multline} \label{pas:invineq}
+\sum_{e \in \Gamma} \bigg( \frac{|e|^\beta}{\sigma_e} \bigg)  \big|\!\big| \{\!\!\{ \nabla u_h \}\!\!\} \big|\!\big|^2_{L^2(e)}
+\leq \sum_{e \in \Gamma_h} \frac{\bar{C}^2}{4\sigma_e} \bigg( h_{\kappa^+}^{2\beta - 1} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\kappa^+)} + h_{\kappa^-}^{2\beta - 1} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\kappa^-)} \bigg)\\
++ \sum_{e \in \Gamma_D} \frac{\bar{C}^2}{\sigma_e} h_\kappa^{2\beta - 1} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\kappa)}
+\leq \sum_{\kappa \in \mathcal{T}} \sum_{e \in \partial \kappa} \frac{\bar{C}^2}{\sigma_e} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\kappa)}
+\leq \frac{n^*\bar{C}^2}{\sigma^*} \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\mathcal{T})}.
 \end{multline}
-
+After having assumed that that $2\beta - 1 \geq 0$, supposed without loss of generality that $h = \min\limits_{\kappa \in \mathcal{T}} h_\kappa < 1$, defined $\sigma^* = \min\limits_{e \in \Gamma} \sigma_e$ and $n^*$ the number of faces for every element.\\
+Putting together \eqref{pas:young} and \eqref{pas:invineq} obtaining:
+\begin{equation*}
+\begin{split}
+a_\epsilon(u_h, u_h) &\geq \big(1 - \frac{n^*\delta\bar{C}^2}{2\sigma^*} (1-\epsilon)\big) \big|\!\big| \nabla u_h \big|\!\big|^2_{L^2(\mathcal{T})}
++ \big(1 - \frac{1}{2\delta} \big) \bigg|\!\bigg| \sqrt{\gamma_e} [u_h] \bigg|\!\bigg|^2_{L^2(\Gamma)}\\
+&\geq \min\bigg\{1 - \frac{n^*\delta\bar{C}^2}{2\sigma^*} (1-\epsilon) , 1 - \frac{1-\epsilon}{2\delta}\bigg\} |\!|u_h|\!|^2_{DG}
+\end{split}
+\end{equation*}
+Choosing for example $\delta = 1$ for $\epsilon = 0$ and  $\delta = 1/2$ for $\epsilon = -1 $ we need then $\sigma^* > \frac{n^*\bar{C}^2}{2}$ in order to get the coercivity constant $\alpha > 0$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Continuity}
+We have to show that $\exists M_1 > 0$ such that:
+\begin{equation*}
+	a_\epsilon(u_h, v_h) \leq M_1 |\!|u_h|\!|_{DG} |\!|v_h|\!|_{DG}, \quad \forall u_h, v_h \in \mathcal{D}_r(\mathcal{T})
+\end{equation*}
+and that $\exists M_2 > 0$ such that:
+\begin{equation*}
+	F_\epsilon(v_h) \leq M_2 |\!|v_h|\!|_{DG}, \quad \forall v_h \in \mathcal{D}_r(\mathcal{T})
+\end{equation*}
+The proof follows easily from standard arguments; indeed exploiting triangular inequality and Cauchy-Schwarz's inequality we can obtain very straight forward the required bounds for the first and last term of $a_\epsilon(u, v)$. For the second and third term we just have to use smartly Cauchy-Schwarz and then apply the trace inequality \eqref{eq:trineq} like for the coercivity.\\
+We can proceed analogously for $F_\epsilon(v)$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Existence and uniqueness}
+Finally we have that always for NIPG and if $\beta \geq 1/2$ and $\sigma^*$ is greater enough for SIPG and IIPG, then Lax-Milgram lemma holds so the solution $u_h$ of \eqref{eq:dgfemform} exists and is unique, moreover:\\
+\begin{equation*}
+	|\!|u_h|\!|_{DG} \leq \frac{M_2}{\alpha},
+\end{equation*}
+where $M_2$ is the continuity constant of $F_\epsilon(v_h)$ and $\alpha$ is the coercivity constant of $a_\epsilon(u_h,v_h)$ and thy depend on $f$, $g$ and $\bar{C}$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Mass conservation}
+An interesting property of DG methods useful for transport problems is the local conservation of mass, indeed if we choose a test function that is $1$ only on one interior element $\kappa^+$ and $0$ elsewhere we get:
+\begin{equation*}
+	- \int_{\partial \kappa^+} \{\!\!\{ \nabla u_h \}\!\!\} \cdot \mathbf{n} + \sum_{e \in \partial \kappa^+} \gamma_e \int_e u_h|_{\kappa^+} - u_h|_{\kappa^-} = \int_{\kappa^+} f
+\end{equation*}
+that can be interpreted as a balance equation in which the first term is the outgoing flux and the second term in a mathematical mass that is zero if the penalty parameter $\sigma_e$ is zero.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Error analysis}
+We quote from \cite{riviere} error bounds both in the $DG$-norm and in the $L^2$-norm.
+\begin{teor} \label{teo:errdg}
+	Assume that the exact solution to the problem~\eqref{eq:wform} belongs to $H^k(\mathcal{T}), \; k>3/2$. Assume also $\beta = 1/2$ and that the penalty parameter $\sigma_e$ is large enough for the SIPG and IIPG methods. Then $\exists C>0$ independent of~$h$ such that:
+	\begin{equation*}
+		|\!| u -u_h |\!|_{DG} \leq h^{s-1} |\!|\!|u|\!|\!|_{H^k(\mathcal{T})}.
+	\end{equation*}
+	where $s = \min \{r+1, k\}$.
+\end{teor}
+\begin{teor}
+	Assume that theorem~\ref{teo:errdg} holds. Then for the SIPG method $\exists C>0$ independent of $h$, such that:
+	\begin{equation*}
+		|\!| u-u_h |\!|_{L^2(\Omega)} \leq C h^{s} |\!|\!|u|\!|\!|_{H^k(\mathcal{T})},
+	\end{equation*}
+	while for both th NIPG and IIPG methods the following suboptimal estimate holds:
+	\begin{equation*}
+				|\!| u-u_h |\!|_{L^2(\Omega)} \leq C h^{s-1} |\!|\!|u|\!|\!|_{H^k(\mathcal{T})},
+	\end{equation*}
+	It has been observed numerically on uniform meshes that for NIPG and IIPG convergence rates are optimal if the polynomial degree is odd and suboptimal if it is even
+\end{teor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Polyhedral grids}\label{sec:poly}
+In this section we follow mainly \cite{multigrid} and \cite{hpmet}.
+\subsection{Grid assumptions}
+Suppose that now $\mathcal{T}$ is a partition of the computational domain $\Omega$ into disjoint open polyhedral elements $\kappa$ such that $\bar{\Omega} = \bigcup_{\kappa \in \mathcal{T}} \bar{\kappa}$. In order to allow the presence of hanging nodes/edges, we define the \textit{interfaces} of $\mathcal{T}$  as the intersection of the $(d-1)$-dimensional facets of neighbouring elements. Then, being us in $d=3$, we assume that each interface of an element $\kappa \in \mathcal{T}$ may be subdivided by a set of co-planar triangles. So with \textit{face} we refer to a $(d-1)$-dimensional simplex (i.e. a triangle in $d=3$), which forms part of an interface of an element $\kappa \in \mathcal{T}$; this means that each interfaces has a sub-triangulation into faces. As before with $\Gamma_h$ we denote the union of all open faces of the mesh interior to $\Omega$ and with $\Gamma_D$ the union of all open faces of the mesh contained in the boundary $\partial \Omega$; then $\Gamma = \Gamma_h \cup \Gamma_D$.\\
+We need now some assumptions on the mesh $\mathcal{T}$:
+\begin{ipotesi} \label{ipo:ipo1}
+	Given $\kappa \in \mathcal{T}$, there exists a set of non-overlapping (not necessarily shape-regular) $3$-dimensional simplices $T_j \subset \kappa, \; j = 1,\dots, n_\kappa$, such that for any face $e \subset \partial \kappa$, $\bar{e} = \partial \bar{\kappa} \cap \partial \bar{T_j}$, for some $j$,
+	\begin{equation*}
+		\cup_{j = 1}^{n_\kappa} \bar{T_k} \subseteq \bar{\kappa},
+	\end{equation*}
+	and  $\exists C > 0$ such that the diameter $h_\kappa$ of $\kappa$ can be bounded by:
+	\begin{equation*}
+		h_\kappa \leq C \frac{3 |T_j|}{|e|}, \quad \forall j = 1,\dots,n_\kappa.
+	\end{equation*}
+\end{ipotesi}
+Observe that we are not restricting neither the number of faces nor the measure of a face with respect to the measure of the element.
+\begin{ipotesi} \label{ipo:ipo2}
+	For any element $\kappa \in \mathcal{T}$ we assume that $\exists C > 0$ such that $h^3_\kappa~\geq~|\kappa|~\geq~Ch^3_\kappa$.
+\end{ipotesi}
+\begin{ipotesi} \label{ipo:ipo3}
+	Every element $\kappa \in \mathcal{T}$ admits a sub-triangulation into at most $m_\kappa \in \mathbb{N}$ non-overlapping, shape-regular simplices $\mathit{s}_i, \; i = 1,\dots,m_\kappa$, such that:
+	\begin{equation*}
+		\bar{\kappa} = \bigcup\limits_{i = 1}^{m_\kappa} \bar{\mathit{s}_i}, \quad \text{ and } \exists C>0 \text{ such that }  \quad |\mathit{s}_i| \geq C |\kappa|, \; \forall i = 1,\dots,m_\kappa,
+	\end{equation*}
+	with $C$ independent of $\kappa$.
+\end{ipotesi}
+\begin{ipotesi} \label{ipo:ipo4}
+	Let $\mathcal{T}^\# = \{ \mathcal{K} \}$ be a covering of $\Omega$ made of shaped-regular $3$-dimensional simplices $\mathcal{K}$. We assume that for any $\kappa~\in~\mathcal{T}, \; \exists\mathcal{K}\in\mathcal{T}^\# $ such that $\kappa\subset\mathcal{K}$, $\exists~C_d>0$ such that:
+	\begin{equation*}
+		diam(\mathcal{K})\leq~C_dh_\kappa, \quad \text{uniformly with respect to the mesh size}
+	\end{equation*}
+	and $\exists~C_c>0$ such that:
+	\begin{equation*}
+		\max\limits_{\kappa \in \mathcal{T}} card \big\{ \kappa' \in \mathcal{T} : \kappa' \cap \mathcal{K} \ne \emptyset, \; \mathcal{K} \in \mathcal{T}^\# \text{ such that } \kappa \subset \mathcal{K} \big\} \leq C_c.
+	\end{equation*}
+\end{ipotesi}
+Notice that in this way the mesh regularity is assumed for the mesh covering $\mathcal{T}^\#$ and not for the computational mesh $\mathcal{T}$.
+\begin{ipotesi} \label{ipo:ipo5}
+	The mesh $\mathcal{T}$ is quasi uniform, i.e. $\exists C>0$ such that $h~\leq~C \min_{\kappa \in \mathcal{T}} h_\kappa$.
+\end{ipotesi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Well posedness}
+The discrete formulation is the same of \eqref{eq:dgfemform}, but we analyse only the SIPG case ($\epsilon~=~-1$) and we choose the penalty parameter $\gamma_e \in L^\infty(\mathcal{T})$ such that:
+\begin{equation*}
+	\gamma_e =
+	\begin{cases}
+		\sigma \max\limits_{\kappa \in \{\kappa^+, \kappa^-\}} \big\{ \frac{r^2}{h_\kappa}\big\},
+		& \quad e \in \Gamma_h, \; e \subset \partial\kappa^+ \cap \partial\kappa^-,\\
+		\sigma\frac{r^2}{h_\kappa},& \quad e \in \Gamma_D, \; e \subset \partial\kappa^+ \cap \partial\Omega,
+	\end{cases}
+\end{equation*}
+where $\sigma$ is a positive constant independent of $r$, $|e|$ and $|\kappa|$ (we remind that $r$ is the degree of polynomials in the space $\mathcal{D}_r(\mathcal{T})$ \eqref{eq:dgspace}.\\
+So it becomes:\\
+Find $u_h \in \mathcal{D}_r(\mathcal{T})$ such that:
+\begin{equation} \label{eq:dgfempolyform}
+	a_{-1}(u_h, v_h) = F_{-1}(v_h), \quad \forall v_h \in \mathcal{D}_r(\mathcal{T}).
+\end{equation}
+We will refer to $a_{-1}(\cdot, \cdot)$ as simply $a\cdot, \cdot)$ and to $F_{-1}(\cdot)$ as $F(\cdot)$.\\
+The proof of well posedness through continuity and coercivity can be found in \cite{hpmet} under slightly weaker assumptions on the mesh, but it follows the same path of the one with classical meshes discussed in section~\ref{sec:DG}, concluding again that we have to require $\sigma$ to be large enough. It exploits the following variation of the inverse trace inequality \eqref{eq:trineq}, whose proof can be found in \cite{multigrid}:
+\begin{lemma}
+	Assume that the mesh $\mathcal{T}$ satisfies Assumption \ref{ipo:ipo1}. Let $\kappa \in \mathcal{T}$ be a polyhedral element, then the following bound holds:
+	\begin{equation*}
+		|\!|v|\!|^2_{L^2(\partial\kappa)} \leq C_{inv} \frac{r^2}{h_\kappa} |\!|v|\!|^2_{L^2(\kappa)}, \quad \forall v \in \mathbb{P}_r(\kappa),
+	\end{equation*}
+	where $C_{inv}$ in a constant independent of $|\kappa|$, $r$ and $v$.
+\end{lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Error analysis}
+We will make use of an extension operator $\mathcal{E}:H^k(\Omega)\rightarrow H^k(\mathbb{R}^d), \; k\in\mathbb{N}_0$, continuos, such that $\mathcal{E}v|_\Omega=v$ (chapter 7, \cite{salsa}).\\
+We now present the following approximation lemma from \cite{multigrid}:
+\begin{lemma}  \label{lemma:interp}
+	Given Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, let $v~\in~H^k(\mathcal{T}), \; k>3/2$ such that $\mathcal{E}v|_\mathcal{K}~\in~H^k(\mathcal{K})$, for each $\kappa~\in~\mathcal{T}$, where $\kappa~\subset~\mathcal{K}, \; \mathcal{K}~\in~\mathcal{T}^\#$. Then there exists a projection operator $\bar{\Pi}:~L^2(\Omega)~\rightarrow~\mathcal{D}_r(\mathcal{T})$ such that:
+	\begin{equation}
+		\big|\!\big| v - \bar{\Pi}v \big|\!\big|_{DG}
+		\leq C_{interp} \frac{h^{s-1}}{r^{k-1-\mu/2}} |\!| v |\|_{H^k(\Omega)},
+	\end{equation}
+	where $s = \min \{r+1, k\}$, $C_{interp}$ depends on the shape-regularity constant $C_d$ of the covering $\mathcal{T}^\#$, but is independent of the discretization parameters, as well as the number of faces per element and the relative measure of the faces. Here $\mu = 0$ whenever a $r$-optimal interpolant can be constructed and $\mu = 1$ otherwise.
+\end{lemma}
+Thanks to this lemma we can state the following error bound both in the $L^2$-norm and $DG$-norm:
+\begin{teor}
+	Given Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, let $u_h \in \mathcal{D}_r(\mathcal{T})$ be the DG-solution of problem~\eqref{eq:dgfempolyform}. If the exact solution of \eqref{eq:wform} is such that $u\in H^k(\mathcal{T}), \; k>5/2$, such that $\mathcal{E}v|_\mathcal{K}~\in~H^k(\mathcal{K})$, for each $\kappa~\in~\mathcal{T}$, where $\kappa~\subset~\mathcal{K}, \; \mathcal{K}~\in~\mathcal{T}^\#$, then the following bounds hold:
+	\begin{equation} \label{eq:dgbound}
+		|\!|u-u_h|\!|_{DG} \leq G \frac{h^{s-1}}{r^{k-1-\mu /2}} |\!|u|\!|_H^k(\Omega),
+	\end{equation}
+	\begin{equation} \label{eq:l2bound}
+		|\!|u-u_h|\!|_{L^2(\Omega)} \leq C_{L^2} \frac{h^s}{r^{k-\mu}} |\!|u|\!|_H^k(\Omega),
+	\end{equation}
+	where $s = \min \{r+1, k\}$ and the constants $G$, $C_{L^2}$ are independent of the discretization parameters. Here $\mu = 0$ whenever a $r$-optimal interpolant can be constructed and $\mu = 1$ otherwise.
+\end{teor}
+Notice that we are assuming only Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, that do not put restrictions on the number or size of faces.
+\begin{proof}
+	The error bound \eqref{eq:dgbound} follows from the general theorem proved in \cite{hpmet}, we will instead prove the bound~\eqref{eq:l2bound}.\\
+	Let $w \in H^2(\Omega)$ be the solution of the problem:
+	\begin{equation*}
+		a(v, w) = \int_{\Omega} (u-u_h)v, \quad \forall v \in  H^2(\Omega))
+	\end{equation*}
+	Using standard elliptic regularity theorems we know that $\exists C_{reg}>0$ such that:
+	\begin{equation} \label{eq:reg}
+		|\!| w |\!|_{H^2(\Omega)} \leq C_{reg} |\!| u - u_h |\!|_{L^2(\Omega)}.
+	\end{equation}
+	The exploiting Galerkin orthogonality:
+	\begin{equation} \label{eq:go}
+	\begin{split}
+		|\!| u - u_h |\!|^2_{L^2(\Omega)} &= a(u-u_h, w)\\
+		&= a(u-u_h, w-w_h) \leq M_1 |\!| u - u_h |\!|_{DG} |\!| w - w_h |\!|_{DG},
+	\end{split}
+	\end{equation}
 
+	For any function $w_h \in \mathcal{D}_r(\mathcal{T})$; so we can select $w_h = \bar{\Pi}w$ and employ lemma~\ref{lemma:interp} followed by~\eqref{eq:reg}:
+	\begin{equation*}
+		|\!|w-\bar{\Pi}w|\!|_{DG} \leq C_{interp} \frac{h}{r^{1-\mu/2}} |\!| w |\!|_{H^2(\Omega)} \leq C_{interp}C_{reg} \frac{h}{r^{1-\mu/2}} |\!| u-u_h |\!|_{L^2(\Omega)}.
+	\end{equation*}
+	Inserting this into \eqref{eq:go} gives the desired result \eqref{eq:l2bound}.
+\end{proof}	
+Finally we quote from \cite{multigrid} the following result about the maximum eigenvalue of the bilinear form $a(\cdot, \cdot)$:
+\begin{teor}
+	Under Assumptions \ref{ipo:ipo1}, \ref{ipo:ipo2}, \ref{ipo:ipo3} and \ref{ipo:ipo5}, for any function $u_h \in \mathcal{D}_r(\mathcal{T}) $ we have that:
+	\begin{equation*}
+		a(u_h, u_h) \leq C_{eig} \frac{r^4}{h^2} |\!| u_h |\!|^2_{L^2(\mathcal{T})}.
+	\end{equation*}
+\end{teor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}\label{sec:imp}
 	
 \section{Numerical results}\label{sec:res}
@@ -135,12 +411,12 @@ Find $u \in H^s(\mathcal{T}), s>3/2$, such that:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\begin{thebibliography}{9}
+\begin{thebibliography}{99}
 	\bibitem{review}
 	Antonietti P. F., Cangiani  A., Collins J., Dong Z., Georgoulis E. H., Giani S., Houston P.: Review of discontinuous Galerkin finite element methods for partial differential equations on complicated domains. \emph{Building bridges: connections and challenges in modern approaches to numerical partial differential equations, Lecture Notes in Computational Science and Engineering}, volume 114, 279–307 (2016).
 	
 	\bibitem{mox}
-	Antonietti, P.F., Facciola, C., Russo, A., Verani, M.: Discontinuous Galerkin approximation of flows in fractured porous media on polygonal and polyhedral meshes. \emph{MOX Report} 55/2016 (2016).
+	Antonietti, P. F., Facciolà, C., Russo, A., Verani, M.: Discontinuous Galerkin approximation of flows in fractured porous media on polygonal and polyhedral meshes. \emph{MOX Report} 55/2016 (2016).
 	
 	\bibitem{multigrid}
 	Antonietti P. F., Houston  P., Hu  X., Sarti  M., Verani M.: Multigrid algorithms for hp-version interior penalty discontinuous Galerkin methods on polygonal and	polyhedral meshes. \emph{Calcolo}, 1-30 (2017).
@@ -148,15 +424,20 @@ Find $u \in H^s(\mathcal{T}), s>3/2$, such that:
 	\bibitem{hpmet}
 	Cangiani A., Georgoulis E. H., Houston P.: Hp-Version discontinuous Galerkin methods on polygonal and polyhedral meshes. \emph{Mathematical Models and Methods in Applied Sciences}, 24(10), 2009-2041 (2014).
 	
+	\bibitem{dunavant}
+	Dunavant D.: High degree efficient symmetrical Gaussian quadrature rules for the triangle. \emph{International Journal for Numerical Methods in Engineering}, 21, 1129-1148 (1985).
+	
 	\bibitem{hest}
 	Hesthaven J. S., Warburton T.: \emph{Nodal Discontinuous Galerkin Methods: Algorithms, Analysis and Applications}. Springer, Berlin (2007).
 	
 	\bibitem{paper4}
-	Giani S., Houston P.: Domain decomposition preconditioners for discontinuous Galerkin discretizations of compressible fluid flows. \emph{Numerical Mathematics: Theory, Methods and
-	Applications}, 7(2), 123-128 (2014).
+	Giani S., Houston P.: Domain decomposition preconditioners for discontinuous Galerkin discretizations of compressible fluid flows. \emph{Numerical Mathematics: Theory, Methods and Applications}, 7(2), 123-128 (2014).
 	
 	\bibitem{quart}
 	Quarteroni A.: \emph{Numerical Models for Differetial Problems}. MS\&A, Springer-Verlag Italia, Milan (2014).
+	
+	\bibitem{salsa}
+	Salsa S.: \emph{Partial Differential Equations in Action: From Modelling to Theory}. Springer (2016).
 	
 	\bibitem{riviere}
 	Rivière B.: \emph{Discontinuous Galerkin Methods for Solving Elliptic and Parabolic Equations: Theory and Implementation}, volume 35 of \emph{Frontiers in Applied Mathematics}. Society for Industrial and Applied Mathematics (SIAM), Philadelphia, PA (2008).
