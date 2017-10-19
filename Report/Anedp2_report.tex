@@ -6,6 +6,9 @@
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{pgfplots}
+%\usepackage{epstopdf}
+\usepackage{graphicx}
+\graphicspath{{img/}}
 \usepackage[en-US]{datetime2}
 \usepackage[hidelinks]{hyperref}
 \pgfplotsset{/pgf/number format/use comma,compat=newest}
@@ -34,6 +37,7 @@
 	Moreover one of the main advantages with respect to the continuous framework is the possibility of handling meshes with hanging nodes and made of general-shaped elements without too many difficulties.\\
 	In section~\ref{sec:DG} we recover the main results about standard DG methods, then in section~\ref{sec:poly} we develop the theory in order to handle polyhedral grids. Subsequently in section~\ref{sec:imp} we explain our main choices for the algorithm implementation and in section~\ref{sec:res} we present the numerical results we obtained in some prototypal cases.
 \end{abstract}
+\newpage
 \phantomsection
 \tableofcontents
 \newpage
@@ -80,17 +84,19 @@ By extension $L^2(\mathcal{T})$ can be seen as $H^0(\mathcal{T})$. Moreover it h
 \end{equation*}
 We denote by $\Gamma_h$ the set of interior faces and by $\Gamma_D$ the set of faces that are on the boundary $\partial \Omega$, we define $\Gamma = \Gamma_h \cup \Gamma_D$. For every face $e \in \Gamma_h$ there are two elements $\kappa^+$ and $\kappa^-$ that share it and they both have their outward normal $\mathbf{n}^+$ and $\mathbf{n}^-$.\\
 Since every function $v$ of $H^s(\mathcal{T})$ is well defined along any side of every $\kappa$, if $e \in \Gamma_h$ there are two different traces of $v$ along $e$ and we denote them by $v^+$ and $v^-$; it will be useful to introduce jumps and average of these traces so we can define:
-\begin{align*}
+\begin{align}
+	[v] = v^+ \mathbf{n}^+ + v^- {n}^-,
+	&\quad [\![ \mathbf{v} ]\!] = \mathbf{v}^+ \cdot \mathbf{n}^+ + \mathbf{v}^- \cdot \mathbf{n}^-, \label{eq:jump} \\
 	\{v\} = \frac{1}{2} (v^+ + v^-) ,
-	& \quad [v] = v^+ \mathbf{n}^+ + v^- {n}^-,\\
-	\{\!\!\{ \mathbf{v} \}\!\!\} = \frac{1}{2} (\mathbf{v}^+ +\mathbf{v}^-),
-	& \quad [\![ \mathbf{v} ]\!] = \mathbf{v}^+ \cdot \mathbf{n}^+ + \mathbf{v}^- \cdot \mathbf{n}^-,
-\end{align*}
+	& \quad \{\!\!\{ \mathbf{v} \}\!\!\} = \frac{1}{2} (\mathbf{v}^+ +\mathbf{v}^-), \label{eq:aver}
+\end{align}
 that can be extended to $e \in \Gamma_D$ through:
-\begin{equation*}
-	\{v\} = v, \quad [v] = v \mathbf{n}^,
-	\quad \{\!\!\{ \mathbf{v} \}\!\!\} = \mathbf{v}, \quad [\![ \mathbf{v} ]\!] = \mathbf{v} \cdot \mathbf{n}.
-\end{equation*}
+\begin{equation} \label{eq:jupsandaverdir}
+	[v] = v \mathbf{n},
+	\quad [\![ \mathbf{v} ]\!] = \mathbf{v} \cdot \mathbf{n},
+	\quad \{v\} = v,
+	\quad \{\!\!\{ \mathbf{v} \}\!\!\} = \mathbf{v}.
+\end{equation}
 Notice that the above definitions are independent of which element is called "$^+$" and which "$^-$".
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Variational formulation}
@@ -355,20 +361,20 @@ We now present the following approximation lemma from \cite{multigrid}:
 	Given Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, let $v~\in~H^k(\mathcal{T}), \; k>3/2$ such that $\mathcal{E}v|_\mathcal{K}~\in~H^k(\mathcal{K})$, for each $\kappa~\in~\mathcal{T}$, where $\kappa~\subset~\mathcal{K}, \; \mathcal{K}~\in~\mathcal{T}^\#$. Then there exists a projection operator $\bar{\Pi}:~L^2(\Omega)~\rightarrow~\mathcal{D}_r(\mathcal{T})$ such that:
 	\begin{equation}
 		\big|\!\big| v - \bar{\Pi}v \big|\!\big|_{DG}
-		\leq C_{interp} \frac{h^{s-1}}{r^{k-1-\mu/2}} |\!| v |\|_{H^k(\Omega)},
+		\leq C_{interp} \frac{h^{s-1}}{r^{k-3/2}} |\!| v |\|_{H^k(\Omega)},
 	\end{equation}
-	where $s = \min \{r+1, k\}$, $C_{interp}$ depends on the shape-regularity constant $C_d$ of the covering $\mathcal{T}^\#$, but is independent of the discretization parameters, as well as the number of faces per element and the relative measure of the faces. Here $\mu = 0$ whenever a $r$-optimal interpolant can be constructed and $\mu = 1$ otherwise.
+	where $s = \min \{r+1, k\}$, $C_{interp}$ depends on the shape-regularity constant $C_d$ of the covering $\mathcal{T}^\#$, but is independent of the discretization parameters, as well as the number of faces per element and the relative measure of the faces.
 \end{lemma}
 Thanks to this lemma we can state the following error bound both in the $L^2$-norm and $DG$-norm:
 \begin{teor}
 	Given Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, let $u_h \in \mathcal{D}_r(\mathcal{T})$ be the DG-solution of problem~\eqref{eq:dgfempolyform}. If the exact solution of \eqref{eq:wform} is such that $u\in H^k(\mathcal{T}), \; k>5/2$, such that $\mathcal{E}v|_\mathcal{K}~\in~H^k(\mathcal{K})$, for each $\kappa~\in~\mathcal{T}$, where $\kappa~\subset~\mathcal{K}, \; \mathcal{K}~\in~\mathcal{T}^\#$, then the following bounds hold:
 	\begin{equation} \label{eq:dgbound}
-		|\!|u-u_h|\!|_{DG} \leq G \frac{h^{s-1}}{r^{k-1-\mu /2}} |\!|u|\!|_H^k(\Omega),
+		|\!|u-u_h|\!|_{DG} \leq G \frac{h^{s-1}}{r^{k-3/2}} |\!|u|\!|_H^k(\Omega),
 	\end{equation}
 	\begin{equation} \label{eq:l2bound}
-		|\!|u-u_h|\!|_{L^2(\Omega)} \leq C_{L^2} \frac{h^s}{r^{k-\mu}} |\!|u|\!|_H^k(\Omega),
+		|\!|u-u_h|\!|_{L^2(\Omega)} \leq C_{L^2} \frac{h^s}{r^{k-1}} |\!|u|\!|_H^k(\Omega),
 	\end{equation}
-	where $s = \min \{r+1, k\}$ and the constants $G$, $C_{L^2}$ are independent of the discretization parameters. Here $\mu = 0$ whenever a $r$-optimal interpolant can be constructed and $\mu = 1$ otherwise.
+	where $s = \min \{r+1, k\}$ and the constants $G$, $C_{L^2}$ are independent of the discretization parameters.
 \end{teor}
 Notice that we are assuming only Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, that do not put restrictions on the number or size of faces.
 \begin{proof}
@@ -390,10 +396,10 @@ Notice that we are assuming only Assumptions \ref{ipo:ipo1} and \ref{ipo:ipo4}, 
 	\end{equation}
 
 	For any function $w_h \in \mathcal{D}_r(\mathcal{T})$; so we can select $w_h = \bar{\Pi}w$ and employ lemma~\ref{lemma:interp} followed by~\eqref{eq:reg}:
-	\begin{equation*}
-		|\!|w-\bar{\Pi}w|\!|_{DG} \leq C_{interp} \frac{h}{r^{1-\mu/2}} |\!| w |\!|_{H^2(\Omega)} \leq C_{interp}C_{reg} \frac{h}{r^{1-\mu/2}} |\!| u-u_h |\!|_{L^2(\Omega)}.
-	\end{equation*}
-	Inserting this into \eqref{eq:go} gives the desired result \eqref{eq:l2bound}.
+	\begin{equation} \label{pas:last}
+		|\!|w-\bar{\Pi}w|\!|_{DG} \leq C_{interp} \frac{h}{r^{1/2}} |\!| w |\!|_{H^2(\Omega)} \leq C_{interp}C_{reg} \frac{h}{r^{1/2}} |\!| u-u_h |\!|_{L^2(\Omega)}.
+	\end{equation}
+	Inserting \eqref{pas:last} into \eqref{eq:go} and employing again the bound~\eqref{eq:dgbound} gives the desired result~\eqref{eq:l2bound}.
 \end{proof}	
 Finally we quote from \cite{multigrid} the following result about the maximum eigenvalue of the bilinear form $a(\cdot, \cdot)$:
 \begin{teor}
@@ -404,8 +410,109 @@ Finally we quote from \cite{multigrid} the following result about the maximum ei
 \end{teor}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}\label{sec:imp}
-	
+In order to proceed with the implementation of the method \eqref{eq:dgfempolyform}, we followed the structure reported in \cite{riviere}, exploiting hints given in \cite{hpmet} and in \cite{hest}.
+\subsection{Algebraic formulation}
+The space $\mathcal{D}_r(\mathcal{T})$ has dimension:
+\begin{equation*}
+	N_h = N_{el} \binom{r+d}{d} = N_{el} \frac{(r+3)!}{6\;r!},
+\end{equation*}
+where $N_{el}$ is the number of elements in $\mathcal{T}$.\\
+Let $\{ \phi_i \}^{N_h}_{i=1}$ be a basis for $\mathcal{D}_r(\mathcal{T})$, so we can expand the solution $u_h$ in terms of the basis:
+\begin{equation*}
+	u_h(\mathbf{x}) = \sum_{j = 1}^{N_h} u_j \phi_j(\mathbf{x}),
+\end{equation*}
+where $\mathbf{x}=[x, y, z]^T$. The algebraic formulation becomes:\\
+Find $\mathbf{u} = [u_1, \dots, u_{N_h}]^T \in \mathbb{R}^{N_h} $ such that:
+\begin{equation*}
+	\mathrm{A}\mathbf{u} = \mathbf{f},
+\end{equation*}
+where $\mathrm{A} \in \mathbb{R}^{N_h \times N_h}, \; \mathrm{A}_{ij} = a(\phi_j, \phi_i)$ and $\mathbf{f} \in \mathbb{R}^{N_h}, \; \mathbf{f}_i = F(\phi_i)$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basis functions}
+The basis functions can be chosen in many different ways; the usual approach, as it is done in the classical finite element method, is to employ standard polynomial bases on a reference element and then map them to physical elements; generally this reduces costs and is effective.\\
+However we follow here a different strategy (cf \cite{hpmet}), that works directly on the physical element $\kappa \in \mathcal{T}$.\\
+Firstly we construct a Cartesian bounding box $B_\kappa=I_1\times I_2 \times I_3, \; \forall\kappa\in~\mathcal{T} $ such that $\bar{\kappa} \subseteq \bar{B_\kappa}$. Then on every bounding box $B_\kappa$ we define a standard polynomial space $\mathbb{P}_r(B_\kappa)$, spanned by a set of basis functions $\{ \phi_{i,\kappa} \}_{i=1}^{dim(\mathbb{P}_r(B_\kappa))}$. We use tensor-product (scaled) Legendre polynomials, i.e. denoted by $L_r(x)$ the Legendre polynomial of degree $r$ defined on the interval $[-1, 1]$, the corresponding scaled Legendre polynomial on the interval $I_b = [x_1, x_2]$ may be defined by:
+\begin{equation*}
+	L_r^{[I_b]} (x) = \frac{1}{\sqrt{h_b}} L_r \bigg( \frac{x-m_b}{h_b} \bigg),
+\end{equation*}
+where $h_b = (x_2-x_1)/2$ and $m_b = (x_1+x_2)/2$. Then the basis on the box $B_\kappa$ can be given by:
+\begin{equation*}
+\phi_{\kappa,i}(\mathbf{x}) = L_{r_1}^{[1]}(x)L_{r_2}^{[2]}(y)L_{r_3}^{[3]}(z), \quad
+r_1+r_2+r_3 \leq r, \; r_k \geq 0, \; k = 1,2,3.
+\end{equation*}
+Finally the polynomial basis over the polyhedral element $\kappa$ is defined simply restricting the support of $\phi_{\kappa, i}(\mathbf{x}), \; i=1,\dots,dim(\mathbb{P}_r(B_\kappa))$ to $\kappa$, i.e. choosing  $\phi_{\kappa, i}|_\kappa (\mathbf{x}), \; i=1,\dots,dim(\mathbb{P}_r(B_\kappa))$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix assembly}
+The matrix $A$ is basically made thorough the sum of four matrices, two of which symmetrical:
+\begin{equation*}
+	\mathrm{A} = \mathrm{V} - \mathrm{I} - \mathrm{I}^T + \mathrm{S},
+\end{equation*}
+where
+\begin{equation*}
+	\mathrm{V}_{ij} = \sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla \phi_j \cdot \nabla \phi_i,
+	\quad \mathrm{I}_{ij} = \sum_{e \in \Gamma} \int_e [\![\phi_j]\!] \cdot \{\!\!\{ \nabla \phi_i \}\!\!\},
+	\quad \mathrm{S}_{ij} = \sum_{e \in \Gamma} \gamma_e \int_e [\![ \phi_j ]\!] \cdot [\![ \phi_i ]\!].
+\end{equation*}
+Let's analyse each of them:
+\begin{itemize}
+	\item $\mathrm{V}$ is a block-diagonal matrix, indeed $\mathrm{V}_{ij} = 0$ whenever $\phi_i$ and $\phi_j$ come from different elements, since the support of each function is restricted to one element $\kappa$.
+	\item $\mathrm{I}$ (and obviously also $\mathrm{I}^T$) has a block-diagonal pattern, with in addition some blocks different from zero out of the diagonal, those referring to basis functions of confining elements. Indeed using the definition of jump \eqref{eq:jump} and average \eqref{eq:aver} we get:
+	\begin{align*}
+		\int_e [\![\phi_j]\!] \cdot \{\!\!\{ \nabla \phi_i \}\!\!\} &=
+		\frac{1}{2} \int_e (\nabla{\phi_i}^+ \cdot \mathbf{n}^+ )\phi_j^+
+		+ \frac{1}{2} \int_e (\nabla{\phi_i}^- \cdot \mathbf{n}^- )\phi_j^-\\
+		&- \frac{1}{2} \int_e (\nabla{\phi_i}^+ \cdot \mathbf{n}^+ )\phi_j^-
+		- \frac{1}{2} \int_e (\nabla{\phi_i}^- \cdot \mathbf{n}^- )\phi_j^+,
+	\end{align*}
+	where $e \in \Gamma_h$ is a face shared bt $\kappa^+$ and $\kappa^-$. We see that only the first two contributions fall on blocks along the diagonal. If $e \in \Gamma_D$, we use definitions~\eqref{eq:jupsandaverdir} and we obtain simply:
+	\begin{equation*}
+		\int_e [\![\phi_j]\!] \cdot \{\!\!\{ \nabla \phi_i \}\!\!\} = \int_e (\nabla{\phi_i} \cdot \mathbf{n} )\phi_j.
+	\end{equation*}
+	\item $\mathrm{S}$ has the same non zero block of $\mathrm{I}$, indeed we have:
+	\begin{equation*}
+		\gamma_e \int_e [\![\phi_j]\!] \cdot [\![\phi_i]\!] =
+		\gamma_e \int_e \phi_i^+ \phi_j^+
+		+ \gamma_e \int_e \phi_i^- \phi_j^-
+		- \gamma_e \int_e \phi_i^+ \phi_j^-
+		- \gamma_e \int_e \phi_i^- \phi_j^+,
+	\end{equation*}
+	if $e \in \Gamma_h$, shared by $\kappa^+$ and $\kappa^-$, and
+	\begin{equation*}
+		\gamma_e \int_e [\![\phi_j]\!] \cdot [\![\phi_i]\!] =
+		\gamma_e \int_e \phi_i \phi_j,
+	\end{equation*}
+	if $e \in \Gamma_D$.
+\end{itemize}
+Hence we globally obtain a symmetric matrix $\mathrm{A}$, as we see in Figure~\ref{fig:spy}.
+\begin{figure}[h] 
+	\centering
+	\includegraphics[scale=0.8]{spy_A}
+	\caption{Sparsity pattern of $\mathrm{A}$ computed over a mesh of 224 elements and $r=2$.}
+	\label{fig:spy}
+\end{figure}
+\newline
+For what concerns the right hand side $\mathbf{f}$ we have basically three contributions:
+\begin{equation*}
+\mathbf{f} = \mathbf{f}_\mathrm{V} - \mathbf{f}_\mathrm{I} + \mathbf{f}_\mathrm{S},
+\end{equation*}
+where
+\begin{equation*}
+	\mathbf{f}_{\mathrm{V}, i} = \sum_{\kappa \in \mathcal{T}} \int_\kappa f \phi_i, \quad
+	\mathbf{f}_{\mathrm{I}, i} = \sum_{e \in \Gamma_D} \int_e g (\nabla \phi_i \cdot \mathbf{n}), \quad
+	\mathbf{f}_{\mathrm{S}, i} = \sum_{e \in \Gamma_D} \gamma_e \int_e g \phi_i.
+\end{equation*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadrature rules}
+Quadrature over general polyhedral elements and polygonal faces is undertaken on first constructing a sub-triangulation, followed bt the exploitation of standard integration schemes. So for every polyhedral element $\kappa \in \mathcal{T}$ we first construct a non-overlapping sub-triangulation $\kappa_\mathcal{S} = \{\tau_\kappa\}$ made of tetrahedral elements, then we map quadrature nodes from a reference simplex to each tetrahedron $\tau_\kappa$. For example we consider an integral coming from the first term of the bilinear form $a(\cdot, \cdot)$:
+\begin{equation*}
+	\int_\kappa \nabla u \cdot \nabla v = \sum_{\tau_\kappa \in \kappa_\mathcal{S}} \nabla u \cdot \nabla v \approx \sum_{\tau_\kappa \in \kappa_\mathcal{S}} \sum_{i=1}^{q} \nabla u(F_\kappa(\xi_i)) \cdot \nabla v(F_\kappa(\xi_i)) det(J_{F_\kappa}(\xi_i))w_i,
+\end{equation*}
+where $F_\kappa: \hat{\kappa} \rightarrow \tau_\kappa$ is the map from the reference
+simplex $\hat{\kappa}$ to $\tau_\kappa$, $J_{F_\kappa}$ is its Jacobian	and $(\xi_i, w_i)^q_{i=1}$ denotes the quadrature nodes and weights over $\hat{\kappa}$. Observe that the gradient operator is not transformed, as it happens when integrals are computer on the reference simplex.\\
+Integrals ever faces of polyhedral elements can be computed in an analogous way, mapping quadrature points from a reference triangle to each face. Of course it is useful for the implementation if each face of a polyhedron $\kappa$ coincide with a face of a tetrahedron $\tau_\kappa$ of the sub-triangulation $\kappa_\mathcal{S}$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \section{Numerical results}\label{sec:res}
+\subsection{Mesh generation}
 
 \section{Conclusion}\label{sec:conc}
 
