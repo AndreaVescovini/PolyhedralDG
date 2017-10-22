@@ -5,7 +5,9 @@ function [nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N)
 %Riviere's book; commented ones from Quarteroni's book.
 %Computes also the maps from the 2D refence triangle to the faces of
 %the 3D reference tetrahedron.
-%Ones in the quadrature nodes are needed by the translation .
+%Ones in the quadrature nodes are needed by the translation vector of Fk.
+%node_maps contains the maps from the reference simplex in 2D to the faces
+%of the reference simplex in 3D.
 
 if N == 1
     % Degree of exactness 2

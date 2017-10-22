@@ -1,0 +1,86 @@
+load "msh3"
+load "Element_P3"
+// load "medit"
+
+int nit = 4;
+ofstream f("standard_fem_results.txt");
+f << "EXPONENTIAL - STRUCTURED TETRAHEDRAL GRID" << endl;
+
+real[int] errl2(nit), errh1(nit), hh(nit), rl2(nit-1), rh1(nit-1);
+for(int n=1; n<=nit; n++)
+{
+  mesh3 Th3 = cube(2*n, 2*n, 2*n);
+  // medit("Th", Th);
+
+  func uex = exp(x*y*z);
+  func f = -uex*((x*y)^2+(x*z)^2+(y*z)^2);
+  func dxuex = uex*y*z;
+  func dyuex = uex*x*z;
+  func dzuex = uex*x*y;
+
+  fespace Vh(Th3, P1);
+  fespace Ph(Th3, P0);
+  Vh uh, vh;
+  Ph hk = hTriangle;
+
+  solve poisson3(uh, vh) =
+     int3d(Th3) (dx(uh)*dx(vh)+dy(uh)*dy(vh)+dz(uh)*dz(vh))
+    -int3d(Th3) (f*vh)
+    +on(1,2,3,4,5,6, uh = uex);
+
+  hh(n-1) = hk[].max;
+  errl2(n-1) = sqrt(int3d(Th3) ((uh-uex)^2));
+  errh1(n-1) = sqrt(int3d(Th3) ((dx(uh)-dxuex)^2
+                              +(dy(uh)-dyuex)^2
+                              +(dz(uh)-dzuex)^2));
+}
+
+for(int i = 0; i < nit-1; i++) {
+  rh1(i) = log(errh1(i)/errh1(i+1))/log(hh(i)/hh(i+1));
+  rl2(i) = log(errl2(i)/errl2(i+1))/log(hh(i)/hh(i+1));
+}
+
+f << "\nN = 1" << endl;
+f << "errh10: " << errh1 << endl;
+f << "rh10; " << rh1 << endl;
+f << "errl2: " << errl2 << endl;
+f << "rhl2; " << rl2 << endl;
+
+for(int n=1; n<=nit; n++)
+{
+  mesh3 Th3 = cube(2*n, 2*n, 2*n);
+  // medit("Th", Th);
+
+  func uex = exp(x*y*z);
+  func f = -uex*((x*y)^2+(x*z)^2+(y*z)^2);
+  func dxuex = uex*y*z;
+  func dyuex = uex*x*z;
+  func dzuex = uex*x*y;
+
+  fespace Vh(Th3, P2);
+  fespace Ph(Th3, P0);
+  Vh uh, vh;
+  Ph hk = hTriangle;
+
+  solve poisson3(uh, vh) =
+     int3d(Th3) (dx(uh)*dx(vh)+dy(uh)*dy(vh)+dz(uh)*dz(vh))
+    -int3d(Th3) (f*vh)
+    +on(1,2,3,4,5,6, uh = uex);
+
+  hh(n-1) = hk[].max;
+  errl2(n-1) = sqrt(int3d(Th3) ((uh-uex)^2));
+  errh1(n-1) = sqrt(int3d(Th3) ((dx(uh)-dxuex)^2
+                              +(dy(uh)-dyuex)^2
+                              +(dz(uh)-dzuex)^2));
+}
+
+for(int i = 0; i < nit-1; i++) {
+  rh1(i) = log(errh1(i)/errh1(i+1))/log(hh(i)/hh(i+1));
+  rl2(i) = log(errl2(i)/errl2(i+1))/log(hh(i)/hh(i+1));
+}
+
+f << "\nN = 2" << endl;
+f << "errh10: " << errh1 << endl;
+f << "rh10; " << rh1 << endl;
+f << "errl2: " << errl2 << endl;
+f << "rhl2; " << rl2 << endl;

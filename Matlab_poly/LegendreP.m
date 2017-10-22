@@ -1,7 +1,7 @@
 function [P, Pder] = LegendreP(x, N, int)
 % function [P] = LegendreP(x, N, int)
-% Purpose: Evaluate Legendre Polynomial and its derivative in int
-% at points x for order N and returns P[1:length(xp))]
+% Evaluate (scaled) Legendre Polynomial and its derivative defined on the interval int
+% at points x for order N.
 
 % Turn points into row if needed.
 xp = x;

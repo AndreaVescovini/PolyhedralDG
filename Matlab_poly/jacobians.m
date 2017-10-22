@@ -1,7 +1,8 @@
 function [Fk, Jinv, Jdet] = jacobians(x, y, z)
 %[Fk, Jcof, Jdet] = jacobians(x, y, z)
-%Functions that computes for every element the map Fk, the determinant of
-%the jacobian and the matrix jcof wrt the simplex (0,0,0),(1,0,0),(0,1,0),(0,0,1)
+%Functions that computes for every tetrahedral element the map Fk from the
+%reference simplex (0,0,0),(1,0,0),(0,1,0),(0,0,1); the determinant of
+%the jacobian Jdet and the inverse of the jacobian Jinv. 
 %(pag 176 of Modellistica numerica per problemi differenziali, Quarteroni).
 % Fk = [J trasl]
 

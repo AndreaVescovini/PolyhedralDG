@@ -1,6 +1,7 @@
 function [blist] = basis_list(N, Np)
 %[blist] = basis_list(N, Np)
-% Function that lists the degrees of the Np basis functions up to the degree N
+% Function that lists the degrees of monomials of the Np basis functions up to
+% a total degree N
 blist = zeros(Np, 3);
 ii = 1;
 q1 = N;

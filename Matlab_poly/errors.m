@@ -1,6 +1,6 @@
 function [err_L2, err_H10] = errors(uex, uex_grad, u, geom, N)
 %function [err_L2, err_H10] = errors(uex, uex_grad, u, geom, N)
-%   Compute L2 norm and H1 seminorm of the error u-uex
+% Compute L2 norm and H1 seminorm of the error (u - uex)
 
 Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
 

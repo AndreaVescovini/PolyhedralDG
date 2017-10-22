@@ -1,7 +1,14 @@
 function [mesh] = MeshReader3Dpoly(FileName)
 % [mesh] = MeshReader3D(FileName)
-% Read in basic grid information to build grid and build connectivity matrices.
+% Reads the mesh from the file FileName and build connectivity matrices.
 % *.mesh format is assumed
+% The output is a struct that contains:
+% Nv: Number of vertices
+% VX, VY, VZ: vectors containing coordinates of vertices
+% Ntet: Total number of tetrahedra of sub-triangulations
+% K: Number of polyhedral elements
+% E2V: Matrix containing Tetrahedra to vertices connectivity
+% E2P: Vector containing for each tetrahedron the number of the polyhedron it belongs to
 
 Fid = fopen(FileName, 'rt');
 
@@ -13,7 +20,7 @@ end
 % find number of vertices
 Nv = fscanf(Fid, '%d', 1);
 
-% read node coordinates
+% read vertices coordinates
 xyz = fscanf(Fid, '%lf', [4, Nv]);
 xyz = xyz(1:3, :);
 VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);

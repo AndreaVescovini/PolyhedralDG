@@ -1,7 +1,25 @@
 function [geom] = geometric_elaboration(mesh)
 %function [geom] = geometric_elaboration(mesh)
 % This function computes geometric quantities needed to build the linear
-% system
+% system.
+% The output struct contains:
+% E2P: Vector containing for each tetrahedron the number of the polyhedron it belongs to
+% K: Number of polyhedral elements
+% Ntet: Total number of tetrahedra of sub-triangulations
+% Nfaces: Total numberof faces of the mesh
+% faces: Matrix containing faces to vertices connectivity
+% faces_neig: Matrix containing for each face the number of the tetrahedra
+%             that share it and the number of that face in both the tetrahedra
+% area: Vector containing face areas
+% normal: Vector containing face normal vector directed from the first face_neig
+%         to the second face_neig
+% bb: Matrix containing coordinates of the cartesian bounding box for each polyhedron
+% hk: Vector containing the diameter of each polyhedron
+% hmax: maximum diameter
+% Fk: Vector of matrices containing the mappings from the reference tetrahedron
+%     to each tetrahedron
+% Jinv: Vector containing the inverse of the jacobian of each Fk
+% Jdet: Vector containing the determinant of each jacobian of each Fk
 
 % set faces of polyhedra and tretrahedra that share them
 [faces, faces_neig] = read_faces(mesh);

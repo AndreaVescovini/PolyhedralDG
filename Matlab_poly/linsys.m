@@ -81,10 +81,7 @@ for e = 1:geom.Nfaces % loop over faces
     end
 end
 
-% sum up the contributions
-% A = A + S + epsilon.*I - transpose(I);
-% b = b + bs + epsilon.*bi;
-spy(A)
+% spy(A, 'k');
 % solve the linear system
 u = A\b;
 u = reshape(u, [Np, geom.K]);

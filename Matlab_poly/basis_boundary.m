@@ -1,6 +1,7 @@
 function [phi_bordo, grad_bordo] = basis_boundary(bb, E2P, faces_neig, blist, Fk, node_maps, nod2)
 % function [phi_bordo, grad_bordo] = basis(bb, E2P, faces_neig, blist, Fk, node_maps, nod2)
-% For face evaluate the basis functions both of E1 and E2 at the 2D quadrature nodes.
+% This function evaluates for every face the basis functions both of the 
+% two sharing tratrahedra E1 and E2 at the 2D quadrature nodes.
 
 nq2 = size(nod2,2);
 Np = size(blist,1);

@@ -1,6 +1,7 @@
 function [phi, dphi] = basis(bb, E2P, blist, Fk, nod3)
 % function [phi, dphi] = basis(bb, E2P, blist, Fk, nod3)
-% For every element evaluate the basis functions at the 3D quadrature nodes.
+% This function evaluates the basis functions at the 3D quadrature nodes
+% for every polyhedral element.
 
 nq3 = size(nod3,2);
 Np = size(blist,1);
