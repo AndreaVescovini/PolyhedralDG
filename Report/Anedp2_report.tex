@@ -6,12 +6,15 @@
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{pgfplots}
+\usepackage{relsize}
+\usepackage{subfig}
 %\usepackage{epstopdf}
 \usepackage{graphicx}
-\graphicspath{{img/}}
 \usepackage[en-US]{datetime2}
+\usepackage[font=small, textfont=sl]{caption}
 \usepackage[hidelinks]{hyperref}
-\pgfplotsset{/pgf/number format/use comma,compat=newest}
+\graphicspath{{img/}}
+\pgfplotsset{compat=newest, every axis/.append style = {font=\relsize{-2}}}
 
 \theoremstyle{definition}
 \newtheorem{ipotesi}{Assumption}
@@ -330,14 +333,14 @@ Notice that in this way the mesh regularity is assumed for the mesh covering $\m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Well posedness}
 The discrete formulation is the same of \eqref{eq:dgfemform}, but we analyse only the SIPG case ($\epsilon~=~-1$) and we choose the penalty parameter $\gamma_e \in L^\infty(\mathcal{T})$ such that:
-\begin{equation*}
+\begin{equation} \label{eq:penalty}
 	\gamma_e =
 	\begin{cases}
 		\sigma \max\limits_{\kappa \in \{\kappa^+, \kappa^-\}} \big\{ \frac{r^2}{h_\kappa}\big\},
 		& \quad e \in \Gamma_h, \; e \subset \partial\kappa^+ \cap \partial\kappa^-,\\
 		\sigma\frac{r^2}{h_\kappa},& \quad e \in \Gamma_D, \; e \subset \partial\kappa^+ \cap \partial\Omega,
 	\end{cases}
-\end{equation*}
+\end{equation}
 where $\sigma$ is a positive constant independent of $r$, $|e|$ and $|\kappa|$ (we remind that $r$ is the degree of polynomials in the space $\mathcal{D}_r(\mathcal{T})$ \eqref{eq:dgspace}.\\
 So it becomes:\\
 Find $u_h \in \mathcal{D}_r(\mathcal{T})$ such that:
@@ -487,7 +490,8 @@ Hence we globally obtain a symmetric matrix $\mathrm{A}$, as we see in Figure~\r
 \begin{figure}[h] 
 	\centering
 	\includegraphics[scale=0.8]{spy_A}
-	\caption{Sparsity pattern of $\mathrm{A}$ computed over a mesh of 224 elements and $r=2$.}
+	\caption{Sparsity pattern of $\mathrm{A}$ computed over a mesh of 406 
+	elements and $r=2$.}
 	\label{fig:spy}
 \end{figure}
 \newline
@@ -510,14 +514,234 @@ Quadrature over general polyhedral elements and polygonal faces is undertaken on
 where $F_\kappa: \hat{\kappa} \rightarrow \tau_\kappa$ is the map from the reference
 simplex $\hat{\kappa}$ to $\tau_\kappa$, $J_{F_\kappa}$ is its Jacobian	and $(\xi_i, w_i)^q_{i=1}$ denotes the quadrature nodes and weights over $\hat{\kappa}$. Observe that the gradient operator is not transformed, as it happens when integrals are computer on the reference simplex.\\
 Integrals ever faces of polyhedral elements can be computed in an analogous way, mapping quadrature points from a reference triangle to each face. Of course it is useful for the implementation if each face of a polyhedron $\kappa$ coincide with a face of a tetrahedron $\tau_\kappa$ of the sub-triangulation $\kappa_\mathcal{S}$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mesh management}
+In our implementation we chose to generate polyhedral meshes by agglomerating tetrahedral elements using the software METIS\footnote{\url{http://glaros.dtc.umn.edu/gkhome/metis/metis/overview}}. In principle it converts the mesh into either a \textit{dual graph} (i.e. each element becomes a graph node) or a \textit{nodal graph} (i.e. each vertex becomes a graph node), then it partitions it in a given number of portions using either a \textit{multilevel recursive bisection} or a \textit{multilevel k-way} partitioning algorithm. We intend each portion to be a polyhedral element of our mesh and METIS gives us the list of tetrahedra it is composed by. Using this approach has also the convenience that we already have for every element $\kappa \in \mathcal{T}$ the sub-triangulation $\kappa_\mathcal{S}$ required by quadrature rules. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \section{Numerical results}\label{sec:res}
-\subsection{Mesh generation}
-
-\section{Conclusion}\label{sec:conc}
-
+We are going to solve the problem~\eqref{eq:dgfempolyform} on the unit cube $\Omega = [0,1]^3$, using different kinds of meshes and analyse the asymptotic behaviour of the method that we developed. We choose the source term $f$ and the Dirichlet datum $g$ such that the exact solution is smooth:
+\begin{equation*}
+	u(x,y,z) = e^{xyz}.
+\end{equation*}
+We set the penalty constant $\sigma$ defined in \eqref{eq:penalty} equal to 10.\\
+Denoted the numerical error by $e_h= u - u_h$, we compute for each mesh the $H^1$-seminorm $|\!| \nabla e_h |\!|_{L^2(\mathcal{T})}$, which is bounded above by the $DG$-norm, and the $L^2$-norm $|\!|e_h|\!|_{L^2(\mathcal{T})}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+\subsection{\textit{h}-convergence}
+Firstly we solve the problem~\eqref{eq:dgfempolyform} over four structured tetrahedral meshes of 48, 
+384, 1296 and 3072 elements, for $r=1,2,3$. We see in Table~\ref{tab:htet} that convergence rates with respect to $h$-convergence are optimal; they correspond to theoretical ones given by the estimates~\eqref{eq:dgbound} and~\eqref{eq:l2bound}.
+\begin{table}[h]\footnotesize
+	\centering
+	\[
+	\begin{array}{ccccccc}
+	\toprule
+	r & Error & \text{48 elem} & \text{384 elem} & \text{1296 elem} & \text{3072 elem} & \text{Rate} \\ 
+	\midrule
+	1 & |\!|\nabla e_{h}|\!|_{L^2}   & 3.7594 \times 10^{-1} & 1.9785 \times 10^{-1} & 1.3266 \times 10^{-1} & 9.9471 \times 10^{-2} & 1.0009\\
+	& |\!|e_{h}|\!|_{L^2} & 1.1256 \times 10^{-2} & 3.6017 \times 10^{-3} & 1.7376 \times 10^{-3} & 1.0227 \times 10^{-3} & 1.8426\\
+	\midrule
+	2 & |\!|\nabla e_{h}|\!|_{L^2}   & 6.5447 \times 10^{-2} & 1.7846 \times 10^{-2} & 8.1377 \times 10^{-3} & 4.6327 \times 10^{-3} & 1.9583\\
+	& |\!|e_{h}|\!|_{L^2} & 5.3216 \times 10^{-3} & 7.2800 \times 10^{-4} & 2.2107 \times 10^{-4} & 9.4460 \times 10^{-5} & 2.9557\\
+	\midrule
+	3 & |\!|\nabla e_{h}|\!|_{L^2}   & 1.1484 \times 10^{-2} & 1.5987 \times 10^{-3} & 4.8485 \times 10^{-4} & 2.0627 \times 10^{-4} & 2.9708\\
+	& |\!|e_{h}|\!|_{L^2} & 8.3358 \times 10^{-4} & 5.7744 \times 10^{-5} & 1.1575 \times 10^{-5} & 3.6715 \times 10^{-6} & 3.9915\\
+	\bottomrule
+	\end{array}
+	\]
+	\caption{Errors of the DG polyhedral method with respect to $h$-refinement over tetrahedral meshes.} \label{tab:htet}
+\end{table}
+\\Subsequently we move to structured hexahedral meshes; we solve the problem over a sequence of four meshes of 8, 64, 216, 512 elements. We see in Table~\ref{tab:hhex} that again we can obtain optimal results.\\
+After that we try with a sequence of mixed meshes, made of both tetrahedral and hexahedral elements, we have in Table~\ref{tab:hhextet} the results and the behaviour is still good.\\
+At last we experiment completely general polyhedral meshes generated with METIS, in which different kinds of polyhedra are employed. In Table~\ref{tab:hpol} we observe that, even if the rates are not perfect since meshes are no more well structured, our DG polyhedral method can manage successfully.
+\begin{table}[h!]\footnotesize
+	\centering
+	\[
+	\begin{array}{ccccccc}
+	\toprule
+	r & Error & \text{8 elem} & \text{64 elem} & \text{216 elem} & 
+	\text{512 elem} & \text{Rate} \\ 
+	\midrule
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.1840 \times 10^{-1} & 1.6678 \times 
+	10^{-1} & 1.1196 \times 10^{-1} & 8.4123 \times 10^{-2} & 0.9938\\
+	& |\!|e_{h}|\!|_{L^2} & 2.7755 \times 10^{-2} & 7.3256 \times 10^{-3} & 3.3204 \times 10^{-3} & 
+	1.8931 \times 10^{-3} & 1.9530\\
+	\midrule
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 6.9691 \times 10^{-2} & 1.8519 \times 
+	10^{-2} & 8.2554 \times 10^{-3} & 4.6362 \times 10^{-3} & 2.0056\\
+	& |\!|e_{h}|\!|_{L^2} & 4.9882 \times 10^{-3} & 6.5314 \times 10^{-4} & 1.9059 \times 10^{-4} & 
+	7.9122 \times 10^{-5} & 3.0560\\
+	\midrule
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.6100 \times 10^{-2} & 2.1286 \times 
+	10^{-3} & 6.1836 \times 10^{-4} & 2.5782 \times 10^{-4} & 3.0409\\
+	& |\!|e_{h}|\!|_{L^2} & 1.0479 \times 10^{-3} & 6.6445 \times 10^{-5} & 1.2080 \times 10^{-5} & 
+	3.6604 \times 10^{-6} & 4.1503\\
+	\bottomrule
+	\end{array}
+	\]
+	\caption{Errors of the DG polyhedral method with respect to $h$-refinement over hexahedral meshes.} \label{tab:hhex}
+%\end{table}
+%\begin{table}[h]\footnotesize
+%	\centering
+	\[
+	\begin{array}{ccccccc}
+	\toprule
+	r & Error & \text{28 elem} & \text{224 elem} & \text{756 elem} & 
+	\text{1792 elem} & \text{Rate} \\ 
+	\midrule
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.3681 \times 10^{-1} & 1.8227 \times 
+	10^{-1} & 1.2424 \times 10^{-1} & 9.4090 \times 10^{-2} & 0.9662\\
+	& |\!|e_{h}|\!|_{L^2} & 2.5401 \times 10^{-2} & 6.1132 \times 10^{-3} & 2.6651 \times 10^{-3} & 
+	1.4851 \times 10^{-3} & 2.0326\\
+	\midrule
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 7.4183 \times 10^{-2} & 1.9944 \times 
+	10^{-2} & 8.9959 \times 10^{-3} & 5.0984 \times 10^{-3} & 1.9738\\
+	& |\!|e_{h}|\!|_{L^2} & 4.1276 \times 10^{-3} & 7.0478 \times 10^{-4} & 2.1079 \times 10^{-4} & 
+	8.9470 \times 10^{-5} & 2.9787\\
+	\midrule
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.8013 \times 10^{-2} & 2.3198 \times 
+	10^{-3} & 6.6815 \times 10^{-4} & 2.7689 \times 10^{-4} & 3.0621\\
+	& |\!|e_{h}|\!|_{L^2} & 1.1527 \times 10^{-3} & 7.1514 \times 10^{-5} & 1.3122 \times 10^{-5} & 
+	3.9958 \times 10^{-6} & 4.1332\\
+	\bottomrule
+	\end{array}
+	\]
+	\caption{Errors of the DG polyhedral method with respect to $h$-refinement over tetrahedral-hexahedral meshes.} \label{tab:hhextet}
+%\end{table}
+%\begin{table}[h]\footnotesize
+%	\centering
+	\[
+	\begin{array}{ccccccc}
+	\toprule
+	r & Error & \text{15 elem} & \text{120 elem} & \text{392 elem} & 
+	\text{965 elem} & \text{Rate} \\ 
+	\midrule
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.5875 \times 10^{-1} & 2.5131 \times 
+	10^{-1} & 1.8462 \times 10^{-1} & 1.4168 \times 10^{-1} & 0.9200\\
+	& |\!|e_{h}|\!|_{L^2} & 3.1209 \times 10^{-2} & 1.7716 \times 10^{-2} & 1.0018 \times 10^{-2} & 
+	5.9973 \times 10^{-3} & 1.7935\\
+	\midrule
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 8.7963 \times 10^{-2} & 4.2298 \times 
+	10^{-2} & 2.3058 \times 10^{-2} & 1.3036 \times 10^{-2} & 1.9823\\
+	& |\!|e_{h}|\!|_{L^2} & 5.3520 \times 10^{-3} & 1.8324 \times 10^{-3} & 7.5865 \times 10^{-4} & 2.8963 \times 10^{-4} & 3.3472\\
+	\midrule
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.9945 \times 10^{-2} & 6.1835 \times 
+	10^{-3} & 2.5932 \times 10^{-3} & 1.1137 \times 10^{-3} & 2.9381\\
+	& |\!|e_{h}|\!|_{L^2} & 1.4164 \times 10^{-3} & 2.2474 \times 10^{-4} & 7.0145 \times 10^{-5} & 2.0407 \times 10^{-5} & 4.2918\\
+	\bottomrule
+	\end{array}
+	\]
+	\caption{Errors of the DG polyhedral method with respect to $h$-refinement over general polyhedral meshes.} \label{tab:hpol}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparison with other methods}
+Then we want to compare errors of our DG method for polyhedral elements with those of the standard SIPG method~\eqref{eq:dgfemform}, based on a Lagrange polynomial basis, and those of the standard continuous Galerkin finite element method (computed with FreeFem++\footnote{\url{http://www.freefem.org/}}). We see in Figure~\ref{fig:comp} that our polyhedral DG method behaves well, as the convergence ratio is the same of the other two methods but the absolute error in most of the cases is smaller.
+\begin{figure}[h]
+\centering
+\subfloat[][$r=1$, $|\!|\nabla e_h|\!|_{L^2(\mathcal{T})}$] {
+\begin{tikzpicture}
+\begin{loglogaxis}[width=0.53\textwidth, xlabel=Diameter $h$, x dir=reverse, xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
+\addplot coordinates
+{(0.866, 3.7594e-1) (0.433, 1.9785e-1) (0.289, 1.3266e-1) (0.216, 9.9471e-2)};
+\addplot coordinates
+{(0.866, 4.2617e-1) (0.433, 2.2842e-1) (0.289, 1.5530e-1) (0.216, 1.1752e-1)};
+\addplot coordinates
+{(0.866, 6.3842e-1) (0.433, 3.0849e-1) (0.289, 2.0414e-1) (0.216, 1.5270e-1)};
+\legend{$DGp$, $DG$, $CG$}
+\end{loglogaxis}
+\end{tikzpicture}}
+\subfloat[$r=1$, $|\!|e_h|\!|_{L^2(\mathcal{T})}$]{
+\begin{tikzpicture}
+\begin{loglogaxis}[width=0.53\textwidth, xlabel=Diameter $h$, x dir=reverse, xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
+\addplot coordinates
+{(0.866, 1.1256e-2) (0.433, 3.6017e-3) (0.289, 1.7376e-3) (0.216, 1.0227e-3)};
+\addplot coordinates
+{(0.866, 3.0189e-2) (0.433, 8.2593e-3) (0.289, 3.7849e-3) (0.216, 2.1654e-3)};
+\addplot coordinates
+{(0.866, 8.0221e-2) (0.433, 1.9297e-2) (0.289, 8.4678e-3) (0.216, 4.7368e-3)};
+\legend{$DGp$, $DG$, $CG$}
+\end{loglogaxis}
+\end{tikzpicture}}\\
+\subfloat[][$r=2$, $|\!|\nabla e_h|\!|_{L^2(\mathcal{T})}$]{
+\begin{tikzpicture}
+\begin{loglogaxis}[width=0.53\textwidth, xlabel=Diameter $h$, x dir=reverse, xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
+\addplot coordinates
+{(0.866, 6.5447e-2) (0.433, 1.7846e-2) (0.289, 8.1377e-3) (0.216, 4.6327e-3)};
+\addplot coordinates
+{(0.866, 8.2336e-2) (0.433, 2.2406e-2) (0.289, 1.0125e-2) (0.216, 5.7278e-3)};
+\addplot coordinates
+{(0.866, 1.1617e-1) (0.433, 3.0729e-2) (0.289, 1.3864e-2) (0.216, 7.8470e-3)};
+\legend{$DGp$, $DG$, $CG$}
+\end{loglogaxis}
+\end{tikzpicture}}
+\subfloat[$r=2$, $|\!|e_h|\!|_{L^2(\mathcal{T})}$]{
+\begin{tikzpicture}
+\begin{loglogaxis}[width=0.53\textwidth, xlabel=Diameter $h$, x dir=reverse, xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
+\addplot coordinates
+{(0.866, 5.3216e-3) (0.433, 7.2800e-4) (0.289, 2.2107e-4) (0.216, 9.4460e-5)};
+\addplot coordinates
+{(0.866, 2.1435e-3) (0.433, 3.0647e-4) (0.289, 9.5019e-5) (0.216, 4.1058e-5)};
+\addplot coordinates
+{(0.866, 6.8249e-3) (0.433, 8.4316e-4) (0.289, 2.4775e-4) (0.216, 1.0415e-4)};
+\legend{$DGp$, $DG$, $CG$}
+\end{loglogaxis}
+\end{tikzpicture}}
+\caption{Comparison of the error with respect to $h$-refinement over tetrahedral meshes among the polyhedral DG method (DGp), standard SIPG method (DG) and standard continuous Galerkin finite element method (CG).} 
+\label{fig:comp}	
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\textit{p}-convergence}
+Finally try to investigate the convergence with respect to $p$-refinement; we see in Figure~\ref{fig:pconv} that we have exponential convergence since, on the linear-log scale, the convergence plots become straight lines.
+\begin{figure}[h]
+	\centering
+	\subfloat[][Tetrahedral elements.]{
+	\begin{tikzpicture}
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\addplot coordinates
+	{(23.08, 9.9471e-2) (31.32, 4.6327e-3) (39.46, 2.0627e-4)};
+	\addplot coordinates
+	{(23.08, 1.0227e-3) (31.32, 9.4460e-5) (39.46, 3.6715e-6)};
+	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
+	\end{semilogyaxis}
+	\end{tikzpicture}}
+	\subfloat[][Hexahedral elements.]{
+	\begin{tikzpicture}
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\addplot coordinates
+	{(12.70, 8.4123e-2) (17.24, 4.6362e-3) (21.72, 2.5782e-4)};
+	\addplot coordinates
+	{(12.70, 1.8931e-3) (17.24, 7.9122e-5) (21.72, 3.6604e-6)};
+	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
+	\end{semilogyaxis}
+	\end{tikzpicture}}\\
+	\subfloat[][Tetrahedral-hexahedral elements.]{
+	\begin{tikzpicture}
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\addplot coordinates
+	{(19.28, 9.4090e-2) (26.17, 5.0984e-3) (32.97, 2.7689e-4)};
+	\addplot coordinates
+	{(19.28, 1.4851e-3) (26.17, 8.9470e-5) (32.97, 3.9958e-6)};
+	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
+	\end{semilogyaxis}
+	\end{tikzpicture}}
+	\subfloat[][Polyhedral elements.]{
+	\begin{tikzpicture}
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\addplot coordinates
+	{(15.68, 1.4168e-1) (21.29, 1.3036e-2) (26.82, 1.1137e-3)};
+	\addplot coordinates
+	{(15.68, 5.9973e-3) (21.29, 2.8963e-4) (26.82, 2.0407e-5)};
+	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
+	\end{semilogyaxis}
+	\end{tikzpicture}}
+	\caption{Errors of the DG polyhedral method with respect to $p$-refinement over different kinds of meshes.} \label{fig:pconv}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusions}\label{sec:conc}
+We have seen the flexibility of handling different kinds of meshes always with 
+optimal results. The drawback is obviously the higher number of degrees of 
+freedom with respect to continuous finite elements. In future we can expand 
+this algorithm different boundary conditions without much effort and to 
+different differential operators 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{99}
 	\bibitem{review}
 	Antonietti P. F., Cangiani  A., Collins J., Dong Z., Georgoulis E. H., Giani S., Houston P.: Review of discontinuous Galerkin finite element methods for partial differential equations on complicated domains. \emph{Building bridges: connections and challenges in modern approaches to numerical partial differential equations, Lecture Notes in Computational Science and Engineering}, volume 114, 279–307 (2016).
