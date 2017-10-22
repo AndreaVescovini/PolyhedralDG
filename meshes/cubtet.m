@@ -1,11 +1,11 @@
 % Partition hexahedral stuctured grid into hexahedral/tetrahedral structured grid
 
 % read input file and elaborate the mesh
-file_input = 'cube_str3072p.mesh';
+file_input = 'cube_str1296h.mesh';
 
 % open output file 
 [~, name_out, ~] = fileparts(file_input);
-file_output = strcat(name_out, 'ht.mesh');
+file_output = strcat(name_out, 't.mesh');
 fo = fopen(file_output, 'wt');
 fi = fopen(file_input, 'rt');
 

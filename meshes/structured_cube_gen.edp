@@ -3,19 +3,22 @@
 load "msh3"
 load "medit"
 
-mesh3 Th1 = cube(1,1,1, flags=4);
-medit("Th1", Th1);
-savemesh(Th1, "cube_str.mesh");
+// mesh3 Th1 = cube(1,1,1);
+// // medit("Th1", Th1);
+// savemesh(Th1, "cube_str6.mesh");
 
-/*mesh3 Th2 = cube(2,2,2);
-medit("Th2", Th2);
-savemesh(Th2, "cube_str48.mesh");
+mesh3 Th2 = cube(2,2,2);
+// medit("Th2", Th2);
+savemesh(Th2, "cube_stra48t.mesh");
 
 mesh3 Th4 = cube(4,4,4);
-medit("Th4", Th4);
-savemesh(Th4, "cube_str384.mesh");
+// medit("Th4", Th4);
+savemesh(Th4, "cube_stra384t.mesh");
+
+mesh3 Th6 = cube(6,6,6);
+// medit("Th6", Th6);
+savemesh(Th6, "cube_stra1296t.mesh");
 
 mesh3 Th8 = cube(8,8,8);
-medit("Th8", Th8);
-savemesh(Th8, "cube_str3072.mesh");
-*/
+// medit("Th8", Th8);
+savemesh(Th8, "cube_stra3072t.mesh");
