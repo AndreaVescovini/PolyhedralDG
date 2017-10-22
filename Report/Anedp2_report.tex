@@ -37,8 +37,18 @@
 \begin{abstract}
 	The main goal of this project is to implement a Discontinuous Galerkin (DG) method for solving a three-dimensional Poisson problem with Dirichlet boundary conditions, employing a general polyhedral mesh.\\
 	DG methods have shown to be very flexible and have been successfully applied to hyperbolic, elliptic and parabolic problem arising from many different fields of application.
-	Moreover one of the main advantages with respect to the continuous framework is the possibility of handling meshes with hanging nodes and made of general-shaped elements without too many difficulties.\\
-	In section~\ref{sec:DG} we recover the main results about standard DG methods, then in section~\ref{sec:poly} we develop the theory in order to handle polyhedral grids. Subsequently in section~\ref{sec:imp} we explain our main choices for the algorithm implementation and in section~\ref{sec:res} we present the numerical results we obtained in some prototypal cases.
+	Moreover one of the main advantages with respect to the continuous 
+	framework is the possibility of handling meshes with hanging nodes and made 
+	of general-shaped elements without too many difficulties. Meshes made of 
+	general polyhedral elements can be useful in many problems, especially when 
+	we have to deal with domains that present small details or microstructures; 
+	these features would need too many standard elements to be described and so 
+	too many degrees of freedom.\\
+	In Section~\ref{sec:DG} we recover the main results about standard DG 
+	methods, then in Section~\ref{sec:poly} we develop the theory in order to 
+	handle polyhedral grids. Afterwards in Section~\ref{sec:imp} we explain our 
+	main choices for the algorithm implementation and in Section~\ref{sec:res} 
+	we present the numerical results we obtained in some prototypal cases.
 \end{abstract}
 \newpage
 \phantomsection
@@ -689,46 +699,53 @@ Then we want to compare errors of our DG method for polyhedral elements with tho
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\textit{p}-convergence}
-Finally try to investigate the convergence with respect to $p$-refinement; we see in Figure~\ref{fig:pconv} that we have exponential convergence since, on the linear-log scale, the convergence plots become straight lines.
+Finally try to investigate the convergence with respect to $p$-refinement; we 
+see in Figure~\ref{fig:pconv} that we have exponential convergence with every 
+kind of mesh since, on the linear-log scale, the convergence plots become 
+straight lines.
 \begin{figure}[h]
 	\centering
 	\subfloat[][Tetrahedral elements.]{
 	\begin{tikzpicture}
-	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={Basis degree}, 
+	xtick={1,2,3}]
 	\addplot coordinates
-	{(23.08, 9.9471e-2) (31.32, 4.6327e-3) (39.46, 2.0627e-4)};
+	{(1, 9.9471e-2) (2, 4.6327e-3) (3, 2.0627e-4)};
 	\addplot coordinates
-	{(23.08, 1.0227e-3) (31.32, 9.4460e-5) (39.46, 3.6715e-6)};
+	{(1, 1.0227e-3) (2, 9.4460e-5) (3, 3.6715e-6)};
 	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
 	\end{semilogyaxis}
 	\end{tikzpicture}}
 	\subfloat[][Hexahedral elements.]{
 	\begin{tikzpicture}
-	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={Basis degree}, 
+	xtick={1,2,3}]
 	\addplot coordinates
-	{(12.70, 8.4123e-2) (17.24, 4.6362e-3) (21.72, 2.5782e-4)};
+	{(1, 8.4123e-2) (2, 4.6362e-3) (3, 2.5782e-4)};
 	\addplot coordinates
-	{(12.70, 1.8931e-3) (17.24, 7.9122e-5) (21.72, 3.6604e-6)};
+	{(1, 1.8931e-3) (2, 7.9122e-5) (3, 3.6604e-6)};
 	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
 	\end{semilogyaxis}
 	\end{tikzpicture}}\\
 	\subfloat[][Tetrahedral-hexahedral elements.]{
 	\begin{tikzpicture}
-	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={Basis degree}, 
+	xtick={1,2,3}]
 	\addplot coordinates
-	{(19.28, 9.4090e-2) (26.17, 5.0984e-3) (32.97, 2.7689e-4)};
+	{(1, 9.4090e-2) (2, 5.0984e-3) (3, 2.7689e-4)};
 	\addplot coordinates
-	{(19.28, 1.4851e-3) (26.17, 8.9470e-5) (32.97, 3.9958e-6)};
+	{(1, 1.4851e-3) (2, 8.9470e-5) (3, 3.9958e-6)};
 	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
 	\end{semilogyaxis}
 	\end{tikzpicture}}
 	\subfloat[][Polyhedral elements.]{
 	\begin{tikzpicture}
-	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={(dof)$^{1/3}$}]
+	\begin{semilogyaxis}[width=0.53\textwidth, xlabel={Basis degree}, 
+	xtick={1,2,3}]
 	\addplot coordinates
-	{(15.68, 1.4168e-1) (21.29, 1.3036e-2) (26.82, 1.1137e-3)};
+	{(1, 1.4168e-1) (2, 1.3036e-2) (3, 1.1137e-3)};
 	\addplot coordinates
-	{(15.68, 5.9973e-3) (21.29, 2.8963e-4) (26.82, 2.0407e-5)};
+	{(1, 5.9973e-3) (2, 2.8963e-4) (3, 2.0407e-5)};
 	\legend{$|\!|\nabla e_{h}|\!|_{L^2}$, $|\!|e_{h}|\!|_{L^2}$}
 	\end{semilogyaxis}
 	\end{tikzpicture}}
@@ -736,11 +753,20 @@ Finally try to investigate the convergence with respect to $p$-refinement; we se
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}\label{sec:conc}
-We have seen the flexibility of handling different kinds of meshes always with 
-optimal results. The drawback is obviously the higher number of degrees of 
-freedom with respect to continuous finite elements. In future we can expand 
-this algorithm different boundary conditions without much effort and to 
-different differential operators 
+We have seen that the DGFEM method for polyhedral meshes that we have developed 
+has a great flexibility, we can handle different kinds of meshes always with 
+optimal results in terms of convergence. The assumptions we made on the mesh 
+are quite weak and do not impose anything about number of faces, angles or 
+relative sizes of the elemental interfaces. A drawback is obviously the higher 
+computational cost due to the fact that the basis is evaluated directly on the 
+physical elements and that, as for any DG method, the number of degrees of 
+freedom is higher with respect to standard continuous finite elements. This 
+issue however can be compensated by the fact that we can employ fewer elements 
+when we have to deal with complicated geometries made of small features or 
+microstructures.\\
+We studied only the Poisson problem with Dirichlet boundary conditions, but in 
+future we could expand this algorithm to different boundary conditions without 
+and more complicated elliptic operators without much effort.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{99}
 	\bibitem{review}
