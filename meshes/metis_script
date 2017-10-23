@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Andrea Vescovini
+#
 # Two parameters are required
 # $1 is the mesh file to be partitioned
 # $2 is the number of partition I want metis to do

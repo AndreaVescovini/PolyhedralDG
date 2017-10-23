@@ -1,6 +1,8 @@
 function [x, y, z] = set_vertices(E2V, VX, VY, VZ)
 %[x, y, z] = set_vertices(E2V, VX, VY, VZ)
 %Set vertices for every tetrahedron.
+%
+% Author: Andrea Vescovini
 
 % vertices
 r = [0; 1; 0; 0];

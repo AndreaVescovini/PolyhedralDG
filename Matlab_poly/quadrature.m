@@ -1,13 +1,15 @@
 function [nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N)
 %[nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N).
 %Computes quadrature nodes and weights over the simplex tetrahedron
-%and triangle. 3D from http://www.cs.rpi.edu/~flaherje/pdf/fea6.pdf and 2D from
+%and triangle. 3D from Keast and 2D from
 %Riviere's book; commented ones from Quarteroni's book.
 %Computes also the maps from the 2D refence triangle to the faces of
 %the 3D reference tetrahedron.
 %Ones in the quadrature nodes are needed by the translation vector of Fk.
 %node_maps contains the maps from the reference simplex in 2D to the faces
 %of the reference simplex in 3D.
+%
+% Author: Andrea Vescovini
 
 if N == 1
     % Degree of exactness 2
@@ -22,7 +24,7 @@ if N == 1
              1   1   1;
              1   1   1];
     wei2 = 0.5*[1/3 1/3 1/3];
-    
+
 elseif N == 2
     % Degree of exactness 2
     nod3 = [0.585410196624969 0.138196601125011 0.138196601125011 0.138196601125011;
@@ -36,7 +38,7 @@ elseif N == 2
             1              1              1              1              1              1;
             1              1              1              1              1              1];
     wei2 = [0.1116907948390 0.1116907948390 0.1116907948390 0.0549758718276 0.0549758718276 0.0549758718276];
-    
+
 elseif N >= 3
     if N >=4
         disp('Warning: quadrature formulas are not exact for N >= 4');
@@ -53,10 +55,10 @@ elseif N >= 3
     nod2 = [1/3 0.479308067841 0.260345966079 0.260345966079 0.869739794195 0.065130102902 0.065130102902 0.048690315425 0.312865496004 0.048690315425 0.638444188569 0.638444188569 0.312865496004;
         1/3 0.260345966079 0.260345966079 0.479308067841 0.065130102902 0.065130102902 0.869739794195 0.312865496004 0.048690315425 0.638444188569 0.048690315425 0.312865496004 0.638444188569;
         1   1              1              1              1              1              1              1              1              1              1              1              1;
-        1   1              1              1              1              1              1              1              1              1              1              1              1];    
-    wei2 = [-0.074785022233 0.087807628716 0.087807628716 0.087807628716 0.026673617804 0.026673617804 0.026673617804 0.038556880445 0.038556880445 0.038556880445 0.038556880445 0.038556880445 0.038556880445];    
+        1   1              1              1              1              1              1              1              1              1              1              1              1];
+    wei2 = [-0.074785022233 0.087807628716 0.087807628716 0.087807628716 0.026673617804 0.026673617804 0.026673617804 0.038556880445 0.038556880445 0.038556880445 0.038556880445 0.038556880445 0.038556880445];
 end
-    
+
 % Degree of exactness 3
 % nod3 = [0.25 0.5 1/6 1/6 1/6;
 %         0.25 1/6 0.5 1/6 1/6;
@@ -68,7 +70,7 @@ end
 % nod2 = [1/3 0.6 0.2 0.2;
 %         1/3 0.2 0.6 0.2;
 %          1   1   1   1;
-%          1   1   1   1]; % ones are needed by the transaltion 
+%          1   1   1   1]; % ones are needed by the transaltion
 % wei2 = 0.5*[-9/16 25/48 25/48 25/48];
 
 % Maps from the 2D refence triangle to the faces of the 3D reference
@@ -79,32 +81,32 @@ node_maps(:,:,1) = [0 1 0 0;
                     1 0 0 0;
                     0 0 0 0;
                     0 0 0 1];
-             
+
 node_maps(:,:,2) = [1 0 0 0;
                     0 0 0 0;
                     0 1 0 0;
                     0 0 0 1];
-             
+
 node_maps(:,:,3) = [0 0 0 0;
                     0 1 0 0;
                     1 0 0 0;
                     0 0 0 1];
-             
+
 node_maps(:,:,4) = [1  0 0 0;
                     0  1 0 0;
                    -1 -1 1 0;
                     0  0 0 1];
-               
+
 node_maps_inv(:,:,1) = [0 1 0;
                         1 0 0];
-                    
+
 node_maps_inv(:,:,2) = [1 0 0;
                         0 0 1];
 
 node_maps_inv(:,:,3) = [0 0 1;
                         0 1 0];
-           
+
 node_maps_inv(:,:,4) = [1 0 0;
                         0 1 0];
-              
+
 end

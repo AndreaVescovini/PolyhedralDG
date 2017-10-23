@@ -1,6 +1,8 @@
 % 3D Poisson problem with Dirichlet conditions
 % -lapl(u) = f    in the domain
 %    u = gd   on the boundary
+%
+% Author: Andrea Vescovini
 
 uex = @(p) exp(p(1,:).*p(2,:).*p(3,:));
 f = @(p) -uex(p).*((p(1,:).*p(2,:)).^2+(p(1,:).*p(3,:)).^2+(p(2,:).*p(3,:)).^2);
@@ -19,7 +21,7 @@ uex_grad = @(p) [uex(p).*p(2,:).*p(3,:); uex(p).*p(1,:).*p(3,:); uex(p).*p(1,:).
 % uex = @(p) p(1,:).*p(2,:);
 % f = @(p) 0;
 % uex_grad = @(p) [p(2,:); p(1,:); 0];
- 
+
 % uex = @(p) p(1,:);
 % f = @(p) 0;
 % uex_grad = @(p) [1; 0; 0];

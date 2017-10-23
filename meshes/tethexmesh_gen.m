@@ -1,9 +1,11 @@
 % Partition hexahedral stuctured grid into hexahedral/tetrahedral structured grid
+%
+% Author: Andrea Vescovini
 
 % read input file and elaborate the mesh
 file_input = 'cube_str1296h.mesh';
 
-% open output file 
+% open output file
 [~, name_out, ~] = fileparts(file_input);
 file_output = strcat(name_out, 't.mesh');
 fo = fopen(file_output, 'wt');
@@ -29,7 +31,7 @@ fprintf(fo, '%d\n', NK*3.5);
 ii = 1;
 primo = zeros(NK/2);
 for ie = 1:Ntet
-    
+
     pol = fscanf(fi, '%d', 1);
 
     if mod(pol,2) == 0

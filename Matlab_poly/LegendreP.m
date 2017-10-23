@@ -2,6 +2,8 @@ function [P, Pder] = LegendreP(x, N, int)
 % function [P] = LegendreP(x, N, int)
 % Evaluate (scaled) Legendre Polynomial and its derivative defined on the interval int
 % at points x for order N.
+%
+% Author: Andrea Vescovini
 
 % Turn points into row if needed.
 xp = x;

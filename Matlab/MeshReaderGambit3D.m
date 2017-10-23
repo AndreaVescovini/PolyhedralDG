@@ -4,11 +4,13 @@ function [mesh] = MeshReaderGambit3D(FileName)
 % Purpose  : Read in basic grid information to build grid and build
 % connectivity matrices.
 % NOTE     : gambit *.neu format is assumed
+%
+% Author: Andrea Vescovini
 
 Fid = fopen(FileName, 'rt');
 
-% read intro 
-for i=1:6 
+% read intro
+for i=1:6
   line = fgetl(Fid);
 end
 
@@ -17,7 +19,7 @@ dims = fscanf(Fid, '%d');
 
 Nv = dims(1); K = dims(2);
 
-for i=1:2 
+for i=1:2
   line = fgetl(Fid);
 end
 
@@ -31,7 +33,7 @@ VX = (VX+ones(1,Nv))/2;
 VY = (VY+ones(1,Nv))/2;
 VZ = (VZ+ones(1,Nv))/2;
 
-for i=1:3 
+for i=1:3
   line = fgetl(Fid);
 end
 

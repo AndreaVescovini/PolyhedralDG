@@ -2,8 +2,10 @@ function [areas, normals] = metric2D(x, y, z, Nfaces)
 %[areas, normals] = metric2D(x, y, z, Nfaces).
 %Function that computes for every face of every element the area doubled
 %and the normal vector.
+%
+% Author: Andrea Vescovini
 
-areas = zeros(Nfaces); % sfruttando EToE e EToF potrei non calcolare le aree che così calcolo due volte
+areas = zeros(Nfaces); % sfruttando EToE e EToF potrei non calcolare le aree che cosï¿½ calcolo due volte
 normals = zeros(3,Nfaces);
 
 
@@ -21,4 +23,3 @@ areas(4) = norm(cross([x(4)-x(3) y(4)-y(3) z(4)-z(3)],[x(2)-x(3) y(2)-y(3) z(2)-
 normals(:,4) = cross([x(4)-x(3) y(4)-y(3) z(4)-z(3)],[x(2)-x(3) y(2)-y(3) z(2)-z(3)])./areas(4);
 
 end
-

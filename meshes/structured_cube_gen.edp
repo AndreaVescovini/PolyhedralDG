@@ -1,4 +1,6 @@
 // Creates a structured tetrahedral mesh in the cube [0,1]x[0,1]x[0,1]
+//
+// Author: Andrea Vescovini
 
 load "msh3"
 load "medit"

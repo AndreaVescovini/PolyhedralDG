@@ -5,6 +5,8 @@ function [faces, faces_neig] = read_faces(mesh)
 % tetrahedron sharing the face, the local number of that face for that
 % tetrahedron, the second tetrahedron sharing that face and its local
 % number of the face.
+%
+% Author: Andrea Vescovini
 
 % I make a preallocation by excess
 tot_faces = mesh.Ntet*4;

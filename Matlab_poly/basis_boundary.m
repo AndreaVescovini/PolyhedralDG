@@ -1,7 +1,9 @@
 function [phi_bordo, grad_bordo] = basis_boundary(bb, E2P, faces_neig, blist, Fk, node_maps, nod2)
 % function [phi_bordo, grad_bordo] = basis(bb, E2P, faces_neig, blist, Fk, node_maps, nod2)
-% This function evaluates for every face the basis functions both of the 
+% This function evaluates for every face the basis functions both of the
 % two sharing tratrahedra E1 and E2 at the 2D quadrature nodes.
+% 
+% Author: Andrea Vescovini
 
 nq2 = size(nod2,2);
 Np = size(blist,1);
@@ -20,7 +22,7 @@ for e = 1:Nfaces
          [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,E2P(E1)));
          [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,E2P(E1)));
          [valz, dvalz] = LegendreP(pt(3,:), blist(f,3), bb(3,:,E2P(E1)));
-    
+
          phi_bordo(f,:,e,1) = valx.*valy.*valz;
          grad_bordo(1,f,:,e,1) = dvalx.*valy.*valz;
          grad_bordo(2,f,:,e,1) = valx.*dvaly.*valz;
@@ -34,7 +36,7 @@ for e = 1:Nfaces
             [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,E2P(E2)));
             [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,E2P(E2)));
             [valz, dvalz] = LegendreP(pt(3,:), blist(f,3), bb(3,:,E2P(E2)));
-    
+
             phi_bordo(f,:,e,2) = valx.*valy.*valz;
             grad_bordo(1,f,:,e,2) = dvalx.*valy.*valz;
             grad_bordo(2,f,:,e,2) = valx.*dvaly.*valz;
@@ -44,4 +46,3 @@ for e = 1:Nfaces
 end
 
 end
-

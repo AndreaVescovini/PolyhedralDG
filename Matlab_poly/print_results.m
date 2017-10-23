@@ -1,4 +1,7 @@
 % This script prints over a file the results of convergence tests.
+%
+% Author: Andrea Vescovini
+
 res = fopen('results_gen.txt', 'wt');
 fprintf(res, 'EXPONENTIAL - POLYHEDRAL GRID\n');
 

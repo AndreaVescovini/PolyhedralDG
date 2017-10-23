@@ -9,10 +9,12 @@ function [mesh] = MeshReader3Dpoly(FileName)
 % K: Number of polyhedral elements
 % E2V: Matrix containing Tetrahedra to vertices connectivity
 % E2P: Vector containing for each tetrahedron the number of the polyhedron it belongs to
+%
+% Author: Andrea Vescovini
 
 Fid = fopen(FileName, 'rt');
 
-% read intro 
+% read intro
 for ii = 1:5
   line = fgetl(Fid);
 end

@@ -2,10 +2,12 @@ function [mesh] = MeshReader3D(FileName)
 % [mesh] = MeshReader3D(FileName)
 % Read in basic grid information to build grid and build connectivity matrices.
 % *.mesh format is assumed
+%
+% Author: Andrea Vescovini
 
 Fid = fopen(FileName, 'rt');
 
-% read intro 
+% read intro
 for i=1:5
   line = fgetl(Fid);
 end
@@ -23,7 +25,7 @@ VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);
 % VY = (VY+ones(1,Nv))/2;
 % VZ = (VZ+ones(1,Nv))/2;
 
-for i=1:3 
+for i=1:3
   line = fgetl(Fid);
 end
 

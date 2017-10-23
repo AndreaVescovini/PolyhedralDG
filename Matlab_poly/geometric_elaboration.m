@@ -20,6 +20,8 @@ function [geom] = geometric_elaboration(mesh)
 %     to each tetrahedron
 % Jinv: Vector containing the inverse of the jacobian of each Fk
 % Jdet: Vector containing the determinant of each jacobian of each Fk
+%
+% Author: Andrea Vescovini
 
 % set faces of polyhedra and tretrahedra that share them
 [faces, faces_neig] = read_faces(mesh);

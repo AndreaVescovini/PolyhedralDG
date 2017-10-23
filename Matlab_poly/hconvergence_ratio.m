@@ -2,6 +2,8 @@ function [err_L2, err_H10, r_L2, r_H10] = hconvergence_ratio(uex, f, uex_grad, N
 %function [err_L2, err_H10, r_L2, r_H10] = convergence_ratio(uex, f, uex_grad, N, file_names)
 % Test for the convergence ratio with respect to h-refinement on the unitary
 % cubic domain, on the meshes stored in file_names.
+%
+% Author: Andrea Vescovini
 
 % problem data
 gd = uex;

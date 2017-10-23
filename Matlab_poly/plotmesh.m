@@ -1,6 +1,8 @@
 function [] = plotmesh(mesh)
 %[] = plotmesh(mesh)
 %   Plots the mesh.
+%
+% Author: Andrea Vescovini
 
 n_step = ceil(mesh.K^(1/3));
 
@@ -23,4 +25,3 @@ hold off
 grid on
 
 end
-
