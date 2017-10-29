@@ -1,0 +1,4 @@
+# I ignore object files, executables and make.dep
+obj/
+*.dep
+main

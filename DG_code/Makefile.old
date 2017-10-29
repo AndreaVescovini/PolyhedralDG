@@ -1,0 +1,48 @@
+SOURCE_DIR = src
+HEADER_DIR = include
+BUILD_DIR = obj
+TEST_DIR = test
+MESH_DIR = ../meshes/
+
+SRCS = $(wildcard $(SOURCE_DIR)/*.cpp)
+OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.cpp=.o)))
+
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
+TEST_OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(TEST_SRCS:.cpp=.o)))
+
+CXX = g++
+CXXFLAGS += -Wall -std=c++11
+CPPFLAGS += -I./$(HEADER_DIR)
+# LD_FLAGS =
+# LD_LIBS =
+EXE = main
+DEPEND = make.dep
+
+-include $(DEPEND)
+
+all: $(DEPEND) $(EXE)
+
+.PHONY: all clean distclean depend
+.DEFAULT_GOAL = all
+
+$(EXE): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	@mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+clean:
+	$(RM) -r $(BUILD_DIR)
+	$(RM) $(DEPEND)
+
+distclean: clean
+	$(RM) $(EXE)
+
+depend: $(DEPEND)
+
+$(DEPEND): $(SRCS)
+	@$(RM) $(DEPEND)
+	@for ff in $(SRCS); do \
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MM $$ff >> $(DEPEND); \
+	done;
