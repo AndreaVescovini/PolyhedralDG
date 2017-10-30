@@ -1,4 +1,5 @@
 #include "Point.hpp"
+#include <cmath>
 
 namespace geom {
 
@@ -25,11 +26,17 @@ real Point::getZ() const
   return coords_[2];
 }
 
+real Point::distance(const Point& p2) const
+{
+  return std::sqrt( (this->coords_[0] - p2.coords_[0]) * (this->coords_[0] - p2.coords_[0])
+                  + (this->coords_[1] - p2.coords_[1]) * (this->coords_[1] - p2.coords_[1])
+                  + (this->coords_[2] - p2.coords_[2]) * (this->coords_[2] - p2.coords_[2]) );
+}
+
 std::ostream& operator<<(std::ostream& out, const Point& point)
 {
   out << point.coords_[0] << " " << point.coords_[1] << " " << point.coords_[2];
   return out;
 }
-
 
 }

@@ -2,6 +2,7 @@ SOURCE_DIR = src
 HEADER_DIR = include
 BUILD_DIR = obj
 TEST_DIR = test
+EXE_DIR = bin
 MESH_DIR = ../meshes/
 
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
@@ -17,17 +18,18 @@ CXXFLAGS += -Wall -std=c++11
 CPPFLAGS += -I./$(HEADER_DIR)
 # LD_FLAGS =
 # LD_LIBS =
-EXE = $(basename $(notdir $(TEST_SRCS)))
+EXE = $(addprefix $(EXE_DIR)/, $(basename $(notdir $(TEST_SRCS))))
 DEPEND = make.dep
 
 -include $(DEPEND)
 
 all: $(DEPEND) $(EXE)
 
-.PHONY: all clean distclean depend
+.PHONY: all clean distclean depend run
 .DEFAULT_GOAL = all
 
 $(EXE): $(OBJS)
+	@mkdir -p $(EXE_DIR)
 	$(CXX) $(CXXFLAGS) $^ $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
@@ -38,12 +40,15 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
+run: $(EXE)
+	@$<
+
 clean:
 	$(RM) -r $(BUILD_DIR)
 	$(RM) $(DEPEND)
 
 distclean: clean
-	$(RM) $(EXE)
+	$(RM) -r $(EXE_DIR)
 
 depend: $(DEPEND)
 

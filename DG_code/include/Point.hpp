@@ -3,10 +3,9 @@
 
 #include <array>
 #include <iostream>
+#include "geom.hpp"
 
 namespace geom {
-
-using real = double; // da includere poi da qualche altra parte
 
 class Point
 {
@@ -19,13 +18,13 @@ public:
   real getY() const;
   real getZ() const;
 
+  real distance(const Point& p2) const;
+
   friend std::ostream& operator<<(std::ostream& out, const Point& point);
 
 private:
   std::array<real, 3> coords_;
 };
-
-
 
 }
 

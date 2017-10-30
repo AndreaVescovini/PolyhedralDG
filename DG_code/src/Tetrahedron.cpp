@@ -2,29 +2,29 @@
 
 namespace geom {
 
-Tetrahedron::Tetrahedron(const std::array<labelType, 4>& vertices, labelType polyNo)
-  : vertices_{vertices}, polyNo_{polyNo} {}
+Tetrahedron::Tetrahedron(const std::array<labelType, 4>& vertices, labelType poly)
+  : vertices_{vertices}, poly_{poly} {}
 
 std::array<labelType, 4> Tetrahedron::getVertices() const
 {
   return vertices_;
 }
 
-labelType Tetrahedron::getPolyNo() const
+labelType Tetrahedron::getPoly() const
 {
-  return polyNo_;
+  return poly_;
 }
 
-void Tetrahedron::setPolyNo(labelType polyNo)
+void Tetrahedron::setPoly(labelType poly)
 {
-  polyNo_ = polyNo;
+  poly_ = poly;
 }
 
 std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra)
 {
   out << "V: " << tetra.vertices_[0] << " " << tetra.vertices_[1] << " "
                << tetra.vertices_[2] << " " << tetra.vertices_[3] << ", P: "
-               << tetra.polyNo_;
+               << tetra.poly_;
   return out;
 }
 

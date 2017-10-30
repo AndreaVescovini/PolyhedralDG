@@ -3,26 +3,25 @@
 
 #include <array>
 #include <iostream>
+#include "geom.hpp"
 
 namespace geom {
-
-using labelType = unsigned; // da includere poi da qualche altra parte
 
 class Tetrahedron
 {
 public:
   Tetrahedron() = default;
-  Tetrahedron(const std::array<labelType, 4>& vertices, labelType polyNo = 0);
+  Tetrahedron(const std::array<labelType, 4>& vertices, labelType poly = 0);
 
   std::array<labelType, 4> getVertices() const;
-  labelType getPolyNo() const;
-  void setPolyNo(labelType polyNo);
+  labelType getPoly() const;
+  void setPoly(labelType poly);
 
   friend std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra);
 
 private:
   std::array<labelType, 4> vertices_;
-  labelType polyNo_;
+  labelType poly_;
 };
 
 }
