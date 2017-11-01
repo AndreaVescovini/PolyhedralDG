@@ -8,6 +8,9 @@
 
 namespace dgfem {
 
+using geom::Point;
+using geom::Tetrahedron;
+
 class Mesh;
 
 class MeshProxy
@@ -15,8 +18,8 @@ class MeshProxy
 public:
   explicit MeshProxy(Mesh& mesh);
 
-  std::vector<geom::Point>& getVerticesRef() const;
-  std::vector<geom::Tetrahedron>& getTetrahedraRef() const;
+  std::vector<Point>& getVerticesRef() const;
+  std::vector<Tetrahedron>& getTetrahedraRef() const;
 
 private:
   Mesh& mesh_;

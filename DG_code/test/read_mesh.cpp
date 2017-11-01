@@ -3,8 +3,11 @@
 
 int main()
 {
-  dgfem::MeshReaderPoly reader("../meshes/", "Vertices", "Tetrahedra", "Polyhedra");
-  dgfem::Mesh Th("cube_str48h.mesh", reader);
+  using dgfem::MeshReaderPoly;
+  using dgfem::Mesh;
+
+  MeshReaderPoly reader({"Vertices", "Tetrahedra", "Polyhedra"});
+  Mesh Th("../meshes/cube_str48h.mesh", reader);
   Th.printHead();
 
   return 0;

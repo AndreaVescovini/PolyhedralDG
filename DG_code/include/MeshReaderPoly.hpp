@@ -12,12 +12,11 @@ class MeshReaderPoly : public MeshReader
 {
 public:
   MeshReaderPoly() = default;
-  MeshReaderPoly(std::string folder, std::string titleSec1,
-                 std::string titleSec2, std::string titleSec3);
+  explicit MeshReaderPoly(std::array<std::string, 3> sections);
 
   void read(Mesh& mesh, const std::string& fileName) const;
 
-  void setSections(std::string titleSec1, std::string titleSec2, std::string titleSec3);
+  void setSections(std::array<std::string, 3> sections);
   std::array<std::string, 3> getSections() const;
 
 private:

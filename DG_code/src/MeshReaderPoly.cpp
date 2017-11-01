@@ -7,23 +7,24 @@
 
 namespace dgfem {
 
-MeshReaderPoly::MeshReaderPoly(std::string folder, std::string titleSec1,
-                       std::string titleSec2, std::string titleSec3)
-  : MeshReader(folder), sections_{{titleSec1, titleSec2, titleSec3}} {}
+MeshReaderPoly::MeshReaderPoly(std::array<std::string, 3> sections)
+  : sections_{sections} {}
 
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {
-  std::ifstream meshFile{folder_ + fileName};
+  using geom::Point;
+  using geom::Tetrahedron;
+  using geom::real;
+  using geom::labelType;
+
+  std::ifstream meshFile{fileName};
   if( meshFile.is_open() == false )
-  {
-    std::cerr << "Can't open mesh file. Mesh file does not exist or is corrupted"
-              << std::endl;
-  }
+    std::cerr << "Can't open mesh file. Mesh file does not exist or is corrupted" << std::endl;
 
   // Use the proxy to access the Mesh class
   MeshProxy mp(mesh);
-  std::vector<geom::Point>& vertList = mp.getVerticesRef();
-  std::vector<geom::Tetrahedron>& tetraList = mp.getTetrahedraRef();
+  std::vector<Point>& vertList = mp.getVerticesRef();
+  std::vector<Tetrahedron>& tetraList = mp.getTetrahedraRef();
 
   // Skip the introduction
   std::string curLine;
@@ -42,7 +43,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     meshFile >> curVertex[0];
     meshFile >> curVertex[1];
     meshFile >> curVertex[2];
-    vertList.emplace_back(geom::Point(curVertex));
+    vertList.emplace_back(Point(curVertex));
     meshFile >> tmp; // label of the vertex
   }
 
@@ -62,7 +63,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     meshFile >> curTetra[1];
     meshFile >> curTetra[2];
     meshFile >> curTetra[3];
-    tetraList.emplace_back(geom::Tetrahedron(curTetra));
+    tetraList.emplace_back(Tetrahedron(curTetra));
     meshFile >> tmp; // label of the vertex
   }
 
@@ -83,10 +84,9 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   meshFile.close();
 }
 
-void MeshReaderPoly::setSections(std::string titleSec1, std::string titleSec2,
-                                 std::string titleSec3)
+void MeshReaderPoly::setSections(std::array<std::string, 3> sections)
 {
-  sections_ = {{titleSec1, titleSec2, titleSec3}};
+  sections_ = sections;
 }
 
 std::array<std::string, 3> MeshReaderPoly::getSections() const

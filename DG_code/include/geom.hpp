@@ -1,7 +1,7 @@
 #ifndef _GEOM_HPP_
 #define _GEOM_HPP_
 
-namespace {
+namespace geom {
 
 using real = double;
 using labelType = unsigned;
