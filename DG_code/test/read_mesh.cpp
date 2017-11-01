@@ -1,9 +1,10 @@
 #include "Mesh.hpp"
+#include "MeshReaderPoly.hpp"
 
 int main()
 {
-  geom::Mesh Th;
-  Th.load("cube_str48h.mesh");
+  dgfem::MeshReaderPoly reader("../meshes/", "Vertices", "Tetrahedra", "Polyhedra");
+  dgfem::Mesh Th("cube_str48h.mesh", reader);
   Th.printHead();
 
   return 0;
