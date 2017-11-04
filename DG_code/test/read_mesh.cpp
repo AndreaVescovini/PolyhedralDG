@@ -6,8 +6,8 @@ int main()
   using dgfem::MeshReaderPoly;
   using dgfem::Mesh;
 
-  MeshReaderPoly reader({"Vertices", "Tetrahedra", "Polyhedra"});
-  Mesh Th("../meshes/cube_str48h.mesh", reader);
+  MeshReaderPoly reader;
+  Mesh Th("../meshes/cube_str48h2.mesh", reader);
   Th.printHead();
 
   return 0;

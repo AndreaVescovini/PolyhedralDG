@@ -2,6 +2,7 @@
 #define _FACE_HPP_
 
 #include <array>
+#include <iostream>
 #include "geom.hpp"
 
 namespace geom
@@ -11,23 +12,24 @@ class Face
 {
 public:
   Face() = default;
+  explicit Face(const std::array<labelType, 3> vertices);
 
   labelType getTet1() const;
-  labelType getTet2() const;
   labelType getFtet1() const;
-  labelType getFtet2() const;
 
   real getArea() const;
+  // get normal vector
 
+  friend std::ostream& operator<<(std::ostream& out, const Face& face);
 
-private:
+protected:
   std::array<labelType, 3> vertices_;
   labelType tet1_;
-  labelType tet2_;
   labelType ftet1_;
-  labelType ftet2_;
   real area_;
   // normal vector
+
+  virtual void print(std::ostream& out) const = 0;
 
 };
 

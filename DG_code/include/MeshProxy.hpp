@@ -5,11 +5,13 @@
 #include "Mesh.hpp"
 #include "Point.hpp"
 #include "Tetrahedron.hpp"
+#include "FaceExt.hpp"
 
 namespace dgfem {
 
 using geom::Point;
 using geom::Tetrahedron;
+using geom::FaceExt;
 
 class Mesh;
 
@@ -20,6 +22,7 @@ public:
 
   std::vector<Point>& getVerticesRef() const;
   std::vector<Tetrahedron>& getTetrahedraRef() const;
+  std::vector<FaceExt>& getFacesExtRef() const;
 
 private:
   Mesh& mesh_;

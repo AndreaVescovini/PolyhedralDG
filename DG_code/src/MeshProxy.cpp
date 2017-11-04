@@ -15,4 +15,9 @@ std::vector<Tetrahedron>& MeshProxy::getTetrahedraRef() const
   return mesh_.tetrahedra_;
 }
 
+std::vector<FaceExt>& MeshProxy::getFacesExtRef() const
+{
+  return mesh_.facesExt_;
+}
+
 }

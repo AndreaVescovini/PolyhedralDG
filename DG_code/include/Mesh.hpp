@@ -8,15 +8,17 @@
 #include "MeshReader.hpp"
 #include "Point.hpp"
 #include "Tetrahedron.hpp"
+#include "FaceExt.hpp"
+#include "FaceInt.hpp"
 #include "Polyhedron.hpp"
-#include "Face.hpp"
 
 namespace dgfem {
 
 using geom::Point;
 using geom::Tetrahedron;
 using geom::Polyhedron;
-using geom::Face;
+using geom::FaceExt;
+using geom::FaceInt;
 
 class MeshReader;
 
@@ -27,8 +29,7 @@ public:
 
   Mesh(const std::string& fileName, MeshReader& reader);
 
-  void print(unsigned lineNo, std::ostream& out = std::cout) const;
-  void printAll(std::ostream& out) const;
+  void printAll(std::ostream& out = std::cout) const;
   void printHead(std::ostream& out = std::cout) const;
 
   friend class MeshProxy;
@@ -36,12 +37,15 @@ public:
 private:
   std::vector<Point> vertices_;
   std::vector<Tetrahedron> tetrahedra_;
+  std::vector<FaceExt> facesExt_;
+  std::vector<FaceInt> facesInt_;
   std::vector<Polyhedron> polyhedra_;
-  std::vector<Face> faces_;
   // unsigned verticesNo_;
   // unsigned tetrahedraNo_;
   // unsigned polyhedraNo_;
   // unsigned facesNo_;
+
+  void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
 
 }

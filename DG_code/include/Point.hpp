@@ -13,6 +13,11 @@ public:
   Point() = default;
   explicit Point(const std::array<real, 3>& coords);
 
+  Point(const Point&) = default;
+  Point& operator=(const Point&) = default;
+  Point(Point&&) = default;
+  Point& operator=(Point&&) = default;
+
   std::array<real, 3> getCoords() const;
   real getX() const;
   real getY() const;
@@ -20,10 +25,12 @@ public:
 
   real distance(const Point& p2) const;
 
+  virtual ~Point() = default;
+
   friend std::ostream& operator<<(std::ostream& out, const Point& point);
 
 private:
-  std::array<real, 3> coords_;
+  const std::array<real, 3> coords_;
 };
 
 }
