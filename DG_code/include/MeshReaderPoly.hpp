@@ -11,12 +11,12 @@ namespace dgfem {
 class MeshReaderPoly : public MeshReader
 {
 public:
-  explicit MeshReaderPoly(std::array<std::string, 4> sections =
+  explicit MeshReaderPoly(const std::array<std::string, 4>& sections = // passare per reference?
     {"Vertices", "Tetrahedra", "Triangles", "Polyhedra"});
 
   void read(Mesh& mesh, const std::string& fileName) const;
 
-  void setSections(std::array<std::string, 4> sections);
+  void setSections(const std::array<std::string, 4>& sections);
   std::array<std::string, 4> getSections() const;
 
 private:

@@ -7,6 +7,7 @@ namespace dgfem {
 Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 {
   reader.read(*this, fileName);
+  // computePolyInfo();
 }
 
 void Mesh::printAll(std::ostream& out) const
@@ -19,6 +20,12 @@ void Mesh::printHead(std::ostream& out) const
 {
   this->print(5, out);
 }
+
+// void Mesh::computePolyInfo()
+// {
+//   for(Polyhedron& p : polyhedra_)
+//     p.computeBBandDiam();
+// }
 
 void Mesh::print(unsigned lineNo, std::ostream& out) const
 {

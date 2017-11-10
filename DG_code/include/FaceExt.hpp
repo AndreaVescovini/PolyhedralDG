@@ -4,7 +4,6 @@
 #include <array>
 #include <iostream>
 #include "Face.hpp"
-#include "geom.hpp"
 
 namespace geom
 {
@@ -12,16 +11,15 @@ namespace geom
 class FaceExt : public Face
 {
 public:
-  FaceExt() = default;
-  FaceExt(const std::array<labelType, 3> vertices, unsigned BClabel);
+  // FaceExt() = default;
+  FaceExt(const Vertex& v1, const Vertex& v2, const Vertex& v3, unsigned BClabel);
 
   unsigned getBClabel() const;
 
 private:
-  unsigned BClabel_;
+  unsigned BClabel_; // mettere l'enum
 
-  void print(std::ostream& out) const;
-
+  void print(std::ostream& out) const override;
 };
 
 }

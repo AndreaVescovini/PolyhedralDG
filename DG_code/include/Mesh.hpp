@@ -6,7 +6,7 @@
 #include <iostream>
 #include "MeshProxy.hpp"
 #include "MeshReader.hpp"
-#include "Point.hpp"
+#include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
 #include "FaceInt.hpp"
@@ -14,7 +14,7 @@
 
 namespace dgfem {
 
-using geom::Point;
+using geom::Vertex;
 using geom::Tetrahedron;
 using geom::Polyhedron;
 using geom::FaceExt;
@@ -35,7 +35,7 @@ public:
   friend class MeshProxy;
 
 private:
-  std::vector<Point> vertices_;
+  std::vector<Vertex> vertices_;
   std::vector<Tetrahedron> tetrahedra_;
   std::vector<FaceExt> facesExt_;
   std::vector<FaceInt> facesInt_;
@@ -45,6 +45,7 @@ private:
   // unsigned polyhedraNo_;
   // unsigned facesNo_;
 
+  // void computePolyInfo();
   void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
 

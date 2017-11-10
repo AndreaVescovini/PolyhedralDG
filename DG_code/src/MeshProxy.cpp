@@ -5,7 +5,7 @@ namespace dgfem {
 MeshProxy::MeshProxy(Mesh& mesh)
   : mesh_{mesh} {}
 
-std::vector<Point>& MeshProxy::getVerticesRef() const
+std::vector<Vertex>& MeshProxy::getVerticesRef() const
 {
   return mesh_.vertices_;
 }
@@ -18,6 +18,11 @@ std::vector<Tetrahedron>& MeshProxy::getTetrahedraRef() const
 std::vector<FaceExt>& MeshProxy::getFacesExtRef() const
 {
   return mesh_.facesExt_;
+}
+
+std::vector<Polyhedron>& MeshProxy::getPolyhedraRef() const
+{
+  return mesh_.polyhedra_;
 }
 
 }

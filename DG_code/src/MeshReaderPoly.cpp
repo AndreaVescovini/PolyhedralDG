@@ -2,22 +2,26 @@
 
 #include <vector>
 #include <fstream>
-#include "Point.hpp"
+#include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
+#include "Polyhedron.hpp"
 
 namespace dgfem {
 
-MeshReaderPoly::MeshReaderPoly(std::array<std::string, 4> sections)
+MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
   : sections_{sections} {}
 
+// Function that performs the reading from fileName and through the proxy saves
+// the data in mesh
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {
-  using geom::Point;
+  using geom::Vertex;
   using geom::Tetrahedron;
   using geom::FaceExt;
+  using geom::Polyhedron;
   using geom::real;
-  using geom::labelType;
+  using geom::labelType; // da riqualificare
 
   std::ifstream meshFile{fileName};
   if( meshFile.is_open() == false )
@@ -25,9 +29,10 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   // Use the proxy to access the Mesh class
   MeshProxy mp(mesh);
-  std::vector<Point>& vertList = mp.getVerticesRef();
+  std::vector<Vertex>& vertList = mp.getVerticesRef();
   std::vector<Tetrahedron>& tetraList = mp.getTetrahedraRef();
   std::vector<FaceExt>& faceExtList = mp.getFacesExtRef();
+  std::vector<Polyhedron>& polyList = mp.getPolyhedraRef();
 
   goToSection(meshFile, 0);
 
@@ -35,6 +40,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   size_t verticesNo = 0;
   meshFile >> verticesNo;
   vertList.reserve(verticesNo);
+  Vertex::resetCounter();
 
   std::array<real, 3> curVertex;
   unsigned label = 0; // used to read unuseful labels
@@ -50,12 +56,14 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   size_t tetrahedraNo = 0;
   meshFile >> tetrahedraNo;
   tetraList.reserve(tetrahedraNo);
+  Tetrahedron::resetCounter();
 
-  std::array<labelType, 4> curTetra;
+  std::array<unsigned, 4> curTet;
   for(size_t i = 0; i < tetrahedraNo; i++)
   {
-    meshFile >> curTetra[0] >> curTetra[1] >> curTetra[2] >> curTetra[3] >> label;
-    tetraList.emplace_back(curTetra);
+    meshFile >> curTet[0] >> curTet[1] >> curTet[2] >> curTet[3] >> label;
+    tetraList.emplace_back(vertList[curTet[0]], vertList[curTet[1]],
+                           vertList[curTet[2]], vertList[curTet[3]]);
   }
 
   goToSection(meshFile, 2);
@@ -64,12 +72,14 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   size_t facesExtNo = 0;
   meshFile >> facesExtNo;
   faceExtList.reserve(facesExtNo);
+  FaceExt::resetCounter();
 
-  std::array<labelType, 3> curFace;
+  std::array<unsigned, 3> curFace;
   for(size_t i = 0; i < facesExtNo; i++)
   {
     meshFile >> curFace[0] >> curFace[1] >> curFace[2] >> label;
-    faceExtList.emplace_back(curFace, label);
+    faceExtList.emplace_back(vertList[curFace[0]], vertList[curFace[1]],
+                                vertList[curFace[2]], label);
   }
 
   goToSection(meshFile, 3);
@@ -77,19 +87,21 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   // Read polyhedra
   size_t polyhedraNo = 0;
   meshFile >> polyhedraNo;
-  // polyList.reserve(polyhedraNo);
+  Polyhedron::resetCounter();
+  polyList.resize(polyhedraNo);
 
-  labelType poly = 0;
+  unsigned poly = 0;
   for(size_t i = 0; i < tetrahedraNo; i++)
   {
     meshFile >> poly;
-    tetraList[i].setPoly(poly);
+    polyList[poly-1].addTetra(tetraList[i]);
+    tetraList[i].setPoly(polyList[poly-1]);
   }
 
   meshFile.close();
 }
 
-void MeshReaderPoly::setSections(std::array<std::string, 4> sections)
+void MeshReaderPoly::setSections(const std::array<std::string, 4>& sections)
 {
   sections_ = sections;
 }
