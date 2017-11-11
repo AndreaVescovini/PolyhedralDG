@@ -9,13 +9,13 @@ namespace geom {
 //   counter_++;
 // }
 
-Vertex::Vertex(const std::array<real, 3>& coords)
-  : id_{counter_}, coords_{coords}
+Vertex::Vertex(real x, real y, real z)
+  : id_{counter_}, coords_{x, y, z}
 {
   counter_++;
 }
 
-std::array<real, 3> Vertex::getCoords() const
+const Eigen::Vector3d& Vertex::getCoords() const
 {
   return coords_;
 }
@@ -40,17 +40,37 @@ unsigned Vertex::getId() const
   return id_;
 }
 
+// real Vertex::distance(const Vertex& v2) const
+// {
+//   return std::sqrt( (this->coords_[0] - v2.coords_[0]) * (this->coords_[0] - v2.coords_[0])
+//                   + (this->coords_[1] - v2.coords_[1]) * (this->coords_[1] - v2.coords_[1])
+//                   + (this->coords_[2] - v2.coords_[2]) * (this->coords_[2] - v2.coords_[2]) );
+// }
+
 real Vertex::distance(const Vertex& v2) const
 {
-  return std::sqrt( (this->coords_[0] - v2.coords_[0]) * (this->coords_[0] - v2.coords_[0])
-                  + (this->coords_[1] - v2.coords_[1]) * (this->coords_[1] - v2.coords_[1])
-                  + (this->coords_[2] - v2.coords_[2]) * (this->coords_[2] - v2.coords_[2]) );
+  return (this->getCoords() - v2.getCoords()).norm();
 }
 
 std::ostream& operator<<(std::ostream& out, const Vertex& v)
 {
   out << v.id_ << " " << v.coords_[0] << " " << v.coords_[1] << " " << v.coords_[2];
   return out;
+}
+
+bool compX(const Vertex& lhs, const Vertex& rhs)
+{
+  return lhs.coords_[0] < rhs.coords_[0];
+}
+
+bool compY(const Vertex& lhs, const Vertex& rhs)
+{
+  return lhs.coords_[1] < rhs.coords_[1];
+}
+
+bool compZ(const Vertex& lhs, const Vertex& rhs)
+{
+  return lhs.coords_[2] < rhs.coords_[2];
 }
 
 void Vertex::resetCounter(unsigned counter)

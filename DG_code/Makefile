@@ -17,7 +17,7 @@ OBJS += $(TEST_OBJS)
 
 CXX = g++
 CXXFLAGS += -Wall -std=c++11
-CPPFLAGS += -I./$(HEADER_DIR)
+CPPFLAGS += -I./$(HEADER_DIR) -I$(mkEigenInc)
 # LD_FLAGS =
 # LD_LIBS =
 EXE = $(addprefix $(EXE_DIR)/, $(basename $(notdir $(TEST_SRCS))))

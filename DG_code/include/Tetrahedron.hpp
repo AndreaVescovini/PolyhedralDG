@@ -45,6 +45,8 @@ private:
   static unsigned counter_;
 };
 
+std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra);
+
 }
 
 #endif // _TETRAHEDRON_HPP_

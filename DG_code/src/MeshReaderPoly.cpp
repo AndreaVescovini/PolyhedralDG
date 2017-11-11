@@ -1,7 +1,6 @@
 #include "MeshReaderPoly.hpp"
 
 #include <vector>
-#include <fstream>
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
@@ -47,7 +46,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   for(size_t i = 0; i < verticesNo; i++)
   {
     meshFile >> curVertex[0] >> curVertex[1] >> curVertex[2] >> label;
-    vertList.emplace_back(curVertex);
+    vertList.emplace_back(curVertex[0], curVertex[1], curVertex[2]);
   }
 
   goToSection(meshFile, 1);
@@ -62,8 +61,8 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   for(size_t i = 0; i < tetrahedraNo; i++)
   {
     meshFile >> curTet[0] >> curTet[1] >> curTet[2] >> curTet[3] >> label;
-    tetraList.emplace_back(vertList[curTet[0]], vertList[curTet[1]],
-                           vertList[curTet[2]], vertList[curTet[3]]);
+    tetraList.emplace_back(vertList[curTet[0]-1], vertList[curTet[1]-1],
+                           vertList[curTet[2]-1], vertList[curTet[3]-1]);
   }
 
   goToSection(meshFile, 2);
@@ -78,8 +77,8 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   for(size_t i = 0; i < facesExtNo; i++)
   {
     meshFile >> curFace[0] >> curFace[1] >> curFace[2] >> label;
-    faceExtList.emplace_back(vertList[curFace[0]], vertList[curFace[1]],
-                                vertList[curFace[2]], label);
+    faceExtList.emplace_back(vertList[curFace[0]-1], vertList[curFace[1]-1],
+                             vertList[curFace[2]-1], label);
   }
 
   goToSection(meshFile, 3);

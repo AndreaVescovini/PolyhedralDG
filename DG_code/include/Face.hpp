@@ -4,6 +4,7 @@
 #include <array>
 #include <iostream>
 #include <functional>
+#include <Eigen/Dense>
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 
@@ -25,7 +26,7 @@ public:
   unsigned getId() const;
 
   real getArea() const;
-  // get normal vector
+  const Eigen::Vector3d& getNormal() const;
 
   static void resetCounter(unsigned counter = 0);
 
@@ -37,7 +38,7 @@ protected:
   Tetrahedron const* tet1_;
   unsigned faceNoTet1_;
   real area_;
-  // normal vector
+  Eigen::Vector3d normal_;
 
   static unsigned counter_;
 
@@ -45,6 +46,8 @@ protected:
   virtual void print(std::ostream& out) const = 0;
 
 };
+
+std::ostream& operator<<(std::ostream& out, const Face& face);
 
 }
 

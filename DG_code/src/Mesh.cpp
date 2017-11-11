@@ -24,7 +24,8 @@ void Mesh::printHead(std::ostream& out) const
 // void Mesh::computePolyInfo()
 // {
 //   for(Polyhedron& p : polyhedra_)
-//     p.computeBBandDiam();
+//     p.computeBB();
+//     p.computeDiameter();
 // }
 
 void Mesh::print(unsigned lineNo, std::ostream& out) const

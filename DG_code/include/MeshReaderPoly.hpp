@@ -3,6 +3,7 @@
 
 #include <string>
 #include <array>
+#include <fstream>
 #include "MeshReader.hpp"
 #include "Mesh.hpp"
 
@@ -11,7 +12,7 @@ namespace dgfem {
 class MeshReaderPoly : public MeshReader
 {
 public:
-  explicit MeshReaderPoly(const std::array<std::string, 4>& sections = // passare per reference?
+  explicit MeshReaderPoly(const std::array<std::string, 4>& sections =
     {"Vertices", "Tetrahedra", "Triangles", "Polyhedra"});
 
   void read(Mesh& mesh, const std::string& fileName) const;
