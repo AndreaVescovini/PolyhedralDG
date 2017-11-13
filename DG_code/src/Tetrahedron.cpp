@@ -2,21 +2,23 @@
 
 namespace geom {
 
-Tetrahedron::Tetrahedron(const Vertex& v1, const Vertex& v2, const Vertex& v3,
-                         const Vertex& v4, const Polyhedron* poly)
+Tetrahedron::Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
+                         Polyhedron* poly)
   : id_{counter_}, vertices_{{v1, v2, v3, v4}}, poly_{poly}
 {
   counter_++;
 }
 
-Tetrahedron::Tetrahedron(const Vertex& v1, const Vertex& v2, const Vertex& v3,
-                         const Vertex& v4, const Polyhedron& poly)
-  : id_{counter_}, vertices_{{v1, v2, v3, v4}}, poly_{&poly}
-{
-  counter_++;
-}
+Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
+                         Polyhedron& poly)
+  : Tetrahedron(v1, v2, v3, v4, &poly) {}
 
 const Vertex& Tetrahedron::getVertex(unsigned i) const
+{
+  return vertices_[i];
+}
+
+Vertex& Tetrahedron::getVertex(unsigned i)
 {
   return vertices_[i];
 }
@@ -26,14 +28,19 @@ const Polyhedron& Tetrahedron::getPoly() const
   return *poly_;
 }
 
-void Tetrahedron::setPoly(const Polyhedron* poly)
+Polyhedron& Tetrahedron::getPoly()
+{
+  return *poly_;
+}
+
+void Tetrahedron::setPoly(Polyhedron* poly)
 {
   poly_ = poly;
 }
 
-void Tetrahedron::setPoly(const Polyhedron& poly)
+void Tetrahedron::setPoly(Polyhedron& poly)
 {
-  poly_ = &poly;
+  setPoly(&poly);
 }
 
 unsigned Tetrahedron::getId() const

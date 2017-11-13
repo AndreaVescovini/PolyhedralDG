@@ -3,12 +3,6 @@
 
 namespace geom {
 
-// Vertex::Vertex()
-//   : id_{counter_}, coords_{{0.0,0.0,0.0}}
-// {
-//   counter_++;
-// }
-
 Vertex::Vertex(real x, real y, real z)
   : id_{counter_}, coords_{x, y, z}
 {
@@ -18,6 +12,11 @@ Vertex::Vertex(real x, real y, real z)
 const Eigen::Vector3d& Vertex::getCoords() const
 {
   return coords_;
+}
+
+void Vertex::setCoords(const Eigen::Vector3d& coords)
+{
+  coords_ = coords;
 }
 
 real Vertex::getX() const
@@ -71,6 +70,11 @@ bool compY(const Vertex& lhs, const Vertex& rhs)
 bool compZ(const Vertex& lhs, const Vertex& rhs)
 {
   return lhs.coords_[2] < rhs.coords_[2];
+}
+
+bool compId(const Vertex& lhs, const Vertex& rhs)
+{
+  return lhs.id_ < rhs.id_;
 }
 
 void Vertex::resetCounter(unsigned counter)

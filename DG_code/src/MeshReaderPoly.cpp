@@ -6,6 +6,9 @@
 #include "FaceExt.hpp"
 #include "Polyhedron.hpp"
 
+// I assume that entities are numerated from 1 to N in the meshFile, then I store
+// them in my mesh conteiners numerating from 0 to N-1
+
 namespace dgfem {
 
 MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)

@@ -15,9 +15,14 @@ real Polyhedron::getDiameter() const
   return diameter_;
 }
 
-void Polyhedron::addTetra(const Tetrahedron& tet)
+void Polyhedron::addTetra(Tetrahedron& tet)
 {
   tetrahedra_.emplace_back(tet);
+}
+
+void Polyhedron::addVertex(Vertex& v)
+{
+  vertices_.emplace(v);
 }
 
 const Tetrahedron& Polyhedron::getTetra(unsigned i) const
@@ -32,6 +37,7 @@ unsigned Polyhedron::getId() const
 
 void Polyhedron::computeBB()
 {
+  // I store in boundingBox_ the min and max vertices coordinates.
   boundingBox_[0][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compX)->get().getX();
   boundingBox_[0][1] = std::max_element(vertices_.cbegin(), vertices_.cend(), compX)->get().getX();
   boundingBox_[1][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compY)->get().getY();

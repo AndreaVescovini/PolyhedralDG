@@ -1,28 +1,27 @@
 #include "Face.hpp"
-
+#include <algorithm>
 #include <Eigen/Geometry>
 
 namespace geom {
 
-// Face::Face()
-//   : id_{counter_} // devo inizializare anche gli altri memnbri?
-//   {
-//     counter_++;
-//   }
+Face::Face(Vertex& v1, Vertex& v2, Vertex& v3,
+           Tetrahedron& tet1, unsigned faceNoTet1)
+  : Face(v1, v2, v3, &tet1, faceNoTet1) {}
 
-Face::Face(const Vertex& v1, const Vertex& v2, const Vertex& v3)
-  : id_{counter_}, vertices_{{v1, v2, v3}}
-  {
-    Eigen::Vector3d tmp1(v1.getCoords() - v2.getCoords());
-    Eigen::Vector3d tmp2(v3.getCoords() - v2.getCoords());
-    normal_ = tmp1.cross(tmp2);
-    area_ = normal_.norm();
-    normal_.normalize();
-
-    counter_++;
-  }
+Face::Face(Vertex& v1, Vertex& v2, Vertex& v3,
+           Tetrahedron* tet1, unsigned faceNoTet1)
+  : vertices_{{v1, v2, v3}}, tet1_{tet1}, faceNoTet1_{faceNoTet1}
+{
+  // I sort vertices comparing the id.
+  std::sort(vertices_.begin(), vertices_.end(), compId);
+}
 
 const Tetrahedron& Face::getTet1() const
+{
+  return *tet1_;
+}
+
+Tetrahedron& Face::getTet1()
 {
   return *tet1_;
 }
@@ -32,12 +31,12 @@ unsigned Face::getFaceNoTet1() const
   return faceNoTet1_;
 }
 
-void Face::setTet1(const Tetrahedron& tet1)
+void Face::setTet1(Tetrahedron& tet1)
 {
   tet1_ = &tet1;
 }
 
-void Face::setTet1(const Tetrahedron* tet1)
+void Face::setTet1(Tetrahedron* tet1)
 {
   tet1_ = tet1;
 }
@@ -47,28 +46,14 @@ void Face::setFaceNoTet1(unsigned faceNoTet1)
   faceNoTet1_ = faceNoTet1;
 }
 
-real Face::getArea() const
+const Vertex& Face::getVertex(unsigned i) const
 {
-  return area_;
+  return vertices_[i];
 }
 
-const Eigen::Vector3d& Face::getNormal() const
+Vertex& Face::getVertex(unsigned i)
 {
-  return normal_;
+  return vertices_[i];
 }
-
-void Face::resetCounter(unsigned counter)
-{
-  counter_ = counter;
-}
-
-
-std::ostream& operator<<(std::ostream& out, const Face& face)
-{
-  face.print(out);
-  return out;
-}
-
-unsigned Face::counter_ = 0;
 
 }

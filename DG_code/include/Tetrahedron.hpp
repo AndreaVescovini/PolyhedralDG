@@ -14,11 +14,10 @@ class Polyhedron;
 class Tetrahedron
 {
 public:
-  // Tetrahedron() = default;
-  Tetrahedron(const Vertex& v1, const Vertex& v2, const Vertex& v3,
-              const Vertex& v4, const Polyhedron* poly = nullptr);
-  Tetrahedron(const Vertex& v1, const Vertex& v2, const Vertex& v3,
-              const Vertex& v4, const Polyhedron& poly);
+  Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
+              Polyhedron* poly = nullptr);
+  Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
+              Polyhedron& poly);
 
   Tetrahedron(const Tetrahedron&) = default;
   Tetrahedron& operator=(const Tetrahedron&) = default;
@@ -26,9 +25,11 @@ public:
   Tetrahedron& operator=(Tetrahedron&&) = default;
 
   const Vertex& getVertex(unsigned i) const;
-  const Polyhedron& getPoly() const;
-  void setPoly(const Polyhedron* poly);
-  void setPoly(const Polyhedron& poly);
+  Vertex& getVertex(unsigned i);
+  const Polyhedron& getPoly() const;// forse questo metodo è da togliere
+  Polyhedron& getPoly(); // forse questo const è da togliere
+  void setPoly(Polyhedron* poly);
+  void setPoly(Polyhedron& poly);
   unsigned getId() const;
 
   static void resetCounter(unsigned counter = 0);
@@ -39,9 +40,8 @@ public:
 
 private:
   const unsigned id_;
-  const std::array<std::reference_wrapper<const Vertex>, 4> vertices_;
-  Polyhedron const* poly_;
-
+  std::array<std::reference_wrapper<Vertex>, 4> vertices_;
+  Polyhedron* poly_;
   static unsigned counter_;
 };
 

@@ -29,9 +29,13 @@ public:
 
   Mesh(const std::string& fileName, MeshReader& reader);
 
+  // Prints all the informations about the mesh
   void printAll(std::ostream& out = std::cout) const;
+
+  // Prints only the first five elements of each entity of the mesh.
   void printHead(std::ostream& out = std::cout) const;
 
+  // Proxy used to modify the mesh.
   friend class MeshProxy;
 
 private:
@@ -45,7 +49,13 @@ private:
   // unsigned polyhedraNo_;
   // unsigned facesNo_;
 
-  // void computePolyInfo();
+  // Function that computes the internal faces of the mesh and completes
+  // the information about the external ones.
+  void computeFaces();
+
+  // Function that computes the bounding box and the diameter of each polyhedron.
+  void computePolyInfo();
+  
   void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
 
