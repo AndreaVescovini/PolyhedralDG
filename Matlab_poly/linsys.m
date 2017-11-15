@@ -5,6 +5,8 @@ function [u] = linsys(geom, f, gd, N, sigma, epsilon)
 %
 % Author: Andrea Vescovini
 
+fprintf('Computing the basis...');
+
 % get quadrature nodes for the required order
 [nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N);
 
@@ -13,6 +15,8 @@ Np = (N+1)*(N+2)*(N+3)/6; %number of dof for every element
 blist = basis_list(N, Np);
 [phi, dphi] = basis(geom.bb, geom.E2P, blist, geom.Fk, nod3);
 [phi_bordo, grad_bordo] = basis_boundary(geom.bb, geom.E2P, geom.faces_neig, blist, geom.Fk, node_maps, nod2);
+
+fprintf('done!\nAssembling the linear system...');
 
 % Allocate matrix and vector
 A = spalloc(geom.K*Np, geom.K*Np, geom.K*Np*Np);
@@ -84,7 +88,12 @@ for e = 1:geom.Nfaces % loop over faces
 end
 
 % spy(A, 'k');
+
+fprintf('done!\nSolving the linear system...');
+
 % solve the linear system
 u = A\b;
 u = reshape(u, [Np, geom.K]);
+
+fprintf('done!\n');
 end

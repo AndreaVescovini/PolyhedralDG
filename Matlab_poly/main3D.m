@@ -33,7 +33,7 @@ sigma = 10; % penalty coefficient
 epsilon = -1; % method
 
 % read the mesh and generate connectivity matrices
-mesh = MeshReader3Dpoly('..\meshes\cube_str384p.mesh');
+mesh = MeshReader3Dpoly('..\meshes\cube_str48h.mesh');
 
 % elaborate geometric information
 geom = geometric_elaboration(mesh);

@@ -23,6 +23,8 @@ function [geom] = geometric_elaboration(mesh)
 %
 % Author: Andrea Vescovini
 
+fprintf('Computing geometric quantities...');
+
 % set faces of polyhedra and tretrahedra that share them
 [faces, faces_neig] = read_faces(mesh);
 
@@ -58,4 +60,6 @@ geom = struct('E2P', mesh.E2P,...
               'Fk', Fk,...
               'Jinv', Jinv,...
               'Jdet', Jdet);
+          
+fprintf('done!\n');
 end

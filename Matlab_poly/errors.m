@@ -4,6 +4,8 @@ function [err_L2, err_H10] = errors(uex, uex_grad, u, geom, N)
 %
 % Author: Andrea Vescovini
 
+fprintf('Computing the error...');
+
 Np = (N+1)*(N+2)*(N+3)/6; %number of nodes for every element
 
 [~, ~, nod3, wei3, ~, ~] = quadrature(N);
@@ -33,5 +35,7 @@ end
 
 err_L2 = sqrt(err_L2);
 err_H10 = sqrt(err_H10);
+
+fprintf('done!\n');
 
 end

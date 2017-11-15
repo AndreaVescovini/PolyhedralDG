@@ -1,14 +1,14 @@
 // Author: Andrea Vescovini
 
 load "msh3"
-load "Element_P3"
+// load "Element_P3"
 // load "medit"
 
 int nit = 4;
 ofstream f("standard_fem_results.txt");
 f << "EXPONENTIAL - STRUCTURED TETRAHEDRAL GRID" << endl;
 
-real[int] errl2(nit), errh1(nit), hh(nit), rl2(nit-1), rh1(nit-1);
+real[int] errl2(nit), errh1(nit), hh(nit), rl2(nit-1), rh1(nit-1), dof(nit);
 for(int n=1; n<=nit; n++)
 {
   mesh3 Th3 = cube(2*n, 2*n, 2*n);
@@ -24,6 +24,8 @@ for(int n=1; n<=nit; n++)
   fespace Ph(Th3, P0);
   Vh uh, vh;
   Ph hk = hTriangle;
+
+  dof(n-1) = Vh.ndof;
 
   solve poisson3(uh, vh) =
      int3d(Th3) (dx(uh)*dx(vh)+dy(uh)*dy(vh)+dz(uh)*dz(vh))
@@ -46,7 +48,8 @@ f << "\nN = 1" << endl;
 f << "errh10: " << errh1 << endl;
 f << "rh10; " << rh1 << endl;
 f << "errl2: " << errl2 << endl;
-f << "rhl2; " << rl2 << endl;
+f << "rhl2: " << rl2 << endl;
+f << "ndof: " << dof << endl;
 
 for(int n=1; n<=nit; n++)
 {
@@ -63,6 +66,8 @@ for(int n=1; n<=nit; n++)
   fespace Ph(Th3, P0);
   Vh uh, vh;
   Ph hk = hTriangle;
+
+  dof(n-1) = Vh.ndof;
 
   solve poisson3(uh, vh) =
      int3d(Th3) (dx(uh)*dx(vh)+dy(uh)*dy(vh)+dz(uh)*dz(vh))
@@ -85,4 +90,5 @@ f << "\nN = 2" << endl;
 f << "errh10: " << errh1 << endl;
 f << "rh10; " << rh1 << endl;
 f << "errl2: " << errl2 << endl;
-f << "rhl2; " << rl2 << endl;
+f << "rhl2: " << rl2 << endl;
+f << "ndof: " << dof << endl;

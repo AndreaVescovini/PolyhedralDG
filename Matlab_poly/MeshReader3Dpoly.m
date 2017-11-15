@@ -12,10 +12,13 @@ function [mesh] = MeshReader3Dpoly(FileName)
 %
 % Author: Andrea Vescovini
 
+fprintf('Reading mesh file...');
+
 Fid = fopen(FileName, 'rt');
+line = '';
 
 % read intro
-for ii = 1:5
+while strcmp(line,'Vertices') == 0
   line = fgetl(Fid);
 end
 
@@ -32,7 +35,7 @@ VX = xyz(1,:); VY = xyz(2,:); VZ = xyz(3,:);
 % VY = (VY+ones(1,Nv))/2;
 % VZ = (VZ+ones(1,Nv))/2;
 
-for ii = 1:3
+while strcmp(line, 'Tetrahedra') == 0
   line = fgetl(Fid);
 end
 
@@ -41,20 +44,15 @@ Ntet = fscanf(Fid, '%d', 1);
 E2V = fscanf(Fid, '%d', [5, Ntet]);
 E2V = E2V(1:4,:)';
 
-for ii = 1:3
-  line = fgetl(Fid);
+while strcmp(line, 'Polyhedra') == 0
+    line = fgetl(Fid);
 end
 
-if strcmp(line,'Polyhedra')
-    % read element to tetrahedron connectivity
-    K = fscanf(Fid, '%d', 1);
-    E2P = fscanf(Fid, '%d', Ntet);
-    if min(E2P) == 0
-        E2P = E2P+1;
-    end
-else
-    K = Ntet;
-    E2P = 1:Ntet;
+% read element to tetrahedron connectivity
+K = fscanf(Fid, '%d', 1);
+E2P = fscanf(Fid, '%d', Ntet);
+if min(E2P) == 0
+     E2P = E2P+1;
 end
 
 fclose(Fid);
@@ -68,4 +66,5 @@ mesh = struct('Nv', Nv,...
               'E2V', E2V,...
               'E2P', E2P);
 
+fprintf('done!\n');
 end

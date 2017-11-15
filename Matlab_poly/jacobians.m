@@ -19,7 +19,7 @@ Mat = [0 0 0 1;
        0 1 0 1;
        0 0 1 1];
 
-for ie = 1:K
+for ie = 1:K %loop over tetrahedra
 
     Fk(1,:,ie) = Mat\x(:,ie);
     Fk(2,:,ie) = Mat\y(:,ie);
