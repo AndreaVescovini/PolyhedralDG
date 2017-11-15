@@ -3,11 +3,11 @@
 % Author: Andrea Vescovini
 
 % read input file and elaborate the mesh
-file_input = 'cube_str1296h.mesh';
+file_input = 'cube_str3072h.mesh';
 
 % open output file
 [~, name_out, ~] = fileparts(file_input);
-file_output = strcat(name_out, 't.mesh');
+file_output = strcat(name_out(1:end-1), 't.mesh');
 fo = fopen(file_output, 'wt');
 fi = fopen(file_input, 'rt');
 

@@ -3,7 +3,7 @@
 % Author: Andrea Vescovini
 
 % read input file and elaborate the mesh
-file_input = '..\meshes\cube_str1296t.mesh';
+file_input = '..\meshes\cube_str3072t.mesh';
 mesh = MeshReader3Dpoly(file_input);
 [x, y, z] = set_vertices(mesh.E2V, mesh.VX, mesh.VY, mesh.VZ);
 [bb, ~] = bbox(x,y,z, mesh.E2P, mesh.K);
@@ -17,7 +17,7 @@ fo = fopen(file_output, 'wt');
 fi = fopen(file_input, 'rt');
 
 line = fgetl(fi);
-while strcmp(line, 'Triangles') == 0
+while strcmp(line, 'End') == 0
     fprintf(fo, strcat(line, '\n'));
     line = fgetl(fi);
 end

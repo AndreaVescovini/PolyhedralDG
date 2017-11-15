@@ -6,6 +6,9 @@
 # $1 is the mesh file to be partitioned
 # $2 is the number of partition I want metis to do
 
+# 1296p is generated with 400
+# 3072p is generated with 979
+
 # extract E2V connectivity matrix needed by metis
 sed -n '/Tetrahedra/,/Triangles/p' $1 | sed '1d;$d' | sed '$d' | sed 's/ 0//' > metis_input
 
@@ -31,7 +34,7 @@ echo "**************************************************************************
 
 # create the file with the final mesh
 final_name="$(echo $1 | cut -f 1 -d '.')_metis.mesh"
-sed '/Triangles/,/-End/d' $1 > $final_name
+sed '/End/d' $1 > $final_name
 
 # add metis output
 echo "Polyhedra" >> $final_name
