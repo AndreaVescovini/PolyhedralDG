@@ -33,10 +33,12 @@ problems on polyhedral grids}}
 \author{Andrea Vescovini\\[1cm]{\small Supervisor: Prof. P. Antonietti}}
 \DTMlangsetup{showdayofmonth=false}
 \date{\today}
+%\institute[Polimi]{Politecnico di Milano}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 \maketitle
+\centerline{Politecnico di Milano}
 \newpage
 \begin{abstract}
 	The main goal of this project is to implement a Discontinuous Galerkin (DG) 
@@ -224,7 +226,7 @@ Find $u \in H^s(\mathcal{T}), \; s>3/2$, such that:
 \end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discrete formulation}
-We introduce now the finite dimensional subspace of $H^s(\mathcal{T})$, for $s>3/2$:
+We introduce now the finite dimensional subspace of $H^s(\mathcal{T})$, $s>3/2$:
 \begin{equation} \label{eq:dgspace}
 	\mathcal{D}_r(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in 
 	\mathbb{P}_r(\kappa) \quad \forall \kappa \in \mathcal{T}  \},
@@ -247,22 +249,38 @@ This kind of formulation is called \textit{Interior Penalty} (IP) and as briefly
 \item
 If $\epsilon = -1$ the method is called \textit{Symmetric Interior Penalty 
 Galerkin} (SIPG), indeed in the bilinear form becomes symmetrical because the 
-two terms involving jumps and averages appear with the same sign (introduced by 
-Arnold \cite{arn82} and Wheeler \cite{whe78}).
+two terms involving jumps and averages appear with the same sign. Introduced by 
+Arnold \cite{arn82} and Wheeler \cite{whe78}.
 \item
 If  $\epsilon = +1$ the method is called \textit{Non-symmetric Interior Penalty 
-Galerkin} (NIPG), for an opposite reason (introduced by Rivière, Wheeler 
-and Girault \cite{rwg}).
+Galerkin} (NIPG), for an opposite reason. Introduced by Rivière, Wheeler 
+and Girault \cite{rwg}.
 \item
 If $\epsilon = 0$ the method is called \textit{Incomplete Interior Penalty 
-Galerkin} (IIPG) (introduced by Dawson, Sun and Wheeler \cite{dsw}).
+Galerkin} (IIPG) Introduced by Dawson, Sun and Wheeler \cite{dsw}.
 \end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency}
+We show the consistency of the discrete formulation~\eqref{eq:dgfemform} 
+specifying the variational formulation~\eqref{eq:dgvarform} for test 
+functions of the space $\mathcal{D}_r(\mathcal{T})$:
+\begin{equation*}
+	a_\epsilon(u, v_h) = F_\epsilon(v_h) \quad v_h \in 
+	\mathcal{D}_r(\mathcal{T}).
+\end{equation*}
+We subtract~\eqref{eq:dgfemform} to the above formulation and we get error 
+$u-u_h$ satisfies the following \textit{Galerkin orthogonality} property:
+\begin{equation*}
+		a_\epsilon(u - u_h, v_h) = 0 \quad v_h \in 
+		\mathcal{D}_r(\mathcal{T}).
+\end{equation*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Well posedness}
 In order to prove the well posedness of \eqref{eq:dgfemform} we have to show 
 coercivity and continuity of the bilinear form and continuity of the functional 
 with respect to the norm $||\cdot||_{DG}$, then apply the Lax-Milgram lemma.\\
-We will use the following inverse trace inequality for polynomials (\cite{riviere}, p. 23):
+We will use the following inverse trace inequality for polynomials 
+(\cite{riviere}, p.~23):
 \begin{equation} \label{eq:trineq}
 	|\!|v|\!|_{L^2(e)} \leq \frac{\bar{C}}{\sqrt{h_\kappa}} 
 	|\!|v|\!|_{L^2(\kappa)} \quad \forall e \subset \partial \kappa \quad 
@@ -325,12 +343,12 @@ coercivity constant $\alpha > 0$.
 \subsubsection{Continuity}
 We have to show that $\exists M_1 > 0$ such that:
 \begin{equation*}
-	a_\epsilon(u_h, v_h) \leq M_1 |\!|u_h|\!|_{DG} |\!|v_h|\!|_{DG} \quad 
+	|a_\epsilon(u_h, v_h)| \leq M_1 |\!|u_h|\!|_{DG} |\!|v_h|\!|_{DG} \quad 
 	\forall u_h, v_h \in \mathcal{D}_r(\mathcal{T})
 \end{equation*}
 and that $\exists M_2 > 0$ such that:
 \begin{equation*}
-	F_\epsilon(v_h) \leq M_2 |\!|v_h|\!|_{DG} \quad \forall v_h \in 
+	|F_\epsilon(v_h)| \leq M_2 |\!|v_h|\!|_{DG} \quad \forall v_h \in 
 	\mathcal{D}_r(\mathcal{T}).
 \end{equation*}
 The proof follows easily from standard arguments; indeed exploiting triangular inequality and Cauchy-Schwarz's inequality we can obtain very straight forward the required bounds for the first and last term of $a_\epsilon(u, v)$. For the second and third term we just have to use smartly Cauchy-Schwarz and then apply the trace inequality \eqref{eq:trineq} like for the coercivity.\\
@@ -456,7 +474,9 @@ We need now some assumptions on the mesh $\mathcal{T}$:
 \end{ipotesi}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Well posedness}
-The discrete formulation is the same of \eqref{eq:dgfemform}, but we analyse only the SIPG case ($\epsilon~=~-1$) and we choose the penalty parameter $\gamma_e \in L^\infty(\mathcal{T})$ such that:
+The discrete formulation is the same of \eqref{eq:dgfemform}, but we analyse 
+only the SIPG case ($\epsilon=-1$) and we choose the penalty parameter 
+$\gamma_e \in L^\infty(\mathcal{T})$ such that:
 \begin{equation} \label{eq:penalty}
 	\gamma_e =
 	\begin{cases}
@@ -481,7 +501,7 @@ The proof of well posedness through continuity and coercivity can be found in
 same path of the one with ``classical" meshes discussed in 
 Section~\ref{sec:DG}, concluding again that we have to require $\sigma$ to be 
 large enough. It exploits the following variation of the inverse trace 
-inequality \eqref{eq:trineq}, whose proof can be found in \cite{multigrid}:
+inequality \eqref{eq:trineq}, whose proof can be found in~\cite{multigrid}:
 \begin{lemma}
 	Assume that the mesh $\mathcal{T}$ satisfies Assumption \ref{ipo:ipo1}. Let $\kappa \in \mathcal{T}$ be a polyhedral element, then the following bound holds:
 	\begin{equation*}
@@ -682,8 +702,8 @@ Figure~\ref{fig:spy}.
 \begin{figure}[h] 
 	\centering
 	\includegraphics[scale=0.8]{spy_A}
-	\caption{Sparsity pattern of $\mathrm{A}$ computed over a mesh of 406 
-	elements and $r=2$, number of non zero entries (nz) is 43843.}
+	\caption{Sparsity pattern of $\mathrm{A}$ computed over a mesh of 392 
+	polyhedral elements and $r=2$, number of non zero entries (nz) is 271192.}
 	\label{fig:spy}
 \end{figure}
 \newline
@@ -711,11 +731,11 @@ $a(\cdot, \cdot)$:
 \begin{equation*}
 	\int_\kappa \nabla u \cdot \nabla v = \sum_{\tau_\kappa \in \kappa_\mathcal{S}} \nabla u \cdot \nabla v \approx \sum_{\tau_\kappa \in \kappa_\mathcal{S}} \sum_{i=1}^{q} \nabla u(F_\kappa(\xi_i)) \cdot \nabla v(F_\kappa(\xi_i)) det(J_{F_\kappa}(\xi_i))w_i,
 \end{equation*}
-where $F_\kappa: \hat{\kappa} \rightarrow \tau_\kappa$ is the map from the reference
-simplex $\hat{\kappa}$ to $\tau_\kappa$, $J_{F_\kappa}$ is its Jacobian	and 
-$(\xi_i, w_i)^q_{i=1}$ denote the quadrature nodes and weights over 
-$\hat{\kappa}$. Observe that the gradient operator is not transformed, as it 
-happens when integrals are computer on the reference simplex.\\
+where $F_\kappa: \hat{\kappa} \rightarrow \tau_\kappa$ is the map from the 
+reference simplex $\hat{\kappa}$ to $\tau_\kappa$, $J_{F_\kappa}$ is its 
+Jacobian	and $(\xi_i, w_i)^q_{i=1}$ denote the quadrature nodes and weights 
+over $\hat{\kappa}$. Observe that the gradient operator is not transformed, as 
+it happens when integrals are computer on the reference simplex.\\
 Integrals over faces of polyhedral elements can be computed in an analogous 
 manner, mapping quadrature points from a reference triangle to each triangular 
 face. Of course it is useful for the implementation if each face of a 
@@ -775,8 +795,7 @@ and~\eqref{eq:l2bound}.\\
 	\end{array}
 	\]
 	\caption{Computed errors on a sequence of tetrahedral meshes consisting of 
-	48, 384, 1296, 3072 elements and polynomial degree $r=1,2,3$.} 
-	\label{tab:htet}
+	48, 384, 1296, 3072 elements and polynomial degree $r=1,2,3$.} \label{tab:htet}
 \end{table}
 Next, we move to structured hexahedral meshes: we consider a sequence of four 
 meshes consisting of 8, 64, 216, 512 elements. We see in 
@@ -816,7 +835,7 @@ manage successfully.
 	\end{array}
 	\]
 	\caption{Computed errors on a sequence of hexahedral meshes consisting of 
-		8, 64, 216, 512 elements and polynomial degree $r=1,2,3$.} 
+		8, 64, 216, 512 elements and polynomial degree $r=1,2,3$.} \label{tab:hhex}
 %\end{table}
 %\begin{table}[h]\footnotesize
 %	\centering
@@ -845,7 +864,7 @@ manage successfully.
 	\]
 	\caption{Computed errors on a sequence of mixed tetrahedral/hexahedral 
 	meshes consisting of 28, 224, 756, 1792 elements and polynomial degree 
-	$r=1,2,3$.} 
+	$r=1,2,3$.} \label{tab:hhextet}
 %\end{table}
 %\begin{table}[h]\footnotesize
 %	\centering
@@ -871,8 +890,20 @@ manage successfully.
 	\end{array}
 	\]
 	\caption{Computed errors on a sequence of polyhedral meshes consisting of 
-	15, 120, 392, 965 elements and polynomial degree $r=1,2,3$.} 
+	15, 120, 392, 965 elements and polynomial degree $r=1,2,3$.} \label{tab:hpol}
 \end{table}
+\begin{figure}[p] 
+	\centering
+	\includegraphics[scale=0.15]{solution_3072p}
+	\caption{Solution of the problem~\eqref{eq:dgfempolyform} on the unit cube $\Omega = (0,1)^3$, with $f$ and $g$ such that the exact solution is $u(x,y,z)=e^{xyz}$, $\sigma=10$, employing a polyhedral mesh consisting of 965 elements.}
+	\label{fig:sol}
+\end{figure}
+\begin{figure}[p]
+	\centering
+	\includegraphics[scale=0.30]{mesh_48p}
+	\caption{Polyhedral mesh consisting of 15 elements.}
+	\label{fig:mesh}
+\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Comparison with other finite element methods}
 We next compare our DG method on polyhedral meshes with the classical SIPG 

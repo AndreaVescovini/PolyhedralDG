@@ -44,15 +44,20 @@ Ntet = fscanf(Fid, '%d', 1);
 E2V = fscanf(Fid, '%d', [5, Ntet]);
 E2V = E2V(1:4,:)';
 
-while strcmp(line, 'Polyhedra') == 0
+while (strcmp(line, 'Polyhedra') == 0 && strcmp(line, 'End') == 0)
     line = fgetl(Fid);
 end
 
 % read element to tetrahedron connectivity
-K = fscanf(Fid, '%d', 1);
-E2P = fscanf(Fid, '%d', Ntet);
-if min(E2P) == 0
-     E2P = E2P+1;
+if strcmp(line, 'Polyhedra') == 1
+    K = fscanf(Fid, '%d', 1);
+    E2P = fscanf(Fid, '%d', Ntet);
+    if min(E2P) == 0
+         E2P = E2P+1;
+    end
+else
+    K = Ntet;
+    E2P = [1:K]';
 end
 
 fclose(Fid);

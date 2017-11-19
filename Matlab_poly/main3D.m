@@ -28,18 +28,19 @@ uex_grad = @(p) [uex(p).*p(2,:).*p(3,:); uex(p).*p(1,:).*p(3,:); uex(p).*p(1,:).
 
 % problem data
 gd = uex; % Dirichlet datum
-N = 3; % degree of finite elements
+N = 1; % degree of finite elements
 sigma = 10; % penalty coefficient
 epsilon = -1; % method
 
 % read the mesh and generate connectivity matrices
-mesh = MeshReader3Dpoly('..\meshes\cube_str48h.mesh');
+mesh = MeshReader3Dpoly('..\meshes\cube_str48p.mesh');
 
 % elaborate geometric information
 geom = geometric_elaboration(mesh);
 
 % build the linear system and solve it
 u = linsys(geom, f, gd, N, sigma, epsilon);
+export_solution(u, mesh, geom.bb);
 
 % compute errors
 [err_L2, err_H10] = errors(uex, uex_grad, u, geom, N);

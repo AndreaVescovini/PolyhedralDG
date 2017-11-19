@@ -13,7 +13,8 @@ In this folder:
 - "main3D.m" is used to set the input data and start the solver.
 - "print_result.m" is used to perform a convergence analysis and prints the
   results on a file "results*.txt".
-- "plotmesh.m" should plot the mesh but is not very effective.
+- "export_solution.m" is used by main3D and exports the solution and the mesh
+  in a file output.vtk, in order to be visualized.
 - "hexmesh_gen.m" is a routine that generates a hexahedral mesh starting from
   a tetrahedral one.
 - the other files contain functions used by the solver.
