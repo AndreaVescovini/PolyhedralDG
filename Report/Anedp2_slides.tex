@@ -55,19 +55,30 @@ Antonietti}
 		-\Delta u= f& \mbox{ in } \Omega\\
 		u = g& \mbox{ on } \partial \Omega
 	\end{cases}\end{equation*}
-	where $\Omega \subset \mathbb{R}^3$ is a convex bounded polyhedral domain
-	with a Lipschitz boundary $\partial \Omega$, $f \in L^2(\Omega)$, $g \in
-	H^{1/2}(\partial \Omega)$.\\
+	\begin{itemize}
+		\item $f \in L^2(\Omega)$.
+		\item $g \in H^{1/2}(\partial \Omega)$.
+		\item $\Omega \subset \mathbb{R}^3$ is a convex bounded polyhedral 		
+				domain with a Lipschitz boundary $\partial \Omega$.
+	\end{itemize}
 	\vspace*{0.5cm}
-	Let $\mathcal{T}$ be a subdivision of $\Omega$ into disjoint open
-	tetrahedral elements $\kappa$ such that $\bar{\Omega} =
-	\bigcup\limits_{\kappa \in \mathcal{T}} \bar{\kappa}$.\\
-	\pause
-	We define the \textbf{broken Sobolev space}:
-	\begin{equation*}
-		H^s(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in H^s(\kappa)
-		\quad \forall \kappa \in \mathcal{T} \}, \quad s>0.
-	\end{equation*}
+	\centering
+	We want to discretize $\Omega$ with \textbf{polyhedral elements}.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Definitions}
+	Let $\mathcal{T}$ be a partition of	$\Omega$ into disjoint open
+	polyhedral elements $\kappa$:
+	\begin{itemize}
+		\item The \textbf{interfaces} of $\mathcal{T}$ are the intersections of
+		the two-dimensional facets of neighbouring elements.
+		\item Each interface can be subdivided by a set of co-planar triangles,
+		which we call \textbf{faces}.
+	\end{itemize}
+	\begin{figure}
+		\centering
+		\includegraphics[scale=0.2]{polifacce}
+	\end{figure}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Trace Operators}
@@ -77,7 +88,7 @@ Antonietti}
 	 $\mathbf{n}^-$.\\
 	\begin{figure}
 		\centering
-		\includegraphics[scale=0.13]{face}
+		\includegraphics[scale=0.12]{polinormali}
 		\end{figure}
 	For every face $e \in \Gamma_h$ we define:
 	\begin{align*}
@@ -98,6 +109,11 @@ Antonietti}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Variational formulation}
+	We define the \textbf{broken Sobolev space}:
+	\begin{equation*}
+		H^s(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in H^s(\kappa)
+		\quad \forall \kappa \in \mathcal{T} \}, \quad s>0.
+	\end{equation*}
 	We assume that the weak solution $u \in H^s(\mathcal{T}), \; s>3/2$:
 	\begin{equation*}
 		\sum_{\kappa \in \mathcal{T}} \int_\kappa -\Delta u \; v
@@ -116,16 +132,30 @@ Antonietti}
 			+ [\![
 			\nabla u ]\!] \{v\} )
 	\end{equation*}
-	\pause
-	$u \in H^2(\Omega) \Rightarrow [u] = 0, \; [\![\nabla u]\!] = 0 $ on every 
-	internal face $e \in \Gamma_h$ and we can add:
+	\begin{block}{Remark}
+		$u \in H^2(\Omega) \Rightarrow [u] = 0, \; [\![\nabla u]\!] = 0 $ 
+		on every internal face $e \in \Gamma_h$.
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Variational formulation}
+	\begin{equation*}
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v -
+	\sum_{e \in \Gamma} \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\} =
+	\sum_{\kappa \in \mathcal{T}} \int_\kappa fv \quad \forall v \in 
+	H^s(\mathcal{T}).
+	\end{equation*}
+	We add at the left hand side two contributions:
 	\begin{equation*}
 		\epsilon \sum_{e \in \Gamma_h} \int_e [u] \cdot \{\!\!\{ \nabla v
-		\}\!\!\} + \sum_{e \in \Gamma_h} \gamma_e \int_e [u] \cdot [v], \quad
-		\gamma_e =
-		\frac{\sigma_e}{|e|^\beta}
+		\}\!\!\}, \quad \sum_{e \in \Gamma_h} \gamma_e \int_e [u] \cdot [v],
 	\end{equation*}
-	Finally we make a \textbf{weak imposition} of Dirichlet b. c.
+	and we make a \textbf{weak imposition} of Dirichlet boundary conditions 
+	adding:
+	\begin{equation*}
+	\epsilon \sum_{e \in \Gamma_D} \int_e (u-g) \nabla v \cdot \mathbf{n}
+	+ \sum_{e \in \Gamma_D} \gamma_e \int_e (u-g)v.
+	\end{equation*}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Variational formulation}
@@ -167,58 +197,26 @@ Antonietti}
 	F_\epsilon(v_h) \quad \forall v_h \in \mathcal{D}_r(\mathcal{T})$.
 	\end{block}
 	\begin{itemize}
-		\item $\epsilon = -1 \rightarrow$ SIPG (Symmetric Interior Penalty
-		Galerkin)
+		\item \textbf{$\epsilon = -1 \rightarrow$} \textbf{SIPG (Symmetric 
+		Interior 
+		Penalty	Galerkin)}
 		\item $\epsilon = ~0 \rightarrow$ IIPG (Incomplete Interior Penalty
 		Galerkin)
 		\item $\epsilon = +1 \rightarrow$ NIPG (Non-symmetric Interior Penalty
 		Galerkin)
 	\end{itemize}
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Well-posedness}
-	Lax-Milgram lemma $\rightarrow$ we need continuity and coercivity of the
-	bilinear form $a_\epsilon (\cdot, \cdot)$ and continuity of the linear
-	functional $F_\epsilon(\cdot)$.\\
-	\vspace*{0.5cm}
-	We exploit the following inverse trace inequality for polynomials:
-	\begin{equation*}
-		|\!|v|\!|_{L^2(e)} \leq \frac{\bar{C}}{\sqrt{h_\kappa}} 
-		|\!|v|\!|_{L^2(\kappa)} \quad \forall e \subset \partial \kappa \quad 
-		\forall 
-		v \in \mathbb{P}_r(\kappa).
-	\end{equation*}
-	We find out that the formulation is well posed:
-	\begin{itemize}
-		\item Always for NIPG.
-		\item If $\beta \geq 1/2$ and $\sigma^* = \min\limits_{e \in \Gamma}
-		\sigma_e$ is greater enough for SIPG and IIPG (recall that $\gamma_e =
-		\frac{\sigma_e}{|e|^\beta}$).
-	\end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Extension to polyhedral grids}
-	Let $\mathcal{T}$ be a partition of	$\Omega$ into disjoint open
-	polyhedral elements $\kappa$:
-	\begin{itemize}
-		\item The \textbf{interfaces} of $\mathcal{T}$ are the intersections of
-		the two-dimensional facets of neighbouring elements.
-		\item Each interface can be subdivided by a set of co-planar triangles,
-		which we call \textbf{faces}.
-	\end{itemize}
-	\begin{figure}
-		\centering
-		\includegraphics[scale=0.2]{elements}
-	\end{figure}
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=main]{Extension to polyhedral grids}
-	We make "weak"
-	\hyperlink{supplemental}{\textbf{assumptions}} on the grid $\mathcal{T}$, 
-	requiring that it is quasi-uniform and that	exists a
-	\textbf{covering} $\mathcal{T}^\#$ made of non-overlapping
-	tetrahedra for which we require to be regular.\\  
-	\vspace*{0.5cm}
+\begin{frame}[label=main]{Grid \hyperlink{supplemental}{assumptions}}
+	\begin{itemize}
+	\item $\forall \kappa \in \mathcal{T}~\exists$ a set of non-overlapping 
+	tetrahedra $\{T_j\}$ included in $\kappa$ s.t. each $ e \subset \partial 
+	\kappa$ is shared by at least one tetrahedron $T_j$ and $\exists C > 0$ 
+	s.t. $h_\kappa \leq 3C|T_j|/|e|$. 
+	\item There exists a \textbf{covering} of $\mathcal{T}$ made of 
+	non-overlapping	tetrahedra for which we require to be regular.
+	\end{itemize}
+	\vspace*{0.3cm}
 	In order to prove the well-posedness we choose the penalty parameter
 	$\gamma_e \in L^\infty(\mathcal{T})$ such that:
 	\begin{equation*} \label{eq:penalty}
@@ -233,12 +231,27 @@ Antonietti}
 	\end{cases}
 	\end{equation*}
 	where $\sigma$ is a positive constant independent of $r$, $|e|$ and
-	$|\kappa|$.\\
-	We restrict our analysis to the \textbf{SIPG method}.
+	$|\kappa|$.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Well-posedness}
+	Lax-Milgram lemma $\rightarrow$ we need continuity and coercivity of the
+	bilinear form $a_\epsilon (\cdot, \cdot)$ and continuity of the linear
+	functional $F_\epsilon(\cdot)$.\\
+	\vspace*{0.5cm}
+	We exploit the following inverse trace inequality for polynomials:
+	\begin{equation*}
+		|\!|v|\!|^2_{L^2(\partial\kappa)} \leq C_{inv} \frac{r^2}{h_\kappa} 
+		|\!|v|\!|^2_{L^2(\kappa)} \quad \forall v \in \mathbb{P}_r(\kappa).
+	\end{equation*}
+	where $C_{inv}$ is a constant independent of $|\kappa|$, $r$ and $v$.\\
+	\vspace*{0.5cm}
+	We conclude that we need the constant $\sigma$ of the penalization 
+	parameter $\gamma_e$ to be large enough.
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Extension to polyhedral grids}
-	\begin{theorem}[Error estimates]
+\begin{frame}{Error estimates}
+	\begin{theorem}
 		Suppose that assumptions on the grid hold and let
 		$u_h \in \mathcal{D}_r(\mathcal{T})$ be the DG solution of
 		the discrete formulation. If the exact solution $u$ belongs to
@@ -297,9 +310,12 @@ Antonietti}
 	where $\mathrm{A} \in \mathbb{R}^{N_h \times N_h}, \; \mathrm{A}_{ij} =
 	a(\phi_j, \phi_i)$ and $\mathbf{f} \in \mathbb{R}^{N_h}, \; \mathbf{f}_i =
 	F(\phi_i)$.\\
-	\vspace*{0.4cm}
-	The matrix $\mathrm{A}$ is the sum of four matrices $\mathrm{A} =
-	\mathrm{V} - \mathrm{I} - \mathrm{I}^T + \mathrm{S}$:\\
+	%\vspace*{0.4cm}
+	%The matrix $\mathrm{A}$ is the sum of four matrices:
+	\begin{equation*}
+	\mathrm{A} =
+	\mathrm{V} - \mathrm{I} - \mathrm{I}^T + \mathrm{S}
+	\end{equation*}
 	\begin{itemize}
 		\item $\mathrm{V}_{ij} = \sum\limits_{\kappa \in \mathcal{T}}
 		\int_\kappa
@@ -371,13 +387,11 @@ Antonietti}
 	$\sigma = 10$.
 	\begin{figure}
 		\centering
-	%	\subfloat[\textit{Solution computed over a polyhedral mesh.}]
-		\subfloat[Solution computed over a polyhedral mesh.]
-		{\includegraphics[width=.45\textwidth]{solution_3072p}}
-		\quad
-	%	\subfloat[\textit{Polyhedral mesh consisting of 15 elements.}]
 		\subfloat[Polyhedral mesh consisting of 15 elements.]
 		{\includegraphics[width=.45\textwidth]{mesh_48p}}
+		\quad
+		\subfloat[Solution computed over a polyhedral mesh.]
+		{\includegraphics[width=.45\textwidth]{solution_3072p}}
 	\end{figure}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -596,15 +610,21 @@ Antonietti}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Main references}
 \begin{itemize}
+	\item Antonietti, Cangiani, Collins, Dong, Georgoulis, Giani, Houston: 
+	Review of discontinuous Galerkin finite element methods for partial 
+	differential equations on complicated domains (2016).
+	
 	\item Antonietti, Houston, Hu, Sarti, Verani: Multigrid
 	algorithms for hp-version interior penalty discontinuous Galerkin methods
-	on polygonal and polyhedral meshes, \emph{Calcolo}, (2017).
+	on polygonal and polyhedral meshes (2017).
+	
 	\item Cangiani, Georgoulis, Houston: Hp-Version discontinuous
-	Galerkin methods on polygonal and polyhedral meshes, \emph{Mathematical
-		Models and Methods in Applied Sciences} (2014).
-	\item Quarteroni: \emph{Numerical Models for Differential Problems}, Springer (2014).
-	\item Rivière: \emph{Discontinuous Galerkin Methods for Solving Elliptic and
-		Parabolic Equations: Theory and Implementation}, SIAM (2008).
+	Galerkin methods on polygonal and polyhedral meshes (2014).
+	
+	\item Quarteroni: Numerical Models for Differential Problems (2014).
+	
+	\item Rivière: Discontinuous Galerkin Methods for Solving Elliptic and
+		Parabolic Equations: Theory and Implementation (2008).
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -649,10 +669,10 @@ grid}
 			\mathcal{K} \big\} \leq C_c.
 		\end{equation*}
 	\end{block}
-	\vspace*{-0.5cm}
-	\begin{block}{Assumption 3}
-		The mesh $\mathcal{T}$ is quasi uniform, i.e. $\exists C>0$ such that
-		$h~\leq~C \min_{\kappa \in \mathcal{T}} h_\kappa$.
-	\end{block}
+%	\vspace*{-0.5cm}
+%	\begin{block}{Assumption 3}
+%		The mesh $\mathcal{T}$ is quasi uniform, i.e. $\exists C>0$ such that
+%		$h~\leq~C \min_{\kappa \in \mathcal{T}} h_\kappa$.
+%	\end{block}
 \end{frame}
 \end{document}
