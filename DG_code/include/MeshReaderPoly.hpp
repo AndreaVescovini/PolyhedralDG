@@ -25,7 +25,7 @@ private:
   // Sections names in the mesh file.
   std::array<std::string, 4> sections_;
 
-  void goToSection(std::ifstream& meshFile, unsigned secNo) const;
+  bool goToSection(std::ifstream& meshFile, unsigned secNo) const;
 };
 
 }

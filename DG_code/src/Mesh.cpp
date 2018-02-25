@@ -13,6 +13,7 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
   computeFaces();
   std::cout << "Faces have been computed." << std::endl;
   computePolyInfo();
+  std::cout << "Informations about polyhedra have been computed." << std::endl;
 }
 
 void Mesh::printAll(std::ostream& out) const

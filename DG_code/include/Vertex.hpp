@@ -29,14 +29,14 @@ public:
   real distance(const Vertex& v2) const;
 
   // Function that resets the counter (to be used at the beginning of the
-// reading of a mesh to assure that ids start from 0).
+  // reading of a new mesh, to assure that ids start from 0).
   static void resetCounter(unsigned counter = 0);
 
   virtual ~Vertex() = default;
 
   friend std::ostream& operator<<(std::ostream& out, const Vertex& v);
-  // Binary comparison operators used to sort face vertices.
 
+  // Binary comparison operators used to sort face vertices.
   friend bool compX(const Vertex& lhs, const Vertex& rhs);
   friend bool compY(const Vertex& lhs, const Vertex& rhs);
   friend bool compZ(const Vertex& lhs, const Vertex& rhs);
@@ -46,7 +46,7 @@ private:
   const unsigned id_;
   Eigen::Vector3d coords_;
 
-  // Counter used to assing a different id to each vertex when it is created
+  // Counter used to assign a different id to each vertex when it is created.
   static unsigned counter_;
 };
 

@@ -36,7 +36,9 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   std::vector<FaceExt>& faceExtList = mp.getFacesExtRef();
   std::vector<Polyhedron>& polyList = mp.getPolyhedraRef();
 
-  goToSection(meshFile, 0);
+  bool found = goToSection(meshFile, 0);
+  if(found == false)
+    std::cerr << "Error in mesh format, " << sections_[0] << " not found." << std::endl;
 
   // Read vertices
   size_t verticesNo = 0;
@@ -52,7 +54,9 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     vertList.emplace_back(curVertex[0], curVertex[1], curVertex[2]);
   }
 
-  goToSection(meshFile, 1);
+  found = goToSection(meshFile, 1);
+  if(found == false)
+    std::cerr << "Error in mesh format, " << sections_[1] << " not found." << std::endl;
 
   // Read tetrahedra
   size_t tetrahedraNo = 0;
@@ -68,7 +72,9 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
                            vertList[curTet[2]-1], vertList[curTet[3]-1]);
   }
 
-  goToSection(meshFile, 2);
+  found = goToSection(meshFile, 2);
+  if(found == false)
+    std::cerr << "Error in mesh format, " << sections_[2] << " not found." << std::endl;
 
   // Read Faces
   size_t facesExtNo = 0;
@@ -84,20 +90,36 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
                              vertList[curFace[2]-1], label);
   }
 
-  goToSection(meshFile, 3);
+  // Se non ho trovato la sezione polyhedra considero ogni tetraedro come un poliedro
+  found = goToSection(meshFile, 3);
 
   // Read polyhedra
-  size_t polyhedraNo = 0;
-  meshFile >> polyhedraNo;
   Polyhedron::resetCounter();
-  polyList.resize(polyhedraNo);
+  size_t polyhedraNo = 0;
 
-  unsigned poly = 0;
-  for(size_t i = 0; i < tetrahedraNo; i++)
+  if(found == true)
   {
-    meshFile >> poly;
-    polyList[poly-1].addTetra(tetraList[i]);
-    tetraList[i].setPoly(polyList[poly-1]);
+    meshFile >> polyhedraNo;
+    polyList.resize(polyhedraNo);
+
+    unsigned poly = 0;
+    for(size_t i = 0; i < tetrahedraNo; i++)
+    {
+      meshFile >> poly;
+      polyList[poly-1].addTetra(tetraList[i]);
+      tetraList[i].setPoly(polyList[poly-1]);
+    }
+  }
+  else
+  {
+    polyhedraNo = tetrahedraNo;
+    polyList.resize(polyhedraNo);
+
+    for(size_t i = 0; i < tetrahedraNo; i++)
+    {
+      polyList[i].addTetra(tetraList[i]);
+      tetraList[i].setPoly(polyList[i]);
+    }
   }
 
   meshFile.close();
@@ -113,11 +135,19 @@ std::array<std::string, 4> MeshReaderPoly::getSections() const
   return sections_;
 }
 
-void MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
+bool MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
 {
   std::string curLine = "";
-  while(curLine != sections_[secNo])
+  while(curLine != sections_[secNo] && curLine != "End")
     meshFile >> curLine;
+
+  if(curLine == "End")
+  {
+    std::cout << sections_[3] << " not found." << std::endl;
+    return false;
+  }
+  // Usare invece un'exception? Leggendo al teoria sembrerebbe di no, che vada bene così perchè è una situazione che può capitare
+  return true;
 }
 
 }

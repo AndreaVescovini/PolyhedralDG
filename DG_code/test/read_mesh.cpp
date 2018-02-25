@@ -7,9 +7,9 @@ int main()
   using dgfem::Mesh;
 
   MeshReaderPoly reader;
-  Mesh Th("../meshes/cube_str48h2.mesh", reader);
-  // Th.printHead();
-  Th.printAll();
+  Mesh Th("../meshes/cube_str6t.mesh", reader);
+  Th.printHead();
+  // Th.printAll();
 
   return 0;
 }
