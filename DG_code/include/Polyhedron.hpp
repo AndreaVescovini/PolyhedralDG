@@ -5,6 +5,7 @@
 #include <array>
 #include <functional>
 #include <unordered_set>
+#include <Eigen/Geometry>
 #include "geom.hpp"
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
@@ -45,7 +46,8 @@ private:
 
   // Here I store vertices coming from faces
   std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> vertices_;
-  std::array<interval, 3> boundingBox_;
+  // std::array<interval, 3> boundingBox_;
+  Eigen::AlignedBox<real, 3> boundingBox_;
   real diameter_;
 
   static unsigned counter_;
