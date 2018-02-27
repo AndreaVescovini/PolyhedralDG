@@ -57,20 +57,20 @@ std::ostream& operator<<(std::ostream& out, const Vertex& v)
   return out;
 }
 
-bool compX(const Vertex& lhs, const Vertex& rhs)
-{
-  return lhs.coords_[0] < rhs.coords_[0];
-}
-
-bool compY(const Vertex& lhs, const Vertex& rhs)
-{
-  return lhs.coords_[1] < rhs.coords_[1];
-}
-
-bool compZ(const Vertex& lhs, const Vertex& rhs)
-{
-  return lhs.coords_[2] < rhs.coords_[2];
-}
+// bool compX(const Vertex& lhs, const Vertex& rhs)
+// {
+//   return lhs.coords_[0] < rhs.coords_[0];
+// }
+//
+// bool compY(const Vertex& lhs, const Vertex& rhs)
+// {
+//   return lhs.coords_[1] < rhs.coords_[1];
+// }
+//
+// bool compZ(const Vertex& lhs, const Vertex& rhs)
+// {
+//   return lhs.coords_[2] < rhs.coords_[2];
+// }
 
 bool compId(const Vertex& lhs, const Vertex& rhs)
 {

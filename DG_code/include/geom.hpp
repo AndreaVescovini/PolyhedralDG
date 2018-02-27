@@ -12,7 +12,7 @@ using real = double;
 using labelType = unsigned;
 
 // Used for the bounding box.
-using interval = std::array<real, 2>;
+// using interval = std::array<real, 2>;
 
 }
 

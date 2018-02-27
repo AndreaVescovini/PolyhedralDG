@@ -5,15 +5,15 @@
 namespace geom {
 
 FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real area, Eigen::Vector3d normal,
+                 real areaDoubled, Eigen::Vector3d normal,
                  Tetrahedron& tet1, unsigned faceNoTet1)
-  :  FaceAbs(v1, v2, v3, area, normal, &tet1, faceNoTet1) {}
+  :  FaceAbs(v1, v2, v3, areaDoubled, normal, &tet1, faceNoTet1) {}
 
 FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real area, Eigen::Vector3d normal,
+                 real areaDoubled, Eigen::Vector3d normal,
                  Tetrahedron* tet1, unsigned faceNoTet1)
   :  Face(v1, v2, v3, tet1, faceNoTet1),
-     id_{counter_}, area_{area}, normal_{normal}
+     id_{counter_}, areaDoubled_{areaDoubled}, normal_{normal}
 {
   counter_++;
 }
@@ -32,17 +32,17 @@ FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
   Eigen::Vector3d tmp2(v3.getCoords() - v2.getCoords());
 
   normal_ = tmp1.cross(tmp2);
-  area_ = normal_.norm(); // this is the area doubled
-  normal_ /= area_;
+  areaDoubled_ = normal_.norm(); // this is the area doubled
+  normal_ /= areaDoubled_;
   if(tet1_ != nullptr)
     checkNormalSign();
 
   counter_++;
 }
 
-real FaceAbs::getArea() const
+real FaceAbs::getAreaDoubled() const
 {
-  return area_;
+  return areaDoubled_;
 }
 
 const Eigen::Vector3d& FaceAbs::getNormal() const
@@ -50,9 +50,9 @@ const Eigen::Vector3d& FaceAbs::getNormal() const
   return normal_;
 }
 
-void FaceAbs::setArea(real area)
+void FaceAbs::setAreaDoubled(real areaDoubled)
 {
-  area_ = area;
+  areaDoubled_ = areaDoubled;
 }
 
 void FaceAbs::setNormal(const Eigen::Vector3d& normal)

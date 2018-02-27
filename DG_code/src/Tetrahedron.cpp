@@ -1,4 +1,5 @@
 #include "Tetrahedron.hpp"
+#include <Eigen/Dense>
 
 namespace geom {
 
@@ -7,6 +8,13 @@ Tetrahedron::Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
   : id_{counter_}, vertices_{{v1, v2, v3, v4}}, poly_{poly}
 {
   counter_++;
+
+  map_ = (Eigen::Matrix4d() << (v2.getCoords() - v1.getCoords()),
+                               (v3.getCoords() - v1.getCoords()),
+                               (v4.getCoords() - v1.getCoords()),
+                                v1.getCoords(), Eigen::RowVector4d::Zero()).finished();
+  // std::cout << map_.linear().matrix() << std::endl;
+  detJacobian_ = map_.linear().matrix().determinant();
 }
 
 Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,

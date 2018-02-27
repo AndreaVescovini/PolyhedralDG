@@ -10,10 +10,10 @@ namespace geom
 class FaceAbs : public Face
 {
 public:
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, real area, Eigen::Vector3d normal,
+  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, real areaDoubled, Eigen::Vector3d normal,
           Tetrahedron& tet1, unsigned faceNoTet1);
 
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, real area, Eigen::Vector3d normal,
+  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, real areaDoubled, Eigen::Vector3d normal,
           Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
 
   FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
@@ -24,9 +24,9 @@ public:
 
   // Mancano i copy constructor e i move constructor.
 
-  real getArea() const;
+  real getAreaDoubled() const;
   const Eigen::Vector3d& getNormal() const;
-  void setArea(real area);
+  void setAreaDoubled(real areaDoubled);
   void setNormal(const Eigen::Vector3d& normal);
   // Function that checks weather the normal vector has the right sign or has
   // to be reverted.
@@ -42,7 +42,7 @@ public:
 
 protected:
   const unsigned id_;
-  real area_;
+  real areaDoubled_;
   Eigen::Vector3d normal_;
   static unsigned counter_;
 

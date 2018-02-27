@@ -37,9 +37,9 @@ public:
   friend std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
   // Binary comparison operators used to sort face vertices.
-  friend bool compX(const Vertex& lhs, const Vertex& rhs);
-  friend bool compY(const Vertex& lhs, const Vertex& rhs);
-  friend bool compZ(const Vertex& lhs, const Vertex& rhs);
+  // friend bool compX(const Vertex& lhs, const Vertex& rhs);
+  // friend bool compY(const Vertex& lhs, const Vertex& rhs);
+  // friend bool compZ(const Vertex& lhs, const Vertex& rhs);
   friend bool compId(const Vertex& lhs, const Vertex& rhs);
 
 private:
@@ -51,9 +51,9 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Vertex& v);
-bool compX(const Vertex& lhs, const Vertex& rhs);
-bool compY(const Vertex& lhs, const Vertex& rhs);
-bool compZ(const Vertex& lhs, const Vertex& rhs);
+// bool compX(const Vertex& lhs, const Vertex& rhs);
+// bool compY(const Vertex& lhs, const Vertex& rhs);
+// bool compZ(const Vertex& lhs, const Vertex& rhs);
 bool compId(const Vertex& lhs, const Vertex& rhs);
 
 }

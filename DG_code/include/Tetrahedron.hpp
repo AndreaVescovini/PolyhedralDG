@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iostream>
+#include <Eigen/Geometry>
 #include "geom.hpp"
 #include "Vertex.hpp"
 #include "Polyhedron.hpp"
@@ -42,6 +43,8 @@ private:
   const unsigned id_;
   std::array<std::reference_wrapper<Vertex>, 4> vertices_;
   Polyhedron* poly_;
+  Eigen::Transform<real, 3, Eigen::AffineCompact> map_;
+  real detJacobian_;
   static unsigned counter_;
 };
 
