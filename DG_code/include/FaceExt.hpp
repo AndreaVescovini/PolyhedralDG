@@ -5,8 +5,7 @@
 #include <iostream>
 #include "FaceAbs.hpp"
 
-namespace geom
-{
+namespace geom {
 
 class FaceExt : public FaceAbs
 {

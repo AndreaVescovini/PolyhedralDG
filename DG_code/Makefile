@@ -36,7 +36,7 @@ $(EXE): $(OBJS)
 	@mkdir -p $(EXE_DIR)
 	$(CXX) $(CXXFLAGS) $^ $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
 
-$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(DEP_DIR)/%.d
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(HEADER_DIR)/%.hpp $(DEP_DIR)/%.d
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(OUTPUT_OPTION)
 	@mv -f $(DEP_DIR)/$*.Td $(DEP_DIR)/$*.d && touch $(word 2,$^) && touch $@

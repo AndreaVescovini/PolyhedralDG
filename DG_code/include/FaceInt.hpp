@@ -4,8 +4,7 @@
 #include "FaceAbs.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom
-{
+namespace geom {
 
 class FaceInt : public FaceAbs
 {

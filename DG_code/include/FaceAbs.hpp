@@ -4,8 +4,7 @@
 #include <iostream>
 #include "Face.hpp"
 
-namespace geom
-{
+namespace geom {
 
 class FaceAbs : public Face
 {

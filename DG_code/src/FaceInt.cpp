@@ -62,7 +62,7 @@ void FaceInt::print(std::ostream& out) const
                              << vertices_[1].get().getId() << " "
                              << vertices_[2].get().getId()
       << ", T:" << tet1_->getId() << " " << tet2_->getId()
-      << ", A:" << area_ << ", N:" << normal_.transpose();
+      << ", A:" << areaDoubled_ << ", N:" << normal_.transpose();
 }
 
 }

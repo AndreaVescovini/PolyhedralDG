@@ -35,7 +35,7 @@ void FaceExt::print(std::ostream& out) const
   out << id_ << " " << "V: " << vertices_[0].get().getId() << " "
                              << vertices_[1].get().getId() << " "
                              << vertices_[2].get().getId() << ", L: " << BClabel_
-      << ", A:" << area_ << ", N:" << normal_.transpose();
+      << ", A:" << areaDoubled_ << ", N:" << normal_.transpose();
 }
 
 }

@@ -7,7 +7,7 @@
 #include "MeshReader.hpp"
 #include "Mesh.hpp"
 
-namespace dgfem {
+namespace geom {
 
 class MeshReaderPoly : public MeshReader
 {

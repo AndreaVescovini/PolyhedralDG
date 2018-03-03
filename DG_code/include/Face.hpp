@@ -9,8 +9,7 @@
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom
-{
+namespace geom {
 
 class Face
 {

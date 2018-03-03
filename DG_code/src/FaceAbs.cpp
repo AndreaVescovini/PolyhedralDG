@@ -72,7 +72,7 @@ void FaceAbs::checkNormalSign()
   if(normal_.dot(fourthVertex.getCoords() - vertices_[0].get().getCoords()) > 0 )
     normal_ *= -1;
 
-  std::cout << "Checked normal sign" << std::endl;
+  // std::cout << "Checked normal sign" << std::endl;
 }
 
 unsigned FaceAbs::getId() const

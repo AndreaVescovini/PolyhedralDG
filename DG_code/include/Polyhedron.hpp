@@ -10,8 +10,7 @@
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom
-{
+namespace geom {
 
 class Tetrahedron;
 
@@ -39,6 +38,8 @@ public:
   void computeDiameter();
 
   static void resetCounter(unsigned counter = 0);
+
+  virtual ~Polyhedron() = default;
 
 private:
   const unsigned id_;

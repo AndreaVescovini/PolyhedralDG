@@ -12,13 +12,7 @@
 #include "FaceInt.hpp"
 #include "Polyhedron.hpp"
 
-namespace dgfem {
-
-using geom::Vertex;
-using geom::Tetrahedron;
-using geom::Polyhedron;
-using geom::FaceExt;
-using geom::FaceInt;
+namespace geom {
 
 class MeshReader;
 
@@ -28,6 +22,13 @@ public:
   Mesh() = default;
 
   Mesh(const std::string& fileName, MeshReader& reader);
+
+  const FaceExt& getFaceExt(unsigned n) const;
+  const FaceInt& getFaceInt(unsigned n) const;
+  const Polyhedron& getPolyhedron(unsigned n) const;
+  unsigned getFacesExtNo() const;
+  unsigned getFacesIntNo() const;
+  unsigned getPolyhedraNo() const;
 
   // Prints all the informations about the mesh
   void printAll(std::ostream& out = std::cout) const;
@@ -55,7 +56,7 @@ private:
 
   // Function that computes the bounding box and the diameter of each polyhedron.
   void computePolyInfo();
-  
+
   void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
 

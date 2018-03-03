@@ -9,7 +9,7 @@
 // I assume that entities are numerated from 1 to N in the meshFile, then I store
 // them in my mesh conteiners numerating from 0 to N-1
 
-namespace dgfem {
+namespace geom {
 
 MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
   : sections_{sections} {}
@@ -18,12 +18,12 @@ MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
 // the data in mesh
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {
-  using geom::Vertex;
-  using geom::Tetrahedron;
-  using geom::FaceExt;
-  using geom::Polyhedron;
-  using geom::real;
-  using geom::labelType; // da riqualificare
+  // using geom::Vertex;
+  // using geom::Tetrahedron;
+  // using geom::FaceExt;
+  // using geom::Polyhedron;
+  // using geom::real;
+  // using geom::labelType; // da riqualificare
 
   std::ifstream meshFile{fileName};
   if( meshFile.is_open() == false )

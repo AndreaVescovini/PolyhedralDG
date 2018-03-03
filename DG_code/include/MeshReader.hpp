@@ -4,7 +4,7 @@
 #include <string>
 #include "Mesh.hpp"
 
-namespace dgfem {
+namespace geom {
 
 class Mesh;
 

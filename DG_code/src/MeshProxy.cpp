@@ -1,6 +1,6 @@
 #include "MeshProxy.hpp"
 
-namespace dgfem {
+namespace geom {
 
 MeshProxy::MeshProxy(Mesh& mesh)
   : mesh_{mesh} {}

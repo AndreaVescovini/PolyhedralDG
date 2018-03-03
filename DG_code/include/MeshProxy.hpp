@@ -8,12 +8,12 @@
 #include "FaceExt.hpp"
 #include "Polyhedron.hpp"
 
-namespace dgfem {
+namespace geom {
 
-using geom::Vertex;
-using geom::Tetrahedron;
-using geom::FaceExt;
-using geom::Polyhedron;
+// using geom::Vertex;
+// using geom::Tetrahedron;
+// using geom::FaceExt;
+// using geom::Polyhedron;
 
 class Mesh;
 
