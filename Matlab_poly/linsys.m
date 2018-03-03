@@ -8,7 +8,7 @@ function [u] = linsys(geom, f, gd, N, sigma, epsilon)
 fprintf('Computing the basis...');
 
 % get quadrature nodes for the required order
-[nod2, wei2, nod3, wei3, node_maps, node_maps_inv] = quadrature(N);
+[nod2, wei2, nod3, wei3, node_maps, ~] = quadrature(N);
 
 % Computed values of basis functions.
 Np = (N+1)*(N+2)*(N+3)/6; %number of dof for every element
@@ -39,7 +39,7 @@ for e = 1:geom.Nfaces % loop over faces
     E1 = geom.faces_neig(e,1);
     E2 = geom.faces_neig(e,3);
     e_E1 = geom.faces_neig(e,2);
-    e_E2 = geom.faces_neig(e,4);
+    %e_E2 = geom.faces_neig(e,4);
 
     if E2 == 0
         sig = sigma*N^2/geom.hk(geom.E2P(E1));
@@ -64,24 +64,28 @@ for e = 1:geom.Nfaces % loop over faces
         else
             % Recover the indexes relative to the element inside which E2 is.
             index2 = (geom.E2P(E2)-1)*Np+1:geom.E2P(E2)*Np;
-            q_star = node_maps_inv(:,:,e_E2)*geom.Jinv(:,:,E2)*(-geom.Fk(:,4,E2)+geom.Fk(:,:,E1)*node_maps(:,:,e_E1)*nod2(:,q));
-            q_2 = find((q_star(1)+0.00001 > nod2(1,:)) & (nod2(1,:) > q_star(1)-0.00001) & (q_star(2)+0.00001 > nod2(2,:)) & (nod2(2,:) > q_star(2)-0.00001));
-
+          %  q_star = node_maps_inv(:,:,e_E2)*geom.Jinv(:,:,E2)*(-geom.Fk(:,4,E2)+geom.Fk(:,:,E1)*node_maps(:,:,e_E1)*nod2(:,q));
+          %  q_2 = find((q_star(1)+0.00001 > nod2(1,:)) & (nod2(1,:) > q_star(1)-0.00001) & (q_star(2)+0.00001 > nod2(2,:)) & (nod2(2,:) > q_star(2)-0.00001));
+          
             A(index1, index1) = A(index1, index1) + sig*wei2(q)*phi_bordo(:,q,e,1)*phi_bordo(:,q,e,1)'*geom.area(e)... % S1
                               + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,1)'*geom.normal(:,e))*phi_bordo(:,q,e,1)'*geom.area(e)... % I1
                               - 0.5*wei2(q)*phi_bordo(:,q,e,1)*(geom.normal(:,e)'*grad_bordo(:,:,q,e,1))*geom.area(e); % I'1
 
-            A(index2, index2) = A(index2, index2) + sig*wei2(q)*phi_bordo(:,q_2,e,2)*phi_bordo(:,q_2,e,2)'*geom.area(e)... % S2
-                              + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q_2,e,2)'*(-geom.normal(:,e)))*phi_bordo(:,q_2,e,2)'*geom.area(e)... % I2
-                              - 0.5*wei2(q)*phi_bordo(:,q_2,e,2)*(-geom.normal(:,e)'*grad_bordo(:,:,q_2,e,2))*geom.area(e); % I'2
+            % in questo secondo pezzo della matrice A c'era q_2 anzichè q,
+            % in realtà si può anche usare q perchè in questo caso non
+            % mischio le funzioni di quadratura di due elementi diversi
+            % quindi il punto in cui integro è semrpe quello.
+            A(index2, index2) = A(index2, index2) + sig*wei2(q)*phi_bordo(:,q,e,2)*phi_bordo(:,q,e,2)'*geom.area(e)... % S2
+                              + epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,2)'*(-geom.normal(:,e)))*phi_bordo(:,q,e,2)'*geom.area(e)... % I2
+                              - 0.5*wei2(q)*phi_bordo(:,q,e,2)*(-geom.normal(:,e)'*grad_bordo(:,:,q,e,2))*geom.area(e); % I'2
 
-            A(index1, index2) = A(index1, index2) - sig*wei2(q)*phi_bordo(:,q,e,1)*phi_bordo(:,q_2,e,2)'*geom.area(e)... % S1
-                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,1)'*geom.normal(:,e))*phi_bordo(:,q_2,e,2)'*geom.area(e)... % I1
-                              + 0.5*wei2(q)*phi_bordo(:,q,e,1)*(-geom.normal(:,e)'*grad_bordo(:,:,q_2,e,2))*geom.area(e); % I'2
+            A(index1, index2) = A(index1, index2) - sig*wei2(q)*phi_bordo(:,q,e,1)*phi_bordo(:,q,e,2)'*geom.area(e)... % S1
+                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,1)'*geom.normal(:,e))*phi_bordo(:,q,e,2)'*geom.area(e)... % I1
+                              + 0.5*wei2(q)*phi_bordo(:,q,e,1)*(-geom.normal(:,e)'*grad_bordo(:,:,q,e,2))*geom.area(e); % I'2
 
-            A(index2, index1) = A(index2, index1) - sig*wei2(q)*phi_bordo(:,q_2,e,2)*phi_bordo(:,q,e,1)'*geom.area(e)... % S2
-                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q_2,e,2)'*(-geom.normal(:,e)))*phi_bordo(:,q,e,1)'*geom.area(e)... % I2
-                              + 0.5*wei2(q)*phi_bordo(:,q_2,e,2)*(geom.normal(:,e)'*grad_bordo(:,:,q,e,1))*geom.area(e); % I'1
+            A(index2, index1) = A(index2, index1) - sig*wei2(q)*phi_bordo(:,q,e,2)*phi_bordo(:,q,e,1)'*geom.area(e)... % S2
+                              - epsilon*0.5*wei2(q)*(grad_bordo(:,:,q,e,2)'*(-geom.normal(:,e)))*phi_bordo(:,q,e,1)'*geom.area(e)... % I2
+                              + 0.5*wei2(q)*phi_bordo(:,q,e,2)*(geom.normal(:,e)'*grad_bordo(:,:,q,e,1))*geom.area(e); % I'1
 
         end
     end

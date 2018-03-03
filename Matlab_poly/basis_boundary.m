@@ -30,8 +30,10 @@ for e = 1:Nfaces
      end
      E2 = faces_neig(e,3);
      if E2 ~= 0
-         e_E2 = faces_neig(e,4);
-         pt = Fk(:,:,E2)*node_maps(:,:,e_E2)*nod2;
+         % Queste due righe non servono più, mi tengo il punto fisico di
+         % prima
+       %  e_E2 = faces_neig(e,4);
+       %  pt = Fk(:,:,E2)*node_maps(:,:,e_E2)*nod2;
          for f = 1:Np
             [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,E2P(E2)));
             [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,E2P(E2)));
