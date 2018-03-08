@@ -33,6 +33,8 @@ public:
   void setPoly(Polyhedron& poly);
   unsigned getId() const;
 
+  const Eigen::Transform<real, 3, Eigen::AffineCompact>& getMap() const;
+
   static void resetCounter(unsigned counter = 0);
 
   virtual ~Tetrahedron() = default;

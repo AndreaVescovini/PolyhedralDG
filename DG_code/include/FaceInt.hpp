@@ -1,6 +1,7 @@
 #ifndef _FACE_INT_HPP_
 #define _FACE_INT_HPP_
 
+#include <iostream>
 #include "FaceAbs.hpp"
 #include "Tetrahedron.hpp"
 

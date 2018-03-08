@@ -56,6 +56,12 @@ unsigned Tetrahedron::getId() const
   return id_;
 }
 
+const Eigen::Transform<real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() const
+{
+  return map_;
+}
+
+
 void Tetrahedron::resetCounter(unsigned counter)
 {
   counter_ = counter;

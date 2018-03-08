@@ -30,10 +30,21 @@ const Tetrahedron& Polyhedron::getTetra(unsigned i) const
   return tetrahedra_[i];
 }
 
+unsigned Polyhedron::getTetrahedraNo() const
+{
+  return tetrahedra_.size();
+}
+
 unsigned Polyhedron::getId() const
 {
   return id_;
 }
+
+const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
+{
+  return boundingBox_;
+}
+
 
 void Polyhedron::computeBB()
 {

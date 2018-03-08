@@ -1,9 +1,9 @@
 #ifndef _FACE_EXT_HPP_
 #define _FACE_EXT_HPP_
 
-#include <array>
 #include <iostream>
 #include "FaceAbs.hpp"
+#include "Tetrahedron.hpp"
 
 namespace geom {
 

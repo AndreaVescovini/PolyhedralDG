@@ -58,4 +58,4 @@ clean:
 distclean: clean
 	$(RM) -r $(EXE_DIR)
 
-include $(DEPS)
+-include $(DEPS)
