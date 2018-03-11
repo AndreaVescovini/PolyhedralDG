@@ -11,8 +11,25 @@ namespace dgfem
 class QuadRuleManager
 {
 public:
-  static const QuadRule<Eigen::Vector3d>& getTetraRule(unsigned doe);
-  static const QuadRule<Eigen::Vector2d>& getTriaRule(unsigned doe);
+  using Rule3D = QuadRule<Eigen::Vector3d>;
+  using Rule2D = QuadRule<Eigen::Vector2d>;
+
+  // template <typename T>
+  // using RuleContainer = std::vector<T>;
+
+  template <typename T>
+  using CIter = typename std::vector<T>::const_iterator;
+
+  static const Rule3D& getTetraRule(unsigned doe);
+  static const Rule2D& getTriaRule(unsigned doe);
+
+  static unsigned getTetraRuleNo();
+  static unsigned getTriaRuleNo();
+
+  static CIter<Rule3D> tetraCbegin();
+  static CIter<Rule3D> tetraCend();
+  static CIter<Rule2D> triaCbegin();
+  static CIter<Rule2D> triaCend();
 
   // static void addTetraRule(const QuadRule<Eigen::Vector3d>& rule);
   // static void addTriaRule(const QuadRule<Eigen::Vector2d>& rule);
@@ -22,11 +39,8 @@ private:
   QuadRuleManager(const QuadRuleManager& man) = default;
   virtual ~QuadRuleManager() = default;
 
-  static std::vector<QuadRule<Eigen::Vector3d>> tetraRules_;
-  static std::vector<QuadRule<Eigen::Vector2d>> triaRules_;
-
-  static std::vector<QuadRule<Eigen::Vector3d>> initTetraRules();
-  static std::vector<QuadRule<Eigen::Vector2d>> initTriaRules();
+  static std::vector<Rule3D> tetraRules_;
+  static std::vector<Rule2D> triaRules_;
 };
 
 }

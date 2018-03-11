@@ -12,9 +12,10 @@ TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
 TEST_OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(TEST_SRCS:.cpp=.o)))
 
 SRCS = $(wildcard $(SOURCE_DIR)/*.cpp)
-SRCS += $(TEST_SRCS)
 OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.cpp=.o)))
+
 DEPS = $(addprefix $(DEP_DIR)/, $(notdir $(OBJS:.o=.d)))
+DEPS += $(addprefix $(DEP_DIR)/, $(notdir $(TEST_OBJS:.o=.d)))
 
 CXX = g++
 CXXFLAGS += -Wall -std=c++11
@@ -33,7 +34,7 @@ all: $(EXE)
 .DEFAULT_GOAL = all
 .PRECIOUS: $(DEP_DIR)/%.d
 
-$(EXE): $(OBJS)
+$(EXE_DIR)/%: $(BUILD_DIR)/%.o $(OBJS)
 	@mkdir -p $(EXE_DIR)
 	$(CXX) $(CXXFLAGS) $^ $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
 

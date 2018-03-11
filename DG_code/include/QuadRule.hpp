@@ -4,7 +4,10 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <initializer_list>
+#include <numeric>
+#include <cmath>
 #include "geom.hpp"
+// #include <iostream>
 
 namespace dgfem
 {
@@ -20,6 +23,8 @@ public:
   unsigned getPointsNo() const;
   const T& getPoint(unsigned i) const;
   geom::real getWeight(unsigned i) const;
+
+  bool checkRule(geom::real tol = 1e-10) const;
 
   virtual ~QuadRule() = default;
 
@@ -61,6 +66,19 @@ template <typename T>
 geom::real QuadRule<T>::getWeight(unsigned i) const
 {
   return weights_[i];
+}
+
+template <typename T>
+bool QuadRule<T>::checkRule(geom::real tol) const
+{
+  geom::real sum = std::accumulate(weights_.cbegin(), weights_.cend(), static_cast<geom::real>(0.0));
+  // std::cout << "Sum of weigths = " << sum << std::endl;
+  geom::real volume = 1. / std::tgamma(points_[0].size() + 1);
+
+  if(std::abs(sum - volume) < tol)
+    return true;
+  else
+    return false;
 }
 
 }
