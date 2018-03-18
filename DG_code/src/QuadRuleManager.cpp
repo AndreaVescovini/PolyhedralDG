@@ -53,6 +53,11 @@ QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCend()
   return triaRules_.cend();
 }
 
+const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
+{
+  return faceMaps_[faceNo];
+}
+
 std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
   // 1 point, degree of exactness = 1, [Quarteroni]
   {1,
@@ -432,5 +437,26 @@ std::vector<QuadRuleManager::Rule2D> QuadRuleManager::triaRules_{
    0.0141636212655285, 0.0141636212655285,0.0141636212655285, 0.0047108334818665,
    0.0047108334818665, 0.0047108334818665, 0.0047108334818665, 0.0047108334818665,
    0.0047108334818665}}};
+
+std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
+
+  // Face z = 0
+  (Eigen::Matrix3d() << 0.0, 1.0, 0.0,
+                        1.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0).finished(),
+  // Face y = 0
+  (Eigen::Matrix3d() << 1.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0).finished(),
+  // Face x = 0
+  (Eigen::Matrix3d() << 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0,
+                        1.0, 0.0, 0.0).finished(),
+
+  // Face x + y + z = 1
+  (Eigen::Matrix3d() << 1.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0,
+                       -1.0, -1.0, 1.0).finished()
+};
 
 }

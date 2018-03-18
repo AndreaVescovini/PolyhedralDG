@@ -72,11 +72,11 @@ void Mesh::computeFaces()
 
       // std::cout << "Tetraedro " << t.getId() << " " << faceNo << std::endl;
 
-      // The i-th face is that one without the i-th vertex.
+      // The i-th face is that one without the (3-i)-th vertex.
       auto res = temp.emplace(new geom::Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
                                              t.getVertex(static_cast<unsigned>(faceNo < 2) + 1),
                                              t.getVertex(static_cast<unsigned>(faceNo < 3) + 2),
-                                             t, faceNo));
+                                             t, 3 - faceNo));
       if(res.second == false)
       {
         // If I find a face of a tetrahedron of a different polyhedron I insert it in

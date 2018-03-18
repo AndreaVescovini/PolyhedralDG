@@ -1,8 +1,6 @@
 #ifndef _GEOM_HPP_
 #define _GEOM_HPP_
 
-#include <array>
-
 namespace geom {
 
 // Used for nothing.

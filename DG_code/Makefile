@@ -50,7 +50,7 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEP_DIR)/%.d
 
 $(DEP_DIR)/%.d: ;
 
-run: $(EXE)
+run: $(word 2, $(MAKECMDGOALS))
 	@$<
 
 clean:

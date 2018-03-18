@@ -31,6 +31,7 @@ public:
   static CIter<Rule2D> triaCbegin();
   static CIter<Rule2D> triaCend();
 
+  static const Eigen::Matrix3d& getFaceMap(unsigned faceNo);
   // static void addTetraRule(const QuadRule<Eigen::Vector3d>& rule);
   // static void addTriaRule(const QuadRule<Eigen::Vector2d>& rule);
 
@@ -41,6 +42,8 @@ private:
 
   static std::vector<Rule3D> tetraRules_;
   static std::vector<Rule2D> triaRules_;
+
+  static std::array<Eigen::Matrix3d, 4> faceMaps_;
 };
 
 }
