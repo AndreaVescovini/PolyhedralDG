@@ -8,14 +8,16 @@ namespace dgfem
 FeElement::FeElement(const TheElem& elem, unsigned order, unsigned dofNo,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRuleManager::Rule3D& tetraRule)
-  : elem_{elem}, order_{order}, dofNo_{dofNo},
-    basisComposition_{basisComposition}, tetraRule_{tetraRule}
+  : elem_{elem}, dofNo_{dofNo}, basisComposition_{basisComposition}, tetraRule_{tetraRule}
 {
   compute_basis();
 }
 
 void FeElement::compute_basis()
 {
+// hb contains the half of the dimensions of the bounding box of the polyhedron,
+// mb contains the center of the bounding box. They are needed for the computation
+// of the scaled Legendre polynomials.
   Eigen::Vector3d hb = elem_.getBoundingBox().sizes() / 2;
   Eigen::Vector3d mb = elem_.getBoundingBox().center();
 
@@ -31,7 +33,7 @@ void FeElement::compute_basis()
     // loop over quadrature points
     for(unsigned p = 0; p < quadPointsNo; p++)
     {
-      // I map the point from the reference tetrahedron to the physical one,
+      // I map the quadrature point from the reference tetrahedron to the physical one,
       // then I rescale it in order to compute the scaled legendre polynomial.
       Eigen::Vector3d physicPt = ((elem_.getTetra(t).getMap() * tetraRule_.getPoint(p)) - mb).array() / hb.array();
 
@@ -41,6 +43,7 @@ void FeElement::compute_basis()
         std::array<std::array<geom::real, 2>, 3> polval;
         for(unsigned i = 0; i < 3; i++)
         {
+          // polval stores the value of the Legendre polynomial and its derivative
           polval[i] = basis::legendre(basisComposition_[f][i], physicPt[i]);
 
           // I rescale the results in order to have the scaled Legendre polynomials
@@ -50,17 +53,13 @@ void FeElement::compute_basis()
 
         phi_.emplace_back(polval[0][0] * polval[1][0] * polval[2][0]);
 
+        // The gradient is computed deriving monomials one by one
         phiDer_.emplace_back(polval[0][1] * polval[1][0] * polval[2][0],
                              polval[0][0] * polval[1][1] * polval[2][0],
                              polval[0][0] * polval[1][0] * polval[2][1]);
       }
     }
   }
-}
-
-unsigned FeElement::getOrder() const
-{
-  return order_;
 }
 
 unsigned FeElement::getDofNo() const
@@ -85,13 +84,19 @@ unsigned FeElement::sub2ind(unsigned t, unsigned p, unsigned f) const
 
 void FeElement::printBasis(std::ostream& out) const
 {
+  // Loop over tetrahedra
   for(unsigned t = 0; t < elem_.getTetrahedraNo(); t++)
   {
     out << "Tetrahedron " << elem_.getTetra(t).getId() << '\n';
+
+    // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
     {
+
+      // Loop over quadrature points
       for(unsigned p = 0; p < tetraRule_.getPointsNo(); p++)
         out << getPhi(t, p, f) << ' ';
+
       out << '\n';
     }
     out << '\n';
@@ -100,13 +105,19 @@ void FeElement::printBasis(std::ostream& out) const
 
 void FeElement::printBasisDer(std::ostream& out) const
 {
+  // Loop over tetrahedra
   for(unsigned t = 0; t < elem_.getTetrahedraNo(); t++)
   {
     out << "Tetrahedron " << elem_.getTetra(t).getId() << '\n';
+
+    // Loop over quadrature points
     for(unsigned p = 0; p < tetraRule_.getPointsNo(); p++)
     {
+
+      // Loop over basis functions
       for(unsigned f = 0; f < dofNo_; f++)
         out << getPhiDer(t, p, f).transpose() << '\n';
+
       out << '\n';
     }
     out << '\n';

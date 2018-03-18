@@ -58,6 +58,8 @@ const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
   return faceMaps_[faceNo];
 }
 
+// Here the quadrature rules over the standard 3d-simplex are defined.
+// There are 8 rules with degree of exactness up to 8.
 std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
   // 1 point, degree of exactness = 1, [Quarteroni]
   {1,
@@ -269,6 +271,8 @@ std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
     0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164,
     0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164}}};
 
+// Here the quadrature rules over the standard 2d-simplex are defined.
+// There are 10 rules with degree of exactness up to 10.
 std::vector<QuadRuleManager::Rule2D> QuadRuleManager::triaRules_{
   // 1 points, degree of exactness = 1, [Dunavant]
   {1,
@@ -438,6 +442,8 @@ std::vector<QuadRuleManager::Rule2D> QuadRuleManager::triaRules_{
    0.0047108334818665, 0.0047108334818665, 0.0047108334818665, 0.0047108334818665,
    0.0047108334818665}}};
 
+// Here the maps from the standard 2d-simplex to the four faces of the standard
+// 3d-simplex are defined.
 std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
 
   // Face z = 0

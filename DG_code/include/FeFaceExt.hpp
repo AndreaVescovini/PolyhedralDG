@@ -32,7 +32,11 @@ public:
 private:
   const TheFace& face_;
 
+// Auxiliary function that fills phi_ and phiDer_
   void compute_basis() override;
+
+// Auxiliary function that, given the quadrature point p and basis function f,
+// returns the index in which the corresponding value is stored in phi_ and phiDer_
   unsigned sub2ind(unsigned p, unsigned f) const;
 
 };

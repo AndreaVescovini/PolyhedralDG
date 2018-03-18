@@ -18,7 +18,6 @@ public:
          const std::vector<std::array<unsigned, 3>>& basisComposition,
          const QuadRuleManager::Rule2D& triaRule);
 
-  unsigned getOrder() const;
   unsigned getDofNo() const;
 
   virtual void printBasis(std::ostream& out) const = 0;
@@ -27,7 +26,6 @@ public:
   virtual ~FeFace() = default;
 
 protected:
-  unsigned order_;
   unsigned dofNo_;
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
   const QuadRuleManager::Rule2D& triaRule_;

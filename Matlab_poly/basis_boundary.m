@@ -22,7 +22,11 @@ for e = 1:Nfaces
          [valx, dvalx] = LegendreP(pt(1,:), blist(f,1), bb(1,:,E2P(E1)));
          [valy, dvaly] = LegendreP(pt(2,:), blist(f,2), bb(2,:,E2P(E1)));
          [valz, dvalz] = LegendreP(pt(3,:), blist(f,3), bb(3,:,E2P(E1)));
-
+          
+         if(f == 2 && e == 18)
+            pt(2,:)
+            bb(2,:,E2P(E1))
+         end
          phi_bordo(f,:,e,1) = valx.*valy.*valz;
          grad_bordo(1,f,:,e,1) = dvalx.*valy.*valz;
          grad_bordo(2,f,:,e,1) = valx.*dvaly.*valz;

@@ -7,6 +7,7 @@
 namespace basis
 {
 
+// Recursive implementation through templates of the integer power of a real number
 template<class T>
 constexpr T pow(const T& x, unsigned n);
 

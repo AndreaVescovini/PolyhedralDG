@@ -17,12 +17,13 @@ class FeElement
 public:
   using TheElem = geom::Polyhedron;
 
+// Constructor that takes a geometrical polyhedron elem, the order of polynomials
+// order, the consequent number of degrees of freedom dofNo, the possible composition
+// of polynomilas of degree less or equal to order into monomials basisComposition,
+// a quadrature rule tetraRule.
   FeElement(const TheElem& elem, unsigned order, unsigned dofNo,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule3D& tetraRule);
-
-// Returns the order of the polynomials emplyed in the finite element
-  unsigned getOrder() const;
 
 // Returns the number of degrees of freedom that in 3D is
 // dofNo = (order+1)*(order+2)*(order+3)/(3!)
@@ -46,17 +47,33 @@ public:
 
 private:
 
-// Reference to the element over which the finite element is computed 
+// Reference to the element over which the finite element is computed
   const TheElem& elem_;
-  unsigned order_; // ordine dei polinomi
-  unsigned dofNo_; // numero di gdl
+
+// Number of degrees of freedom that in 3D is dofNo = (order+1)*(order+2)*(order+3)/(3!)
+  unsigned dofNo_;
+
+// Vector that contains all the possible degrees of the monomials that give
+// polynomials of degree less or equal to order_
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
+
+// Reference to the tetrahedral rule used for the computation of the basis functions
   const QuadRuleManager::Rule3D& tetraRule_;
 
+// Vector containing all the values of the basis functions over this element
   std::vector<geom::real> phi_;
+
+// Vector containing all the values of the gradient of the basis functions over
+// this element
   std::vector<Eigen::Vector3d> phiDer_;
 
+// Auxiliary function that performs the computation of the basis functinos and
+// fills phi_ and phiDer_
   void compute_basis();
+
+// Auxiliary function that, given the number of the tetrahedron t, quadrature
+// point p and basis function f, return the index in which the corresponding value
+// is stored in phi_ and phiDer_
   unsigned sub2ind(unsigned t, unsigned p, unsigned f) const;
 };
 

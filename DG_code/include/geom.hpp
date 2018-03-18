@@ -3,7 +3,6 @@
 
 namespace geom {
 
-// Used for nothing.
 using real = double;
 
 // Used for nothing.

@@ -24,13 +24,20 @@ public:
   const T& getPoint(unsigned i) const;
   geom::real getWeight(unsigned i) const;
 
+// Functions that returns true if the sum of the weights is the volume of the
+// simplex up to a tolerance tol and returns false otherwise.
   bool checkRule(geom::real tol = 1e-10) const;
 
   virtual ~QuadRule() = default;
 
 private:
-  unsigned doe_; // degree of exactness
+// Degree of exactness od the quadrature formula
+  unsigned doe_;
+
+// Vector of quadrature points
   std::vector<T> points_;
+
+// Vector of quadrature weigths
   std::vector<geom::real> weights_;
 };
 
@@ -73,6 +80,8 @@ bool QuadRule<T>::checkRule(geom::real tol) const
 {
   geom::real sum = std::accumulate(weights_.cbegin(), weights_.cend(), static_cast<geom::real>(0.0));
   // std::cout << "Sum of weigths = " << sum << std::endl;
+
+  // I use the Gamma function in order to compute the factorial
   geom::real volume = 1. / std::tgamma(points_[0].size() + 1);
 
   if(std::abs(sum - volume) < tol)

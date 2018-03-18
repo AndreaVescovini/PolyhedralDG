@@ -15,10 +15,14 @@ FeFaceInt::FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
 
 void FeFaceInt::compute_basis()
 {
+  // hb and hb2 contain the half of the dimensions of the bounding box of the two
+  // polyhedra sharing the face. They are needed for the computation of the scaled Legendre polynomials.
   Eigen::Vector3d hb = face_.getTet1().getPoly().getBoundingBox().sizes() / 2;
-  Eigen::Vector3d mb = face_.getTet1().getPoly().getBoundingBox().center();
-
   Eigen::Vector3d hb2 = face_.getTet2().getPoly().getBoundingBox().sizes() / 2;
+
+  // mb and mb2 contain the center of the bounding box of the two polyhedra sharing
+  // the face. They are needed for the computation of the scaled Legendre polynomials.
+  Eigen::Vector3d mb = face_.getTet1().getPoly().getBoundingBox().center();
   Eigen::Vector3d mb2 = face_.getTet2().getPoly().getBoundingBox().center();
 
   unsigned quadPointsNo = triaRule_.getPointsNo();
@@ -29,8 +33,9 @@ void FeFaceInt::compute_basis()
   // loop over quadrature points
   for(unsigned p = 0; p < quadPointsNo; p++)
   {
-    // I map the point from the reference tetrahedron to the physical one,
-    // then I rescale it in order to compute the scaled legendre polynomial.
+    // I map the quadrature point from the refrence triangle to the face of the
+    // reference tetrahedron and then to the physical one, finally I rescale it
+    // in order to compute the scaled legendre polynomial.
     Eigen::Vector3d physicPt = ((face_.getTet1().getMap() *
                                  QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
                                  triaRule_.getPoint(p).homogeneous()) - mb).array() / hb.array();
@@ -38,12 +43,13 @@ void FeFaceInt::compute_basis()
                                   QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
                                   triaRule_.getPoint(p).homogeneous()) - mb2).array() / hb2.array();
 
-    // loop over basis functions
+    // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
     {
       std::array<std::array<geom::real, 2>, 3> polval;
       std::array<std::array<geom::real, 2>, 3> polval2;
 
+      // Loop over the three coordinates
       for(unsigned i = 0; i < 3; i++)
       {
         // I compute the basis for both the sides of the face
@@ -90,12 +96,18 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
   out << "Face " << face_.getId() << '\n';
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
+  // Loop over sides
   for(unsigned side = 0; side < 2; side++)
   {
+
+    // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
     {
+
+      // Loop over quadrature points
       for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
         out << getPhi(side, p, f) << ' ';
+
       out << '\n';
     }
     out << '\n';
@@ -108,12 +120,18 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
   out << "Face " << face_.getId() << '\n';
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
+  // Loop over sides
   for(unsigned side = 0; side < 2; side++)
   {
+
+    // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
     {
+
+      // Loop over quadrature points
       for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
         out << getPhiDer(side, p, f).transpose() << '\n';
+
       out << '\n';
     }
     out << '\n';
