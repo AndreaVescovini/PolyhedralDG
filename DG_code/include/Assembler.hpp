@@ -68,7 +68,7 @@ void Assembler<T>::assembleVol()
   A_.setFromTriplets(tripletList.begin(), tripletList.end());
 
   // I remove numericale zeros, I hope it works well
-  A_.prune(1.0);
+  A_.prune(A_.coeff(0,0));
 }
 
 template <typename T>
