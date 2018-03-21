@@ -1,0 +1,2 @@
+# I ignore object files, executables and make.dep
+*.vtk

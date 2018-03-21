@@ -4,7 +4,7 @@
 #include <array>
 #include <iostream>
 #include <functional>
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include "geom.hpp"
 
 namespace geom {

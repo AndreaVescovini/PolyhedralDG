@@ -1,7 +1,7 @@
 #ifndef _QUAD_RULE_HPP_
 #define _QUAD_RULE_HPP_
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <vector>
 #include <initializer_list>
 #include <numeric>
@@ -41,7 +41,7 @@ private:
   std::vector<geom::real> weights_;
 };
 
-//------------IMPLEMENTATION----------------------------------------------------
+//-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename T>
 QuadRule<T>::QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<geom::real>& weights)

@@ -67,6 +67,26 @@ unsigned FeElement::getDofNo() const
   return dofNo_;
 }
 
+unsigned FeElement::getTetrahedraNo() const
+{
+  return elem_.getTetrahedraNo();
+}
+
+geom::real FeElement::getAbsDetJac(unsigned i) const
+{
+  return elem_.getTetra(i).getAbsDetJacobian();
+}
+
+unsigned FeElement::getQuadPointsNo() const
+{
+  return tetraRule_.getPointsNo();
+}
+
+geom::real FeElement::getWeight(unsigned i) const
+{
+  return tetraRule_.getWeight(i);
+}
+
 geom::real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
 {
   return phi_[sub2ind(t, p, f)];

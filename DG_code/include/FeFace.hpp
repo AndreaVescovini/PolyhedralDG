@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 #include "geom.hpp"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <iostream>
 
 namespace dgfem

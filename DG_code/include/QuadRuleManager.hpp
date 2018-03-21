@@ -2,7 +2,7 @@
 #define _QUAD_RULE_MANAGER_HPP_
 
 #include "QuadRule.hpp"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <vector>
 
 namespace dgfem

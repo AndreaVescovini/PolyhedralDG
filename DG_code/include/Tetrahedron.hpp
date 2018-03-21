@@ -34,6 +34,7 @@ public:
   unsigned getId() const;
 
   const Eigen::Transform<real, 3, Eigen::AffineCompact>& getMap() const;
+  real getAbsDetJacobian() const;
 
   static void resetCounter(unsigned counter = 0);
 
@@ -46,7 +47,7 @@ private:
   std::array<std::reference_wrapper<Vertex>, 4> vertices_;
   Polyhedron* poly_;
   Eigen::Transform<real, 3, Eigen::AffineCompact> map_;
-  real detJacobian_;
+  real absDetJacobian_;
   static unsigned counter_;
 };
 

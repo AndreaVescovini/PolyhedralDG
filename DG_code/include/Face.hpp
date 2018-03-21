@@ -3,7 +3,7 @@
 
 #include <array>
 #include <functional>
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <memory>
 #include "geom.hpp"
 #include "Vertex.hpp"

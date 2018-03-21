@@ -12,12 +12,10 @@ int main()
   unsigned r = 1;
   dgfem::FeSpace Vh(Th, r, 2, 2);
 
-  // Vh.printElemBasis();
-  // Vh.printElemBasisDer();
-  // Vh.printFaceBasis();
+  Vh.printElemBasis();
+  Vh.printElemBasisDer();
+  Vh.printFaceBasis();
   Vh.printFaceBasisDer();
-
-
 
   return 0;
 }

@@ -8,7 +8,7 @@
 #include "QuadRuleManager.hpp"
 #include <vector>
 #include <array>
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <iostream>
 
 namespace dgfem {
@@ -29,6 +29,21 @@ public:
   void setOrder(unsigned order);
   unsigned getOrder() const;
   unsigned getDofNo() const;
+
+  const FeElement& getFeElement(unsigned i) const;
+  const FeFaceInt& getFeFaceInt(unsigned i) const;
+  const FeFaceExt& getFeFaceExt(unsigned i) const;
+
+  unsigned getFeElementsNo() const;
+  unsigned getFeFacesIntNo() const;
+  unsigned getFeFacesExtNo() const;
+
+  std::vector<FeElement>::const_iterator feElementsCbegin() const;
+  std::vector<FeElement>::const_iterator feElementsCend() const;
+  std::vector<FeFaceInt>::const_iterator feFacesIntCbegin() const;
+  std::vector<FeFaceInt>::const_iterator feFacesIntCend() const;
+  std::vector<FeFaceExt>::const_iterator feFacesExtCbegin() const;
+  std::vector<FeFaceExt>::const_iterator feFacesExtCend() const;
 
   void printElemBasis(std::ostream& out = std::cout) const;
   void printElemBasisDer(std::ostream& out = std::cout) const;

@@ -4,7 +4,7 @@
 #include "Polyhedron.hpp"
 #include "geom.hpp"
 #include "QuadRuleManager.hpp"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <vector>
 #include <array>
 #include <iostream>
@@ -29,6 +29,15 @@ public:
 // dofNo = (order+1)*(order+2)*(order+3)/(3!)
   unsigned getDofNo() const;
 
+// Returns the number of tetrhedra that compose elem_
+  unsigned getTetrahedraNo() const;
+
+// Returns the number of quadrature points of tetraRule_
+  unsigned getQuadPointsNo() const;
+
+// Return the absolute value of the determinant of the jacobian of the i-th tetrahedron
+  geom::real getAbsDetJac(unsigned i) const;
+
 // Returns the value of the basis function f, computed at the quadrature node p in
 // the tetrahedron t
   geom::real getPhi(unsigned t, unsigned p, unsigned f) const;
@@ -36,6 +45,9 @@ public:
 // Returns the vector of the gradient of the basis function f, computed at the
 // quadrature node p in the tetrahedron t
   const Eigen::Vector3d& getPhiDer(unsigned t, unsigned p, unsigned f) const;
+
+// Returns the i-th quadrature weight
+  geom::real getWeight(unsigned i) const;
 
 // Prints all the computed values of the basis functions
   void printBasis(std::ostream& out = std::cout) const;

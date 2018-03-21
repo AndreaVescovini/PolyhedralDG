@@ -1,5 +1,6 @@
 #include "Tetrahedron.hpp"
-#include <Eigen/Dense>
+#include <Eigen/Core>
+#include <cmath>
 
 namespace geom {
 
@@ -14,7 +15,7 @@ Tetrahedron::Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
                                (v4.getCoords() - v1.getCoords()),
                                 v1.getCoords(), Eigen::RowVector4d::Zero()).finished();
   // std::cout << map_.linear().matrix() << std::endl;
-  detJacobian_ = map_.linear().matrix().determinant();
+  absDetJacobian_ = std::abs(map_.linear().matrix().determinant());
 }
 
 Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
@@ -61,6 +62,10 @@ const Eigen::Transform<real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() con
   return map_;
 }
 
+real Tetrahedron::getAbsDetJacobian() const
+{
+  return absDetJacobian_;
+}
 
 void Tetrahedron::resetCounter(unsigned counter)
 {
