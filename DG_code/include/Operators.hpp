@@ -3,17 +3,23 @@
 
 #include "FeElement.hpp"
 #include "geom.hpp"
+#include "ExprWrapper.hpp"
 
 namespace dgfem
 {
 
-struct Stiff
+class Stiff : public ExprWrapper<Stiff>
 {
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j,
-                               unsigned t, unsigned q) const
-  {
-    return fe.getPhiDer(t, q, j).transpose() * fe.getPhiDer(t, q, i);
-  }
+public:
+  Stiff() = default;
+
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned j,
+                        unsigned t, unsigned q) const;
+  virtual ~Stiff() = default;
+
+// private:
+  // geom::real viscosity;
+
 };
 
 }

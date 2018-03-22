@@ -7,25 +7,23 @@
 #include <Eigen/Core>
 #include <vector>
 #include <iostream>
-#include "Expr.hpp"
 
 namespace dgfem
 {
 
-template <typename T>
 class Assembler
 {
 public:
-  Assembler(const Expr<T>& expr, const FeSpace& Vh);
+  explicit Assembler(const FeSpace& Vh);
 
-  void assembleVol();
+  template <typename T>
+  void assembleVol(T expr);
 
   void printMatrix(std::ostream& out = std::cout) const;
 
   virtual ~Assembler() = default;
 
 private:
-  const Expr<T>& expr_;;
   const FeSpace& Vh_;
   Eigen::SparseMatrix<double> A_;
 
@@ -34,12 +32,7 @@ private:
 //-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename T>
-Assembler<T>::Assembler(const Expr<T>& expr, const FeSpace& Vh)
-  : expr_{expr}, Vh_{Vh},
-    A_{Vh.getFeElementsNo() * Vh.getDofNo(), Vh.getFeElementsNo() * Vh.getDofNo()} {}
-
-template <typename T>
-void Assembler<T>::assembleVol()
+void Assembler::assembleVol(T expr)
 {
   using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
@@ -51,13 +44,13 @@ void Assembler<T>::assembleVol()
   {
     geom::real sum;
 
-    for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-      for(unsigned j = i; j < Vh_.getDofNo(); j++)
+    for(unsigned j = 0; j < Vh_.getDofNo(); j++)
+      for(unsigned i = 0; i <= j; i++)
       {
         sum = 0.0;
         for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
           for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-            sum += expr_(*it, i, j, t, q) * it->getWeight(q) * it->getAbsDetJac(t);
+            sum += expr(*it, i, j, t, q) * it->getWeight(q) * it->getAbsDetJac(t);
 
         tripletList.emplace_back(i + elemNo * Vh_.getDofNo(), j + elemNo * Vh_.getDofNo(), sum);
       }
@@ -69,12 +62,6 @@ void Assembler<T>::assembleVol()
 
   // I remove numericale zeros, I hope it works well
   A_.prune(A_.coeff(0,0));
-}
-
-template <typename T>
-void Assembler<T>::printMatrix(std::ostream& out) const
-{
-  out << A_.selfadjointView<Eigen::Upper>() << std::endl;
 }
 
 }
