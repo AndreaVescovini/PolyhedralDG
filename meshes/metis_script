@@ -39,7 +39,8 @@ sed '/End/d' $1 > $final_name
 # add metis output
 echo "Polyhedra" >> $final_name
 echo $((end+1)) >> $final_name
-cat metis_input.epart.$2 >> $final_name
+# I sum 1 to the metis output i order to have polyhedra numbered from 1 to N
+awk '{print $1+1}' metis_input.epart.$2 >> $final_name
 echo "" >> $final_name
 echo End >> $final_name
 
