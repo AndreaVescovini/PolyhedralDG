@@ -17,8 +17,16 @@ public:
                         unsigned t, unsigned q) const;
   virtual ~Stiff() = default;
 
-// private:
-  // geom::real viscosity;
+};
+
+class Mass : public ExprWrapper<Mass>
+{
+public:
+  Mass() = default;
+
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned j,
+                        unsigned t, unsigned q) const;
+  virtual ~Mass() = default;
 
 };
 

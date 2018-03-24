@@ -7,6 +7,7 @@
 #include <Eigen/Core>
 #include <vector>
 #include <iostream>
+#include "ExprWrapper.hpp"
 
 namespace dgfem
 {
@@ -17,7 +18,7 @@ public:
   explicit Assembler(const FeSpace& Vh);
 
   template <typename T>
-  void assembleVol(T expr);
+  void assembleVol(const ExprWrapper<T>& expr);
 
   void printMatrix(std::ostream& out = std::cout) const;
 
@@ -32,7 +33,7 @@ private:
 //-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename T>
-void Assembler::assembleVol(T expr)
+void Assembler::assembleVol(const ExprWrapper<T>& expr)
 {
   using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
@@ -60,7 +61,7 @@ void Assembler::assembleVol(T expr)
 
   A_.setFromTriplets(tripletList.begin(), tripletList.end());
 
-  // I remove numericale zeros, I hope it works well
+  // I remove numerical zeros, I hope it works well
   A_.prune(A_.coeff(0,0));
 }
 

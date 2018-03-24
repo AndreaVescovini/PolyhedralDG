@@ -3,6 +3,7 @@
 #include "MeshReaderPoly.hpp"
 #include "Assembler.hpp"
 #include "Operators.hpp"
+#include "ExprOperators.hpp"
 
 using namespace dgfem;
 
@@ -20,9 +21,10 @@ int main()
   // Assembler<Stiff> exprTemplate(stiff, Vh);
   // exprTemplate.assembleVol();
 
-  Stiff stiff; // qui potrei assgnarli la viscosità forse, o forse no la viscosità dovrei semplicemente moltiplicargliela
+  Stiff stiff; // qui potrei assgnargli la viscosità forse, o forse no la viscosità dovrei semplicemente moltiplicargliela
+  Mass mass;
   Assembler exprTemplate(Vh);
-  exprTemplate.assembleVol(stiff);
+  exprTemplate.assembleVol(2.0*stiff*2);
 
   exprTemplate.printMatrix();
 
