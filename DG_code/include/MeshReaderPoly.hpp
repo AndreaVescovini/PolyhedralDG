@@ -21,6 +21,8 @@ public:
   void setSections(const std::array<std::string, 4>& sections);
   std::array<std::string, 4> getSections() const;
 
+  virtual ~MeshReaderPoly() = default;
+
 private:
   // Sections names in the mesh file.
   std::array<std::string, 4> sections_;

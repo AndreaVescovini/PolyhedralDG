@@ -27,6 +27,8 @@ public:
   unsigned getBClabel() const;
   void setBClabel(unsigned BClabel);
 
+  virtual ~FaceExt() = default;
+
 private:
   // I store an unsigned correspoing to the boundary condition assigned to this
   // external face.

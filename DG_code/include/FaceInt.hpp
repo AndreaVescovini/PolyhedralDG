@@ -35,6 +35,8 @@ public:
   void setTet2(Tetrahedron* tet2);
   void setFaceNoTet2(unsigned faceNoTet2);
 
+  virtual ~FaceInt() = default;
+
 private:
   // I store also the second tetrahedron that owns the face and the local number
   // of the face in tetrahderon.

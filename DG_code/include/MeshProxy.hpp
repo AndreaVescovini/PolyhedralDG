@@ -27,6 +27,8 @@ public:
   std::vector<FaceExt>& getFacesExtRef() const;
   std::vector<Polyhedron>& getPolyhedraRef() const;
 
+  virtual ~MeshProxy() = default;
+
 private:
   Mesh& mesh_;
 };

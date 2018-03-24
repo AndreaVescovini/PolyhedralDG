@@ -36,6 +36,8 @@ public:
   // Prints only the first five elements of each entity of the mesh.
   void printHead(std::ostream& out = std::cout) const;
 
+  virtual ~Mesh() = default;
+
   // Proxy used to modify the mesh.
   friend class MeshProxy;
 
