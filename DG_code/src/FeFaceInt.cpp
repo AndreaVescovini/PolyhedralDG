@@ -1,6 +1,7 @@
 #include "FeFaceInt.hpp"
 #include "Legendre.hpp"
 #include <cmath>
+#include <algorithm>
 
 namespace dgfem
 {
@@ -11,6 +12,8 @@ FeFaceInt::FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
   : FeFace(order, dofNo, basisComposition, triaRule), face_{face}
 {
   compute_basis();
+  penaltyParam_ = order * order / std::min(face.getTet1().getPoly().getDiameter(),
+                                          face.getTet2().getPoly().getDiameter());
 }
 
 void FeFaceInt::compute_basis()
@@ -84,6 +87,24 @@ geom::real FeFaceInt::getPhi(unsigned side, unsigned p, unsigned f) const
 const Eigen::Vector3d& FeFaceInt::getPhiDer(unsigned side, unsigned p, unsigned f) const
 {
   return phiDer_[sub2ind(side, p, f)];
+}
+
+unsigned FeFaceInt::getElem(unsigned side) const
+{
+  if(side == 0)
+    return face_.getTet1().getPoly().getId();
+  else
+    return face_.getTet2().getPoly().getId();
+}
+
+geom::real FeFaceInt::getAreaDoubled() const
+{
+  return face_.getAreaDoubled();
+}
+
+const Eigen::Vector3d& FeFaceInt::getNormal() const
+{
+  return face_.getNormal();
 }
 
 unsigned FeFaceInt::sub2ind(unsigned side, unsigned p, unsigned f) const

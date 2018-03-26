@@ -11,6 +11,7 @@ FeFaceExt::FeFaceExt(const TheFace& face, unsigned order, unsigned dofNo,
   : FeFace(order, dofNo, basisComposition, triaRule), face_{face}
 {
   compute_basis();
+  penaltyParam_ = order * order / face.getTet1().getPoly().getDiameter();
 }
 
 void FeFaceExt::compute_basis()
@@ -70,6 +71,16 @@ const Eigen::Vector3d& FeFaceExt::getPhiDer(unsigned p, unsigned f) const
   return phiDer_[sub2ind(p, f)];
 }
 
+geom::real FeFaceExt::getAreaDoubled() const
+{
+  return face_.getAreaDoubled();
+}
+
+const Eigen::Vector3d& FeFaceExt::getNormal() const
+{
+  return face_.getNormal();
+}
+
 unsigned FeFaceExt::sub2ind(unsigned p, unsigned f) const
 {
   return f + dofNo_ * p;
@@ -105,7 +116,7 @@ void FeFaceExt::printBasisDer(std::ostream& out = std::cout) const
     // Loop over the quadrature points
     for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
       out << getPhiDer(p, f).transpose() << '\n';
-      
+
     out << '\n';
   }
   out << '\n';

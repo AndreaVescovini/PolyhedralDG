@@ -20,6 +20,13 @@ public:
 
   unsigned getDofNo() const;
 
+  unsigned getQuadPointsNo() const;
+  geom::real getWeight(unsigned i) const;
+  geom::real getPenaltyParam() const;
+
+  virtual geom::real getAreaDoubled() const = 0;
+  virtual const Eigen::Vector3d& getNormal() const = 0;
+
   virtual void printBasis(std::ostream& out) const = 0;
   virtual void printBasisDer(std::ostream& out) const = 0;
 
@@ -32,6 +39,12 @@ protected:
 
   std::vector<geom::real> phi_;
   std::vector<Eigen::Vector3d> phiDer_;
+
+// Penalty parameter equal to max(order^2 / diameter_k) for k = k1, k2,
+// with order the order of the polynomials k1 and k2 the two polyhedra sharing
+// the face, diameter_k their diameter. For external face there is only one
+// polyhedron and so no need for the maximum.
+  geom::real penaltyParam_;
 
   virtual void compute_basis() = 0;
 

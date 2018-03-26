@@ -8,6 +8,11 @@ Assembler::Assembler(const FeSpace& Vh)
 
 void Assembler::printMatrix(std::ostream& out) const
 {
+  out << A_ << std::endl;
+}
+
+void Assembler::printMatrixSym(std::ostream& out) const
+{
   out << A_.selfadjointView<Eigen::Upper>() << std::endl;
 }
 

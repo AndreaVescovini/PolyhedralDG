@@ -24,6 +24,9 @@ public:
   geom::real getPhi(unsigned p, unsigned f) const;
   const Eigen::Vector3d& getPhiDer(unsigned p, unsigned f) const;
 
+  geom::real getAreaDoubled() const override;
+  const Eigen::Vector3d& getNormal() const override;
+
   void printBasis(std::ostream& out) const override;
   void printBasisDer(std::ostream& out) const override;
 

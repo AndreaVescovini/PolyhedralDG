@@ -13,4 +13,19 @@ unsigned FeFace::getDofNo() const
   return dofNo_;
 }
 
+unsigned FeFace::getQuadPointsNo() const
+{
+  return triaRule_.getPointsNo();
+}
+
+geom::real FeFace::getWeight(unsigned i) const
+{
+  return triaRule_.getWeight(i);
+}
+
+geom::real FeFace::getPenaltyParam() const
+{
+  return penaltyParam_;
+}
+
 }
