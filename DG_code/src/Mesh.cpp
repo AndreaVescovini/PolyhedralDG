@@ -64,7 +64,7 @@ void Mesh::computeFaces()
   temp.reserve(tetrahedra_.size() * 4);
   facesInt_.reserve(tetrahedra_.size() * 2);
 
-  for(Tetrahedron& t : tetrahedra_)
+  for(Tetrahedron& t : tetrahedra_) // perchè non const?
     for(unsigned faceNo = 0; faceNo < 4; faceNo++)
     { // I store faces in temp, the constructor will sort vertices so that
       // the comparison will be easy, if a face is not present it will be inserted,
@@ -82,10 +82,11 @@ void Mesh::computeFaces()
         // If I find a face of a tetrahedron of a different polyhedron I insert it in
         // facesInt_, then in any case I erase the face from temp
         if(t.getPoly().getId() != (*res.first)->getTet1().getPoly().getId())
+        {
           facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
                                  (*res.first)->getTet1(), (*res.first)->getFaceNoTet1(),
-                                 t, faceNo);
-
+                                 t, 3 - faceNo);
+        }
         temp.erase(res.first);
       }
     }

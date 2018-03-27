@@ -67,10 +67,10 @@ void FaceAbs::checkNormalSign()
   // that one that does not belong to the face. If the dot product is positive
   // mean that the two vectors are in the same direction so I have to revert the
   // sign of the normal.
-  const Vertex& fourthVertex = tet1_->getVertex(faceNoTet1_);
+  const Vertex& fourthVertex = tet1_->getVertex(3 - faceNoTet1_);
 
   if(normal_.dot(fourthVertex.getCoords() - vertices_[0].get().getCoords()) > 0 )
-    normal_ *= -1;
+    normal_ *= -1.0;
 
   // std::cout << "Checked normal sign" << std::endl;
 }

@@ -24,7 +24,7 @@ FaceInt::FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
                  Tetrahedron* tet1, unsigned faceNoTet1,
                  Tetrahedron* tet2, unsigned faceNoTet2)
   :  FaceAbs(v1, v2, v3, tet1, faceNoTet1),
-     tet2_{tet2}, faceNoTet2_{faceNoTet2_} {}
+     tet2_{tet2}, faceNoTet2_{faceNoTet2} {}
 
 const Tetrahedron& FaceInt::getTet2() const
 {

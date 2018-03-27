@@ -2,9 +2,9 @@
 #define _EXPR_WRAPPER_HPP_
 
 #include "geom.hpp"
-#include "FeElement.hpp"
-#include "FeFaceInt.hpp"
-#include "FeFaceExt.hpp"
+// #include "FeElement.hpp"
+// #include "FeFaceInt.hpp"
+// #include "FeFaceExt.hpp"
 
 namespace dgfem
 {
@@ -29,7 +29,7 @@ public:
 //
 // // Call operator for expressions that involve integrals over internal faces
 //   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j,
-//                         unsigned side1, unsigned side2, unsigned q) const;
+//                         int side1, int side2, unsigned q) const;
 //
 // // Call operator for expressions that involve integrals over external faces
 //   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
@@ -64,7 +64,7 @@ public:
 //
 // template <typename E>
 // geom::real ExprWrapper<E>::operator()(const FeFaceInt& fe, unsigned i, unsigned j,
-//                                       unsigned side1, unsigned side2, unsigned q) const
+//                                       int side1, int side2, unsigned q) const
 // {
 //   return asDerived().operator()(fe, i, j, side1, side2, q);
 // }

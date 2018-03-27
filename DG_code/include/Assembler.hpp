@@ -22,7 +22,7 @@ public:
   void assembleVol(const ExprWrapper<T>& expr);
 
   template <typename T>
-  void assembleFacesInt(const ExprWrapper<T>& expr);
+  void assembleFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
 
   void printMatrix(std::ostream& out = std::cout) const;
   void printMatrixSym(std::ostream& out = std::cout) const;
@@ -72,7 +72,7 @@ void Assembler::assembleVol(const ExprWrapper<T>& expr)
 }
 
 template <typename T>
-void Assembler::assembleFacesInt(const ExprWrapper<T>& expr)
+void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
 {
   const T& exprDerived(expr);
 
@@ -80,11 +80,11 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr)
   std::vector<triplet> tripletList;
   tripletList.reserve(Vh_.getDofNo() * Vh_.getFeFacesIntNo() * 4);
 
-  for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCbegin()+1; it++)
+  for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i < Vh_.getDofNo(); i++)//= j; i++)
-        for(unsigned side1 = 0; side1 < 2; side1++)
-          for(unsigned side2 = 0; side2 < 2; side2++)
+      for(unsigned i = 0; i < Vh_.getDofNo()*(1-sym)+(j+1)*sym; i++)
+        for(int side1 = 0; side1 < 2; side1++)
+          for(int side2 = 0; side2 < 2; side2++)
           {
             geom::real sum = 0.0;
 
@@ -94,7 +94,6 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr)
               tripletList.emplace_back(i + it->getElem(side1) * Vh_.getDofNo(),
                                        j + it->getElem(side2) * Vh_.getDofNo(),
                                        sum);
-              std::cout << sum << '\n';
           }
 
   A_.setFromTriplets(tripletList.begin(), tripletList.end());

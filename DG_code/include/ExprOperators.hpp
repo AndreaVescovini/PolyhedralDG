@@ -39,7 +39,7 @@ public:
   BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const;
+  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -56,7 +56,7 @@ public:
   BinaryOperator(geom::real lo, const ExprWrapper<RO>& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const;
+  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -73,7 +73,7 @@ public:
   BinaryOperator(const ExprWrapper<LO>& lo, geom::real ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const;
+  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -90,7 +90,7 @@ public:
   BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const;
+  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -107,7 +107,7 @@ public:
   explicit UnaryOperator(const ExprWrapper<RO>& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const;
+  geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
 
   virtual ~UnaryOperator() = default;
 
@@ -219,7 +219,7 @@ geom::real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned 
 }
 
 template <typename LO, typename RO, typename OP>
-geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const
+geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return OP()(lo_(fe, i, j, side1, side2, q), ro_(fe, i, j, side1, side2, q));
 }
@@ -235,7 +235,7 @@ geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeElement& fe, u
 }
 
 template <typename RO, typename OP>
-geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const
+geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return OP()(lo_, ro_(fe, i, j, side1, side2, q));
 }
@@ -251,7 +251,7 @@ geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeElement& fe, u
 }
 
 template <typename LO, typename OP>
-geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const
+geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return OP()(lo_(fe, i, j, side1, side2, q), ro_);
 }
@@ -267,7 +267,7 @@ geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, u
 }
 
 template <typename LO, typename RO>
-geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const
+geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return DotProduct()(lo_(fe, i, side1, q), ro_(fe, j, side2, q));
 }
@@ -283,7 +283,7 @@ geom::real UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, un
 }
 
 template <typename RO, typename OP>
-geom::real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, unsigned side1, unsigned side2, unsigned q) const
+geom::real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return OP()(ro_(fe, i, j, side1, side2, q));
 }

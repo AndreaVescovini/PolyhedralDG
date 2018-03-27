@@ -79,17 +79,17 @@ void FeFaceInt::compute_basis()
   }
 }
 
-geom::real FeFaceInt::getPhi(unsigned side, unsigned p, unsigned f) const
+geom::real FeFaceInt::getPhi(int side, unsigned p, unsigned f) const
 {
   return phi_[sub2ind(side, p, f)];
 }
 
-const Eigen::Vector3d& FeFaceInt::getPhiDer(unsigned side, unsigned p, unsigned f) const
+const Eigen::Vector3d& FeFaceInt::getPhiDer(int side, unsigned p, unsigned f) const
 {
   return phiDer_[sub2ind(side, p, f)];
 }
 
-unsigned FeFaceInt::getElem(unsigned side) const
+unsigned FeFaceInt::getElem(int side) const
 {
   if(side == 0)
     return face_.getTet1().getPoly().getId();
@@ -107,7 +107,7 @@ const Eigen::Vector3d& FeFaceInt::getNormal() const
   return face_.getNormal();
 }
 
-unsigned FeFaceInt::sub2ind(unsigned side, unsigned p, unsigned f) const
+unsigned FeFaceInt::sub2ind(int side, unsigned p, unsigned f) const
 {
   return side + 2 * (f + p * dofNo_);
 }
@@ -118,7 +118,7 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
   // Loop over sides
-  for(unsigned side = 0; side < 2; side++)
+  for(int side = 0; side < 2; side++)
   {
 
     // Loop over basis functions
@@ -142,7 +142,7 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
   // Loop over sides
-  for(unsigned side = 0; side < 2; side++)
+  for(int side = 0; side < 2; side++)
   {
 
     // Loop over basis functions

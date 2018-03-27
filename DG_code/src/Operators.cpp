@@ -33,9 +33,22 @@ geom::real PhiJ::operator()(const FeElement& fe, unsigned i, unsigned j, unsigne
   return fe.getPhi(t, q, j);
 }
 
-Eigen::Vector3d JumpInt::operator()(const FeFaceInt& fe, unsigned i, unsigned side, unsigned q) const
+Eigen::Vector3d JumpIntPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
 {
-  return fe.getPhi(side, q, i) * (1 - 2 * side) * fe.getNormal() ;
+  return fe.getPhi(side, q, i) * (1.0 - 2.0 * side) * fe.getNormal();
 }
 
+Eigen::Vector3d AverIntGradPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
+{
+  return 0.5 * fe.getPhiDer(side, q, i);
 }
+
+PenaltyScaling::PenaltyScaling(geom::real sigma)
+  : sigma_{sigma} {}
+
+geom::real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+{
+  return sigma_ * fe.getPenaltyParam();
+}
+
+} // namespace dgfem

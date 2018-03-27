@@ -21,10 +21,10 @@ public:
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule2D& triaRule);
 
-  geom::real getPhi(unsigned side, unsigned p, unsigned f) const;
-  const Eigen::Vector3d& getPhiDer(unsigned side, unsigned p, unsigned f) const;
+  geom::real getPhi(int side, unsigned p, unsigned f) const;
+  const Eigen::Vector3d& getPhiDer(int side, unsigned p, unsigned f) const;
 
-  unsigned getElem(unsigned side) const;
+  unsigned getElem(int side) const;
 
   geom::real getAreaDoubled() const override;
   const Eigen::Vector3d& getNormal() const override;
@@ -43,7 +43,7 @@ private:
 // Auxiliary function that, given the side of the face, the quadrature point p
 // and basis function f, returns the index in which the corresponding value
 // is stored in phi_ and phiDer_
-  unsigned sub2ind(unsigned side, unsigned p, unsigned f) const;
+  unsigned sub2ind(int side, unsigned p, unsigned f) const;
 
 };
 
