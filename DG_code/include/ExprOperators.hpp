@@ -36,7 +36,7 @@ template <typename LO, typename RO, typename OP>
 class BinaryOperator : public ExprWrapper<BinaryOperator<LO, RO, OP>>
 {
 public:
-  BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro);
+  BinaryOperator(const LO& lo, const RO& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
@@ -53,7 +53,7 @@ template <typename RO, typename OP>
 class BinaryOperator<geom::real, RO, OP> : public ExprWrapper<BinaryOperator<geom::real, RO, OP>>
 {
 public:
-  BinaryOperator(geom::real lo, const ExprWrapper<RO>& ro);
+  BinaryOperator(geom::real lo, const RO& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
@@ -70,7 +70,7 @@ template <typename LO, typename OP>
 class BinaryOperator<LO, geom::real, OP> : public ExprWrapper<BinaryOperator<LO, geom::real, OP>>
 {
 public:
-  BinaryOperator(const ExprWrapper<LO>& lo, geom::real ro);
+  BinaryOperator(const LO& lo, geom::real ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
@@ -87,7 +87,7 @@ template <typename LO, typename RO>
 class BinaryOperator<LO, RO, DotProduct> : public ExprWrapper<BinaryOperator<LO, RO, DotProduct>>
 {
 public:
-  BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro);
+  BinaryOperator(const LO& lo, const RO& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
@@ -104,7 +104,7 @@ template <typename RO, typename OP>
 class UnaryOperator : public ExprWrapper<UnaryOperator<RO, OP>>
 {
 public:
-  explicit UnaryOperator(const ExprWrapper<RO>& ro);
+  explicit UnaryOperator(const RO& ro);
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
@@ -209,7 +209,7 @@ inline BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo, const E
 //-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename LO, typename RO, typename OP>
-BinaryOperator<LO, RO, OP>::BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, OP>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename RO, typename OP>
@@ -225,7 +225,7 @@ geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned 
 }
 
 template <typename RO, typename OP>
-BinaryOperator<geom::real, RO, OP>::BinaryOperator(geom::real lo, const ExprWrapper<RO>& ro)
+BinaryOperator<geom::real, RO, OP>::BinaryOperator(geom::real lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename RO, typename OP>
@@ -241,7 +241,7 @@ geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceInt& fe, u
 }
 
 template <typename LO, typename OP>
-BinaryOperator<LO, geom::real, OP>::BinaryOperator(const ExprWrapper<LO>& lo, geom::real ro)
+BinaryOperator<LO, geom::real, OP>::BinaryOperator(const LO& lo, geom::real ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename OP>
@@ -257,7 +257,7 @@ geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeFaceInt& fe, u
 }
 
 template <typename LO, typename RO>
-BinaryOperator<LO, RO, DotProduct>::BinaryOperator(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, DotProduct>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename RO>
@@ -273,7 +273,7 @@ geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, u
 }
 
 template <typename RO, typename OP>
-UnaryOperator<RO, OP>::UnaryOperator(const ExprWrapper<RO>& ro)
+UnaryOperator<RO, OP>::UnaryOperator(const RO& ro)
   : ro_{ro} {}
 
 template <typename RO, typename OP>
