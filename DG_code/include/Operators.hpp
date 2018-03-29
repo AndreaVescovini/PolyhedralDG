@@ -32,25 +32,45 @@ public:
 
 };
 
-class GradPhi : public ExprWrapper<GradPhi>
+// class GradPhi : public ExprWrapper<GradPhi>
+// {
+// public:
+//   GradPhi() = default;
+//
+//   Eigen::Vector3d operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+//
+//   virtual ~GradPhi() = default;
+// };
+
+class GradPhiI : public ExprWrapper<GradPhiI>
 {
 public:
-  GradPhi() = default;
+  GradPhiI() = default;
 
-  Eigen::Vector3d operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+  Eigen::Vector3d operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
 
-  virtual ~GradPhi() = default;
+  virtual ~GradPhiI() = default;
 };
 
-class Phi : public ExprWrapper<Phi>
+class GradPhiJ : public ExprWrapper<GradPhiJ>
 {
 public:
-  Phi() = default;
+  GradPhiJ() = default;
 
-  geom::real operator()(const FeElement&, unsigned i, unsigned t, unsigned q) const;
+  Eigen::Vector3d operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
 
-  virtual ~Phi() = default;
+  virtual ~GradPhiJ() = default;
 };
+
+// class Phi : public ExprWrapper<Phi>
+// {
+// public:
+//   Phi() = default;
+//
+//   geom::real operator()(const FeElement&, unsigned i, unsigned t, unsigned q) const;
+//
+//   virtual ~Phi() = default;
+// };
 
 class PhiI : public ExprWrapper<PhiI>
 {
@@ -72,26 +92,70 @@ public:
   virtual ~PhiJ() = default;
 };
 
-class JumpPhi : public ExprWrapper<JumpPhi>
+// class JumpPhi : public ExprWrapper<JumpPhi>
+// {
+// public:
+//   JumpPhi() = default;
+//
+//   Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
+//   Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+//
+//   virtual ~JumpPhi() = default;
+// };
+
+class JumpPhiI : public ExprWrapper<JumpPhiI>
 {
 public:
-  JumpPhi() = default;
+  JumpPhiI() = default;
 
-  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
-  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
-  virtual ~JumpPhi() = default;
+  virtual ~JumpPhiI() = default;
 };
 
-class AverGradPhi : public ExprWrapper<AverGradPhi>
+class JumpPhiJ : public ExprWrapper<JumpPhiJ>
 {
 public:
-  AverGradPhi() = default;
+  JumpPhiJ() = default;
 
-  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
-  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
-  virtual ~AverGradPhi() = default;
+  virtual ~JumpPhiJ() = default;
+};
+
+// class AverGradPhi : public ExprWrapper<AverGradPhi>
+// {
+// public:
+//   AverGradPhi() = default;
+//
+//   Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
+//   Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+//
+//   virtual ~AverGradPhi() = default;
+// };
+
+class AverGradPhiI : public ExprWrapper<AverGradPhiI>
+{
+public:
+  AverGradPhiI() = default;
+
+  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+
+  virtual ~AverGradPhiI() = default;
+};
+
+class AverGradPhiJ : public ExprWrapper<AverGradPhiJ>
+{
+public:
+  AverGradPhiJ() = default;
+
+  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+
+  virtual ~AverGradPhiJ() = default;
 };
 
 class PenaltyScaling : public ExprWrapper<PenaltyScaling>

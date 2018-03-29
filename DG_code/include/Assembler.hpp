@@ -25,7 +25,7 @@ public:
   void assembleFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
 
   template <typename T>
-  void assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym = false);
+  void assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, const bool sym = false);
 
   void printMatrix(std::ostream& out = std::cout) const;
   void printMatrixSym(std::ostream& out = std::cout) const;

@@ -19,23 +19,24 @@ int main()
 
   Stiff   stiff; // qui potrei assegnargli la viscosità forse, o forse no la viscosità dovrei semplicemente moltiplicargliela
   Mass    mass;
-  GradPhi gradPhi;
-  PhiI    u;
-  PhiJ    v;
-  Phi     phi;
-  JumpPhi jumpIntPhi;
-  AverGradPhi averIntGradPhi;
+  GradPhiJ uGrad;
+  GradPhiI vGrad;
+  JumpPhiJ uJump;
+  JumpPhiI vJump;
+  AverGradPhiJ uGradAver;
+  AverGradPhiI vGradAver;
   PenaltyScaling gamma(10.0);
 
   Assembler volumes(Vh);
   Assembler facesI(Vh);
   Assembler facesE(Vh);
 
-  // volumes.assembleVol(dot(gradPhi, gradPhi));
-  // facesI.assembleFacesInt(-dot(averIntGradPhi, jumpIntPhi)-dot(jumpIntPhi, averIntGradPhi)+gamma*dot(jumpIntPhi,jumpIntPhi));
-  facesE.assembleFacesExt(-dot(averIntGradPhi, jumpIntPhi)-dot(jumpIntPhi, averIntGradPhi)+gamma*dot(jumpIntPhi,jumpIntPhi), 1);
+  volumes.assembleVol(dot(uGrad, vGrad));
+  facesI.assembleFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump));
+  facesE.assembleFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1);
 
+  volumes.printMatrix();
+  facesI.printMatrix();
   facesE.printMatrix();
-  // facesIt.printMatrix();
   return 0;
 }
