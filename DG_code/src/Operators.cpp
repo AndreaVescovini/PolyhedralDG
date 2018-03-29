@@ -33,20 +33,35 @@ geom::real PhiJ::operator()(const FeElement& fe, unsigned i, unsigned j, unsigne
   return fe.getPhi(t, q, j);
 }
 
-Eigen::Vector3d JumpIntPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
+Eigen::Vector3d JumpPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
 {
   return fe.getPhi(side, q, i) * (1.0 - 2.0 * side) * fe.getNormal();
 }
 
-Eigen::Vector3d AverIntGradPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
+Eigen::Vector3d JumpPhi::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return fe.getPhi(q, i) * fe.getNormal();
+}
+
+Eigen::Vector3d AverGradPhi::operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const
 {
   return 0.5 * fe.getPhiDer(side, q, i);
+}
+
+Eigen::Vector3d AverGradPhi::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return fe.getPhiDer(q, i);
 }
 
 PenaltyScaling::PenaltyScaling(geom::real sigma)
   : sigma_{sigma} {}
 
 geom::real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+{
+  return sigma_ * fe.getPenaltyParam();
+}
+
+geom::real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
 {
   return sigma_ * fe.getPenaltyParam();
 }

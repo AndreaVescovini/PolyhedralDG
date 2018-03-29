@@ -14,22 +14,6 @@ int main()
   geom::MeshReaderPoly reader;
   geom::Mesh Th(fileName, reader);
 
-  // for(int i = 0; i < Th.getFacesIntNo(); i++)
-  // {
-  //   auto faccia = Th.getFaceInt(i);
-  //   std::cout << "Normale" << '\n';
-  //   std::cout << faccia.getNormal().transpose() << std::endl;
-  //   std::cout << "Vertici faccia" << '\n';
-  //   for(int j = 0; j < 3; j++)
-  //     std::cout << faccia.getVertex(j).getCoords().transpose() << std::endl;
-  //   std::cout << "Vertici Tetra 1 e poi 2" << '\n';
-  //   std::cout << faccia.getTet1().getVertex(3-faccia.getFaceNoTet1()).getCoords().transpose() << std::endl;
-  //   std::cout << faccia.getFaceNoTet2() << std::endl;
-  //
-  //
-  //   std::cout << "--------------------------------------------" << '\n';
-  // }
-
   unsigned r = 1;
   FeSpace Vh(Th, r);
 
@@ -39,19 +23,19 @@ int main()
   PhiI    u;
   PhiJ    v;
   Phi     phi;
-  JumpIntPhi jumpIntPhi;
-  AverIntGradPhi averIntGradPhi;
+  JumpPhi jumpIntPhi;
+  AverGradPhi averIntGradPhi;
   PenaltyScaling gamma(10.0);
 
   Assembler volumes(Vh);
   Assembler facesI(Vh);
-  Assembler facesIt(Vh);
+  Assembler facesE(Vh);
+
   // volumes.assembleVol(dot(gradPhi, gradPhi));
+  // facesI.assembleFacesInt(-dot(averIntGradPhi, jumpIntPhi)-dot(jumpIntPhi, averIntGradPhi)+gamma*dot(jumpIntPhi,jumpIntPhi));
+  facesE.assembleFacesExt(-dot(averIntGradPhi, jumpIntPhi)-dot(jumpIntPhi, averIntGradPhi)+gamma*dot(jumpIntPhi,jumpIntPhi), 1);
 
-  facesI.assembleFacesInt(-dot(jumpIntPhi, averIntGradPhi)-dot(averIntGradPhi, jumpIntPhi), true);
-  // facesIt.assembleFacesInt();
-
-  facesI.printMatrix();
+  facesE.printMatrix();
   // facesIt.printMatrix();
   return 0;
 }

@@ -71,6 +71,16 @@ const Eigen::Vector3d& FeFaceExt::getPhiDer(unsigned p, unsigned f) const
   return phiDer_[sub2ind(p, f)];
 }
 
+unsigned FeFaceExt::getElem() const
+{
+  return face_.getTet1().getPoly().getId();
+}
+
+unsigned FeFaceExt::getBClabel() const
+{
+  return face_.getBClabel();
+}
+
 geom::real FeFaceExt::getAreaDoubled() const
 {
   return face_.getAreaDoubled();
@@ -122,4 +132,4 @@ void FeFaceExt::printBasisDer(std::ostream& out = std::cout) const
   out << '\n';
 }
 
-}
+} // namespace dgfem

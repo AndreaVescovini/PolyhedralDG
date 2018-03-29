@@ -19,10 +19,13 @@ public:
   explicit Assembler(const FeSpace& Vh);
 
   template <typename T>
-  void assembleVol(const ExprWrapper<T>& expr);
+  void assembleVol(const ExprWrapper<T>& expr, const bool sym = false);
 
   template <typename T>
   void assembleFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
+
+  template <typename T>
+  void assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym = false);
 
   void printMatrix(std::ostream& out = std::cout) const;
   void printMatrixSym(std::ostream& out = std::cout) const;
@@ -38,21 +41,21 @@ private:
 //-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename T>
-void Assembler::assembleVol(const ExprWrapper<T>& expr)
+void Assembler::assembleVol(const ExprWrapper<T>& expr, const bool sym)
 {
 // I exploit the conversion to derived
   const T& exprDerived(expr);
 
   using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
-  tripletList.reserve(Vh_.getDofNo() * Vh_.getFeElementsNo());
+  tripletList.reserve(Vh_.getFeElementsNo() * Vh_.getDofNo() * Vh_.getDofNo()); //devo calcolare quanto spazio mi serve
 
   unsigned elemNo = 0;
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i <= j; i++)
+      for(unsigned i = 0; i < (j+1) * sym + (1-sym) * Vh_.getDofNo(); i++)
       {
         geom::real sum = 0.0;
         for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
@@ -65,6 +68,7 @@ void Assembler::assembleVol(const ExprWrapper<T>& expr)
     elemNo++;
   }
 
+  // probabilmente mi serve fare anche un A_.reserve()
   A_.setFromTriplets(tripletList.begin(), tripletList.end());
 
   // I remove numerical zeros, I hope it works well
@@ -78,7 +82,7 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
 
   using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
-  tripletList.reserve(Vh_.getDofNo() * Vh_.getFeFacesIntNo() * 4);
+  tripletList.reserve(Vh_.getDofNo() * Vh_.getFeFacesIntNo() * 4); // devo calcolare quanto spazio mi serve
 
   for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
@@ -91,10 +95,41 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
             for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
               sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
 
-              tripletList.emplace_back(i + it->getElem(side1) * Vh_.getDofNo(),
-                                       j + it->getElem(side2) * Vh_.getDofNo(),
-                                       sum);
+            tripletList.emplace_back(i + it->getElem(side1) * Vh_.getDofNo(),
+                                     j + it->getElem(side2) * Vh_.getDofNo(),
+                                     sum);
           }
+
+// probabilmente mi serve fare anche un A_.reserve()
+  A_.setFromTriplets(tripletList.begin(), tripletList.end());
+
+  // I remove numerical zeros, I hope it works well
+  A_.prune(A_.coeff(0,0));
+}
+
+template <typename T>
+void Assembler::assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym)
+{
+  const T& exprDerived(expr);
+
+  using triplet = Eigen::Triplet<double>;
+  std::vector<triplet> tripletList;
+  tripletList.reserve(Vh_.getDofNo() * Vh_.getFeFacesExtNo() * 4);  // devo calcolare quanto spazio mi serve
+
+  for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
+    if(it->getBClabel() == BClabel)
+      for(unsigned j = 0; j < Vh_.getDofNo(); j++)
+        for(unsigned i = 0; i < Vh_.getDofNo()*(1-sym)+(j+1)*sym; i++)
+        {
+          geom::real sum = 0.0;
+
+          for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+            sum += exprDerived(*it, i, j, q) * it->getWeight(q) * it->getAreaDoubled();
+
+          tripletList.emplace_back(i + it->getElem() * Vh_.getDofNo(),
+                                   j + it->getElem() * Vh_.getDofNo(),
+                                   sum);
+        }
 
   A_.setFromTriplets(tripletList.begin(), tripletList.end());
 
@@ -102,6 +137,6 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
   A_.prune(A_.coeff(0,0));
 }
 
-}
+} // namespace dgfem
 
 #endif // _ASSEMBLER_HPP_

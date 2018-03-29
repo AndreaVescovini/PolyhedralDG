@@ -72,24 +72,26 @@ public:
   virtual ~PhiJ() = default;
 };
 
-class JumpIntPhi : public ExprWrapper<JumpIntPhi>
+class JumpPhi : public ExprWrapper<JumpPhi>
 {
 public:
-  JumpIntPhi() = default;
+  JumpPhi() = default;
 
   Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
 
-  virtual ~JumpIntPhi() = default;
+  virtual ~JumpPhi() = default;
 };
 
-class AverIntGradPhi : public ExprWrapper<AverIntGradPhi>
+class AverGradPhi : public ExprWrapper<AverGradPhi>
 {
 public:
-  AverIntGradPhi() = default;
+  AverGradPhi() = default;
 
   Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, int side, unsigned q) const;
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
 
-  virtual ~AverIntGradPhi() = default;
+  virtual ~AverGradPhi() = default;
 };
 
 class PenaltyScaling : public ExprWrapper<PenaltyScaling>
@@ -98,6 +100,7 @@ public:
   explicit PenaltyScaling(geom::real sigma = 1.0);
 
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~PenaltyScaling() = default;
 
@@ -105,6 +108,6 @@ private:
   geom::real sigma_;
 };
 
-}
+} // namespace dgfem
 
 #endif // _OPERATORS_HPP_

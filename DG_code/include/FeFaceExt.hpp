@@ -24,6 +24,9 @@ public:
   geom::real getPhi(unsigned p, unsigned f) const;
   const Eigen::Vector3d& getPhiDer(unsigned p, unsigned f) const;
 
+  unsigned getElem() const;
+  unsigned getBClabel() const;
+
   geom::real getAreaDoubled() const override;
   const Eigen::Vector3d& getNormal() const override;
 
@@ -44,6 +47,6 @@ private:
 
 };
 
-}
+} // namespace dgfem
 
 #endif // _FE_FACE_EXT_HPP_
