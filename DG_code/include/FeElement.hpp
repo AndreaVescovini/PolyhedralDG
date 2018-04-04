@@ -46,8 +46,11 @@ public:
 // quadrature node p in the tetrahedron t
   const Eigen::Vector3d& getPhiDer(unsigned t, unsigned p, unsigned f) const;
 
-// Returns the i-th quadrature weight
-  geom::real getWeight(unsigned i) const;
+// Returns the q-th quadrature weight
+  geom::real getWeight(unsigned q) const;
+
+// Returns the q-th quadrature point in the tetrahedron t
+  const Eigen::Vector3d& getQuadPoint(unsigned t, unsigned q) const;
 
 // Prints all the computed values of the basis functions
   void printBasis(std::ostream& out = std::cout) const;
@@ -89,6 +92,6 @@ private:
   unsigned sub2ind(unsigned t, unsigned p, unsigned f) const;
 };
 
-}
+} // namespace dgfem
 
 #endif // _FE_ELEMENT_HPP_

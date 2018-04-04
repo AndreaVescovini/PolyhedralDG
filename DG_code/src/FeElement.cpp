@@ -82,9 +82,14 @@ unsigned FeElement::getQuadPointsNo() const
   return tetraRule_.getPointsNo();
 }
 
-geom::real FeElement::getWeight(unsigned i) const
+geom::real FeElement::getWeight(unsigned q) const
 {
-  return tetraRule_.getWeight(i);
+  return tetraRule_.getWeight(q);
+}
+
+const Eigen::Vector3d& FeElement::getQuadPoint(unsigned t, unsigned q) const
+{
+  return elem_.getTetra(t).getMap() * tetraRule_.getPoint(q);
 }
 
 geom::real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
@@ -144,4 +149,4 @@ void FeElement::printBasisDer(std::ostream& out) const
   }
 }
 
-}
+} // namespace dgfem

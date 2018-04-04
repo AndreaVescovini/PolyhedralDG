@@ -27,14 +27,22 @@ public:
   template <typename T>
   void assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, const bool sym = false);
 
+  template <typename T>
+  void assembleVolRhs(const ExprWrapper<T>& expr);
+
+  template <typename T>
+  void assembleFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel = 1);
+
   void printMatrix(std::ostream& out = std::cout) const;
   void printMatrixSym(std::ostream& out = std::cout) const;
+  void printRhs(std::ostream& out = std::cout) const;
 
   virtual ~Assembler() = default;
 
 private:
   const FeSpace& Vh_;
   Eigen::SparseMatrix<double> A_;
+  Eigen::VectorXd b_;
 
 };
 
@@ -135,6 +143,40 @@ void Assembler::assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, c
 
   // I remove numerical zeros, I hope it works well
   A_.prune(A_.coeff(0,0));
+}
+
+template <typename T>
+void Assembler::assembleVolRhs(const ExprWrapper<T>& expr)
+{
+  const T& exprDerived(expr);
+
+  unsigned elemNo = 0;
+
+  for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
+  {
+    for(unsigned i = 0; i < Vh_.getDofNo(); i++)
+      for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
+        for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+          b_(i + elemNo * Vh_.getDofNo()) += exprDerived(*it, i, t, q) *
+                                             it->getWeight(q) *
+                                             it->getAbsDetJac(t);
+    elemNo++;
+  }
+
+}
+
+template <typename T>
+void Assembler::assembleFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
+{
+  const T& exprDerived(expr);
+
+  for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
+    if(it->getBClabel() == BClabel)
+      for(unsigned i = 0; i < Vh_.getDofNo(); i++)
+        for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+          b_(i + it->getElem() * Vh_.getDofNo()) += exprDerived(*it, i, q) *
+                                                    it->getWeight(q) *
+                                                    it->getAreaDoubled();
 }
 
 } // namespace dgfem

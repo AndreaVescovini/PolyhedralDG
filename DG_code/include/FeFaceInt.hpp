@@ -26,6 +26,8 @@ public:
 
   unsigned getElem(int side) const;
 
+  Eigen::Vector3d getQuadPoint(unsigned q) const override;
+
   geom::real getAreaDoubled() const override;
   const Eigen::Vector3d& getNormal() const override;
 
@@ -47,6 +49,6 @@ private:
 
 };
 
-}
+} // namespace dgfem
 
 #endif // _FE_FACE_INT_HPP_

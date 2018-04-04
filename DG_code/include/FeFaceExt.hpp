@@ -27,6 +27,8 @@ public:
   unsigned getElem() const;
   unsigned getBClabel() const;
 
+  Eigen::Vector3d getQuadPoint(unsigned q) const override;
+
   geom::real getAreaDoubled() const override;
   const Eigen::Vector3d& getNormal() const override;
 

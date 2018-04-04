@@ -97,6 +97,13 @@ unsigned FeFaceInt::getElem(int side) const
     return face_.getTet2().getPoly().getId();
 }
 
+Eigen::Vector3d FeFaceInt::getQuadPoint(unsigned q) const
+{
+  return face_.getTet1().getMap() *
+         QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+         triaRule_.getPoint(q).homogeneous();
+}
+
 geom::real FeFaceInt::getAreaDoubled() const
 {
   return face_.getAreaDoubled();

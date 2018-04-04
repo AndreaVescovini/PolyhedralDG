@@ -21,7 +21,9 @@ public:
   unsigned getDofNo() const;
 
   unsigned getQuadPointsNo() const;
-  geom::real getWeight(unsigned i) const;
+  geom::real getWeight(unsigned q) const;
+  virtual Eigen::Vector3d getQuadPoint(unsigned q) const = 0;
+
   geom::real getPenaltyParam() const;
 
   virtual geom::real getAreaDoubled() const = 0;
@@ -50,6 +52,6 @@ protected:
 
 };
 
-}
+} // namespace dgfem
 
 #endif // _FE_FACE_

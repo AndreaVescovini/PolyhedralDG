@@ -18,9 +18,9 @@ unsigned FeFace::getQuadPointsNo() const
   return triaRule_.getPointsNo();
 }
 
-geom::real FeFace::getWeight(unsigned i) const
+geom::real FeFace::getWeight(unsigned q) const
 {
-  return triaRule_.getWeight(i);
+  return triaRule_.getWeight(q);
 }
 
 geom::real FeFace::getPenaltyParam() const
@@ -28,4 +28,4 @@ geom::real FeFace::getPenaltyParam() const
   return penaltyParam_;
 }
 
-}
+} // namespace dgfem

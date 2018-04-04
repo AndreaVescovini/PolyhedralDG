@@ -81,6 +81,13 @@ unsigned FeFaceExt::getBClabel() const
   return face_.getBClabel();
 }
 
+Eigen::Vector3d FeFaceExt::getQuadPoint(unsigned q) const
+{
+  return face_.getTet1().getMap() *
+         QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+         triaRule_.getPoint(q).homogeneous();
+}
+
 geom::real FeFaceExt::getAreaDoubled() const
 {
   return face_.getAreaDoubled();

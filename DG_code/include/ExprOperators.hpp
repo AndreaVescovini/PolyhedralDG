@@ -17,6 +17,8 @@ using Multiply = std::multiplies<geom::real>;
 using Divide = std::divides<geom::real>;
 using Negate = std::negate<geom::real>;
 
+// using fun3 = std::function<geom::real (Eigen::Vector3d)>;
+
 // Defining the scalar product
 struct DotProduct
 {
@@ -38,8 +40,10 @@ class BinaryOperator : public ExprWrapper<BinaryOperator<LO, RO, OP>>
 public:
   BinaryOperator(const LO& lo, const RO& ro);
 
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
@@ -56,8 +60,10 @@ class BinaryOperator<geom::real, RO, OP> : public ExprWrapper<BinaryOperator<geo
 public:
   BinaryOperator(geom::real lo, const RO& ro);
 
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
@@ -74,8 +80,10 @@ class BinaryOperator<LO, geom::real, OP> : public ExprWrapper<BinaryOperator<LO,
 public:
   BinaryOperator(const LO& lo, geom::real ro);
 
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
@@ -84,6 +92,46 @@ public:
     const LO& lo_;
     geom::real ro_;
 };
+
+// // Specialization for a left operation by a function
+// template <typename RO, typename OP>
+// class BinaryOperator<fun3, RO, OP> : public ExprWrapper<BinaryOperator<fun3, RO, OP>>
+// {
+// public:
+//   BinaryOperator(const fun3& lo, const RO& ro);
+//
+//   geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+//   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+//   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+//   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+//   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+//
+//   virtual ~BinaryOperator() = default;
+//
+//   private:
+//     const fun3& lo_;
+//     const RO& ro_;
+// };
+//
+// // Specialization for a rigth operation by a function
+// template <typename LO, typename OP>
+// class BinaryOperator<LO, fun3, OP> : public ExprWrapper<BinaryOperator<LO, fun3, OP>>
+// {
+// public:
+//   BinaryOperator(const LO& lo, const fun3& ro);
+//
+//   geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+//   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+//   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+//   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+//   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+//
+//   virtual ~BinaryOperator() = default;
+//
+//   private:
+//     const LO& lo_;
+//     const fun3& ro_;
+// };
 
 // Specialization for the scalar product
 template <typename LO, typename RO>
@@ -94,6 +142,7 @@ public:
 
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~BinaryOperator() = default;
@@ -110,8 +159,10 @@ class UnaryOperator : public ExprWrapper<UnaryOperator<RO, OP>>
 public:
   explicit UnaryOperator(const RO& ro);
 
+  geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~UnaryOperator() = default;
@@ -127,17 +178,17 @@ inline BinaryOperator<LO, RO, Add> operator+(const ExprWrapper<LO>& lo, const Ex
   return BinaryOperator<LO, RO, Add>(lo, ro);
 }
 
-template <typename LO>
-inline BinaryOperator<LO, geom::real, Add> operator+(const ExprWrapper<LO>& lo, geom::real ro)
-{
-  return BinaryOperator<LO, geom::real, Add>(lo, ro);
-}
-
-template <typename RO>
-inline BinaryOperator<geom::real, RO, Add> operator+(geom::real lo, const ExprWrapper<RO>& ro)
-{
-  return BinaryOperator<geom::real, RO, Add>(lo, ro);
-}
+// template <typename LO>
+// inline BinaryOperator<LO, geom::real, Add> operator+(const ExprWrapper<LO>& lo, geom::real ro)
+// {
+//   return BinaryOperator<LO, geom::real, Add>(lo, ro);
+// }
+//
+// template <typename RO>
+// inline BinaryOperator<geom::real, RO, Add> operator+(geom::real lo, const ExprWrapper<RO>& ro)
+// {
+//   return BinaryOperator<geom::real, RO, Add>(lo, ro);
+// }
 
 // Overloading of the operator - for the subtraction
 template <typename LO, typename RO>
@@ -146,17 +197,17 @@ inline BinaryOperator<LO, RO, Subtract> operator-(const ExprWrapper<LO>& lo, con
   return BinaryOperator<LO, RO, Subtract>(lo, ro);
 }
 
-template <typename LO>
-inline BinaryOperator<LO, geom::real, Subtract> operator-(const ExprWrapper<LO>& lo, geom::real ro)
-{
-  return BinaryOperator<LO, geom::real, Subtract>(lo, ro);
-}
-
-template <typename RO>
-inline BinaryOperator<geom::real, RO, Subtract> operator-(geom::real lo, const ExprWrapper<RO>& ro)
-{
-  return BinaryOperator<geom::real, RO, Subtract>(lo, ro);
-}
+// template <typename LO>
+// inline BinaryOperator<LO, geom::real, Subtract> operator-(const ExprWrapper<LO>& lo, geom::real ro)
+// {
+//   return BinaryOperator<LO, geom::real, Subtract>(lo, ro);
+// }
+//
+// template <typename RO>
+// inline BinaryOperator<geom::real, RO, Subtract> operator-(geom::real lo, const ExprWrapper<RO>& ro)
+// {
+//   return BinaryOperator<geom::real, RO, Subtract>(lo, ro);
+// }
 
 // Overloading of the operator * for the multiplication
 template <typename LO, typename RO>
@@ -176,6 +227,18 @@ inline BinaryOperator<geom::real, RO, Multiply> operator*(geom::real lo, const E
 {
   return BinaryOperator<geom::real, RO, Multiply>(lo, ro);
 }
+//
+// template <typename LO>
+// inline BinaryOperator<LO, fun3, Multiply> operator*(const ExprWrapper<LO>& lo, const fun3& ro)
+// {
+//   return BinaryOperator<LO, fun3, Multiply>(lo, ro);
+// }
+//
+// template <typename RO>
+// inline BinaryOperator<fun3, RO, Multiply> operator*(const fun3& lo, const ExprWrapper<RO>& ro)
+// {
+//   return BinaryOperator<fun3, RO, Multiply>(lo, ro);
+// }
 
 // Overloading of the operator / for the division
 template <typename LO, typename RO>
@@ -195,6 +258,18 @@ inline BinaryOperator<geom::real, RO, Divide> operator/(geom::real lo, const Exp
 {
   return BinaryOperator<geom::real, RO, Divide>(lo, ro);
 }
+//
+// template <typename LO>
+// inline BinaryOperator<LO, fun3, Divide> operator/(const ExprWrapper<LO>& lo, const fun3& ro)
+// {
+//   return BinaryOperator<LO, fun3, Divide>(lo, ro);
+// }
+//
+// template <typename RO>
+// inline BinaryOperator<fun3, RO, Divide> operator/(const fun3& lo, const ExprWrapper<RO>& ro)
+// {
+//   return BinaryOperator<fun3, RO, Divide>(lo, ro);
+// }
 
 // Overloading of the unary operator - for the negation
 template <typename RO>
@@ -211,11 +286,19 @@ inline BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo, const E
 }
 
 
-//-------------------------------IMPLEMENTATION---------------------------------
+////////////////////////////////////////////////////////////////////////////////
+//-------------------------------IMPLEMENTATION-------------------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 template <typename LO, typename RO, typename OP>
 BinaryOperator<LO, RO, OP>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
+
+template <typename LO, typename RO, typename OP>
+geom::real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+{
+  return OP()(lo_(fe, i, t, q), ro_(fe, i, t, q));
+}
 
 template <typename LO, typename RO, typename OP>
 geom::real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
@@ -230,6 +313,12 @@ geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned 
 }
 
 template <typename LO, typename RO, typename OP>
+geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return OP()(lo_(fe, i, q), ro_(fe, i, q));
+}
+
+template <typename LO, typename RO, typename OP>
 geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
 {
   return OP()(lo_(fe, i, j, q), ro_(fe, i, j, q));
@@ -238,6 +327,12 @@ geom::real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned 
 template <typename RO, typename OP>
 BinaryOperator<geom::real, RO, OP>::BinaryOperator(geom::real lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
+
+template <typename RO, typename OP>
+geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+{
+  return OP()(lo_, ro_(fe, i, t, q));
+}
 
 template <typename RO, typename OP>
 geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
@@ -252,6 +347,12 @@ geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceInt& fe, u
 }
 
 template <typename RO, typename OP>
+geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return OP()(lo_, ro_(fe, i, q));
+}
+
+template <typename RO, typename OP>
 geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
 {
   return OP()(lo_, ro_(fe, i, j, q));
@@ -260,6 +361,12 @@ geom::real BinaryOperator<geom::real, RO, OP>::operator()(const FeFaceExt& fe, u
 template <typename LO, typename OP>
 BinaryOperator<LO, geom::real, OP>::BinaryOperator(const LO& lo, geom::real ro)
   : lo_{lo}, ro_{ro} {}
+
+template <typename LO, typename OP>
+geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+{
+  return OP()(lo_(fe, i, t, q), ro_);
+}
 
 template <typename LO, typename OP>
 geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
@@ -279,27 +386,83 @@ geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeFaceExt& fe, u
   return OP()(lo_(fe, i, j, q), ro_);
 }
 
+template <typename LO, typename OP>
+geom::real BinaryOperator<LO, geom::real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return OP()(lo_(fe, i, q), ro_);
+}
+//
+// template <typename RO, typename OP>
+// BinaryOperator<fun3, RO, OP>::BinaryOperator(const fun3& lo, const RO& ro)
+//   : lo_{lo}, ro_{ro} {}
+//
+// template <typename RO, typename OP>
+// geom::real BinaryOperator<fun3, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+// {
+//   return OP()(lo_(fe.getQuadPoint(t, q)), ro_(fe, i, t, q));
+// }
+//
+// template <typename RO, typename OP>
+// geom::real BinaryOperator<fun3, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+// {
+//   return OP()(lo_(fe.getQuadPoint(t, q)), ro_(fe, i, j, t, q));
+// }
+//
+// template <typename RO, typename OP>
+// geom::real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+// {
+//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, side1, side2, q));
+// }
+//
+// template <typename RO, typename OP>
+// geom::real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+// {
+//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, q));
+// }
+//
+// template <typename RO, typename OP>
+// geom::real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+// {
+//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, q));
+// }
+//
+// template <typename LO, typename OP>
+// BinaryOperator<LO, fun3, OP>::BinaryOperator(const LO& lo, const fun3& ro)
+//   : lo_{lo}, ro_{ro} {}
+//
+// template <typename LO, typename OP>
+// geom::real BinaryOperator<LO, fun3, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+// {
+//   return OP()(lo_(fe, i, t, q), ro_(fe.getQuadPoint(t, q)));
+// }
+//
+// template <typename LO, typename OP>
+// geom::real BinaryOperator<LO, fun3, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+// {
+//   return OP()(lo_(fe, i, j, t, q), ro_(fe.getQuadPoint(t, q)));
+// }
+//
+// template <typename LO, typename OP>
+// geom::real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+// {
+//   return OP()(lo_(fe, i, j, side1, side2, q), ro_(fe.getQuadPoint(q)));
+// }
+//
+// template <typename LO, typename OP>
+// geom::real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+// {
+//   return OP()(lo_(fe, i, q), ro_(fe.getQuadPoint(q)));
+// }
+//
+// template <typename LO, typename OP>
+// geom::real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+// {
+//   return OP()(lo_(fe, i, j, q), ro_(fe.getQuadPoint(q)));
+// }
+
 template <typename LO, typename RO>
 BinaryOperator<LO, RO, DotProduct>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
-
-// template <typename LO, typename RO>
-// geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
-// {
-//   return DotProduct()(lo_(fe, i, t, q), ro_(fe, j, t, q));
-// }
-//
-// template <typename LO, typename RO>
-// geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
-// {
-//   return DotProduct()(lo_(fe, i, side1, q), ro_(fe, j, side2, q));
-// }
-//
-// template <typename LO, typename RO>
-// geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
-// {
-//   return DotProduct()(lo_(fe, i, q), ro_(fe, j, q));
-// }
 
 template <typename LO, typename RO>
 geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
@@ -311,6 +474,12 @@ template <typename LO, typename RO>
 geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return DotProduct()(lo_(fe, i, j, side1, side2, q), ro_(fe, i, j, side1, side2, q));
+}
+
+template <typename LO, typename RO>
+geom::real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return DotProduct()(lo_(fe, i, q), ro_(fe, i, q));
 }
 
 template <typename LO, typename RO>
@@ -333,6 +502,12 @@ template <typename RO, typename OP>
 geom::real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
   return OP()(ro_(fe, i, j, side1, side2, q));
+}
+
+template <typename RO, typename OP>
+geom::real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+{
+  return OP()(ro_(fe, i, q));
 }
 
 template <typename RO, typename OP>
