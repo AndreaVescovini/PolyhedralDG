@@ -50,7 +50,7 @@ public:
   geom::real getWeight(unsigned q) const;
 
 // Returns the q-th quadrature point in the tetrahedron t
-  const Eigen::Vector3d& getQuadPoint(unsigned t, unsigned q) const;
+  Eigen::Vector3d getQuadPoint(unsigned t, unsigned q) const;
 
 // Prints all the computed values of the basis functions
   void printBasis(std::ostream& out = std::cout) const;

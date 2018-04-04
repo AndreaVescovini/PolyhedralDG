@@ -87,7 +87,7 @@ geom::real FeElement::getWeight(unsigned q) const
   return tetraRule_.getWeight(q);
 }
 
-const Eigen::Vector3d& FeElement::getQuadPoint(unsigned t, unsigned q) const
+Eigen::Vector3d FeElement::getQuadPoint(unsigned t, unsigned q) const
 {
   return elem_.getTetra(t).getMap() * tetraRule_.getPoint(q);
 }

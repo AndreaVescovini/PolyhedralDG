@@ -16,7 +16,7 @@ int main()
   geom::Mesh Th(fileName, reader);
 
   unsigned r = 1;
-  FeSpace Vh(Th, r, 2, 2);
+  FeSpace Vh(Th, r);
 
   Stiff   stiff; // qui potrei assegnargli la viscosità forse, o forse no la viscosità dovrei semplicemente moltiplicargliela
   Mass    mass;
@@ -44,17 +44,16 @@ int main()
   Assembler facesI(Vh);
   Assembler facesE(Vh);
 
-  // volumes.assembleVol(dot(uGrad, vGrad));
-  // facesI.assembleFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump));
-  // facesE.assembleFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1);
+  volumes.integrateVol(dot(uGrad, vGrad));
+  facesI.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump));
+  facesE.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1);
 
-  // volumes.assembleVolRhs(source * v);
-  facesE.assembleFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+  volumes.integrateVolRhs(f * v);
+  volumes.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
 
-  // volumes.printRhs();
-  facesE.printRhs();
-  // volumes.printMatrix();
-  // facesI.printMatrix();
-  // facesE.printMatrix();
+  volumes.printRhs();
+  volumes.printMatrix();
+  facesI.printMatrix();
+  facesE.printMatrix();
   return 0;
 }

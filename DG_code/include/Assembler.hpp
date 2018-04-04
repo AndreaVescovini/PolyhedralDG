@@ -19,19 +19,19 @@ public:
   explicit Assembler(const FeSpace& Vh);
 
   template <typename T>
-  void assembleVol(const ExprWrapper<T>& expr, const bool sym = false);
+  void integrateVol(const ExprWrapper<T>& expr, const bool sym = false);
 
   template <typename T>
-  void assembleFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
+  void integrateFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
 
   template <typename T>
-  void assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, const bool sym = false);
+  void integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, const bool sym = false);
 
   template <typename T>
-  void assembleVolRhs(const ExprWrapper<T>& expr);
+  void integrateVolRhs(const ExprWrapper<T>& expr);
 
   template <typename T>
-  void assembleFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel = 1);
+  void integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel = 1);
 
   void printMatrix(std::ostream& out = std::cout) const;
   void printMatrixSym(std::ostream& out = std::cout) const;
@@ -49,7 +49,7 @@ private:
 //-------------------------------IMPLEMENTATION---------------------------------
 
 template <typename T>
-void Assembler::assembleVol(const ExprWrapper<T>& expr, const bool sym)
+void Assembler::integrateVol(const ExprWrapper<T>& expr, const bool sym)
 {
 // I exploit the conversion to derived
   const T& exprDerived(expr);
@@ -84,7 +84,7 @@ void Assembler::assembleVol(const ExprWrapper<T>& expr, const bool sym)
 }
 
 template <typename T>
-void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
+void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, const bool sym)
 {
   const T& exprDerived(expr);
 
@@ -116,7 +116,7 @@ void Assembler::assembleFacesInt(const ExprWrapper<T>& expr, const bool sym)
 }
 
 template <typename T>
-void Assembler::assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym)
+void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym)
 {
   const T& exprDerived(expr);
 
@@ -146,7 +146,7 @@ void Assembler::assembleFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, c
 }
 
 template <typename T>
-void Assembler::assembleVolRhs(const ExprWrapper<T>& expr)
+void Assembler::integrateVolRhs(const ExprWrapper<T>& expr)
 {
   const T& exprDerived(expr);
 
@@ -166,7 +166,7 @@ void Assembler::assembleVolRhs(const ExprWrapper<T>& expr)
 }
 
 template <typename T>
-void Assembler::assembleFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
+void Assembler::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
 {
   const T& exprDerived(expr);
 
