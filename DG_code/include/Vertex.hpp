@@ -20,7 +20,10 @@ public:
   Vertex& operator=(Vertex&&) = default;
 
   const Eigen::Vector3d& getCoords() const;
-  void setCoords(const Eigen::Vector3d& coords);
+
+  template <typename D>
+  void setCoords(const Eigen::MatrixBase<D>& coords);
+  
   real getX() const;
   real getY() const;
   real getZ() const;
@@ -56,7 +59,13 @@ std::ostream& operator<<(std::ostream& out, const Vertex& v);
 // bool compZ(const Vertex& lhs, const Vertex& rhs);
 bool compId(const Vertex& lhs, const Vertex& rhs);
 
+template <typename D>
+void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
+{
+  coords_ = coords;
 }
+
+} // namespace geom
 
 namespace std {
 
@@ -83,6 +92,6 @@ struct hash<geom::Vertex>
   }
 };
 
-}
+} // namespace std
 
 #endif // _VERTEX_HPP_

@@ -18,8 +18,6 @@ int main()
   unsigned r = 1;
   FeSpace Vh(Th, r);
 
-  Stiff   stiff; // qui potrei assegnargli la viscosità forse, o forse no la viscosità dovrei semplicemente moltiplicargliela
-  Mass    mass;
   PhiI v;
   GradPhiJ uGrad;
   GradPhiI vGrad;
@@ -30,30 +28,26 @@ int main()
   PenaltyScaling gamma(10.0);
   Normal n;
 
-  auto source = [](Eigen::Vector3d x) {
+  Function f([](Eigen::Vector3d x) {
     return -std::exp(x(0)*x(1)*x(2)) * (x(0)*x(0)*x(1)*x(1) +
                                         x(1)*x(1)*x(2)*x(2) +
-                                        x(0)*x(0)*x(2)*x(2) ); };
-
-  auto dirichlet = [](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); };
-
-  Function f(source);
-  Function gd(dirichlet);
+                                        x(0)*x(0)*x(2)*x(2) ); });
+  Function gd([](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); });
 
   Assembler volumes(Vh);
   Assembler facesI(Vh);
   Assembler facesE(Vh);
 
-  volumes.integrateVol(dot(uGrad, vGrad));
-  facesI.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump));
-  facesE.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1);
+  // volumes.integrateVol(dot(uGrad, vGrad), true);
+  facesI.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
+  // facesE.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
 
-  volumes.integrateVolRhs(f * v);
-  volumes.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+  // volumes.integrateVolRhs(f * v);
+  // volumes.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
 
-  volumes.printRhs();
-  volumes.printMatrix();
-  facesI.printMatrix();
-  facesE.printMatrix();
+  // volumes.printRhs();
+  // volumes.printMatrix();
+  facesI.printMatrixSym();
+  // facesE.printMatrix();
   return 0;
 }

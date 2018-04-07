@@ -8,6 +8,11 @@ Assembler::Assembler(const FeSpace& Vh)
     A_{Vh.getFeElementsNo() * Vh.getDofNo(), Vh.getFeElementsNo() * Vh.getDofNo()},
     b_{Eigen::VectorXd::Zero(Vh.getFeElementsNo() * Vh.getDofNo())} {}
 
+void Assembler::clearRhs()
+{
+  b_ = Eigen::VectorXd::Zero(Vh_.getFeElementsNo() * Vh_.getDofNo());
+}
+
 void Assembler::printMatrix(std::ostream& out) const
 {
   out << A_ << std::endl;

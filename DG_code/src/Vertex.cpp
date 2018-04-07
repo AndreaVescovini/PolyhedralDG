@@ -14,10 +14,10 @@ const Eigen::Vector3d& Vertex::getCoords() const
   return coords_;
 }
 
-void Vertex::setCoords(const Eigen::Vector3d& coords)
-{
-  coords_ = coords;
-}
+// void Vertex::setCoords(const Eigen::Vector3d& coords)
+// {
+//   coords_ = coords;
+// }
 
 real Vertex::getX() const
 {

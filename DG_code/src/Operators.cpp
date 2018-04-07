@@ -85,7 +85,7 @@ const Eigen::Vector3d& AverGradPhiI::operator()(const FeFaceExt& fe, unsigned i,
 
 Eigen::Vector3d AverGradPhiJ::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
 {
-  return 0.5 * fe.getPhiDer(side2, q, i);
+  return 0.5 * fe.getPhiDer(side2, q, j);
 }
 
 const Eigen::Vector3d& AverGradPhiJ::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
