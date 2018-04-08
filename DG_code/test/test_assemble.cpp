@@ -34,20 +34,22 @@ int main()
                                         x(0)*x(0)*x(2)*x(2) ); });
   Function gd([](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); });
 
-  Assembler volumes(Vh);
-  Assembler facesI(Vh);
-  Assembler facesE(Vh);
+  Assembler sym(Vh);
+  Assembler nonsym(Vh);
 
-  // volumes.integrateVol(dot(uGrad, vGrad), true);
-  facesI.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
-  // facesE.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
+  sym.integrateVol(dot(uGrad, vGrad), true);
+  sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
+  sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
+  nonsym.integrateVol(dot(uGrad, vGrad), false);
+  nonsym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), false);
+  nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
 
-  // volumes.integrateVolRhs(f * v);
-  // volumes.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+  sym.integrateVolRhs(f * v);
+  sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
 
-  // volumes.printRhs();
-  // volumes.printMatrix();
-  facesI.printMatrixSym();
-  // facesE.printMatrix();
+  sym.printRhs();
+  sym.printMatrixSym();
+  nonsym.printMatrix();
+
   return 0;
 }

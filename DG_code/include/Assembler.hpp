@@ -17,16 +17,16 @@ namespace dgfem
 class Assembler
 {
 public:
-  explicit Assembler(const FeSpace& Vh);
+  explicit Assembler(const FeSpace& Vh, bool sym = false);
 
   template <typename T>
-  void integrateVol(const ExprWrapper<T>& expr, const bool sym = false);
+  void integrateVol(const ExprWrapper<T>& expr, bool symExpr = false);
 
   template <typename T>
-  void integrateFacesInt(const ExprWrapper<T>& expr, const bool sym = false);
+  void integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr = false);
 
   template <typename T>
-  void integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, const bool sym = false);
+  void integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, bool symExpr = false);
 
   template <typename T>
   void integrateVolRhs(const ExprWrapper<T>& expr);
@@ -34,6 +34,19 @@ public:
   template <typename T>
   void integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel = 1);
 
+  void solveLU();
+  void solveChol();
+  void solveCG(const Eigen::VectorXd& x0, unsigned iterMax,
+               geom::real tol = Eigen::NumTraits<geom::real>::epsilon());
+
+  void isSymmetric(bool sym);
+
+  const Eigen::SparseMatrix<geom::real> getMatrix() const;
+  const Eigen::VectorXd getRhs() const;
+  const Eigen::VectorXd getSolution() const;
+  unsigned getDim() const;
+
+  void clearMatrix();
   void clearRhs();
 
   void printMatrix(std::ostream& out = std::cout) const;
@@ -44,9 +57,14 @@ public:
 
 private:
   const FeSpace& Vh_;
-  Eigen::SparseMatrix<double> A_;
+  unsigned dim_;
+  Eigen::SparseMatrix<geom::real> A_;
   // std::vector<triplet> tripletList
   Eigen::VectorXd b_;
+  Eigen::VectorXd u_;
+
+  bool sym_;
+
 
 };
 
@@ -55,7 +73,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void Assembler::integrateVol(const ExprWrapper<T>& expr, const bool sym)
+void Assembler::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
 {
   // I exploit the conversion to derived
   const T& exprDerived(expr);
@@ -64,10 +82,10 @@ void Assembler::integrateVol(const ExprWrapper<T>& expr, const bool sym)
   std::vector<triplet> tripletList;
 
   // If the variational form is symmetric I store only half elements
-  if(sym == true)
-    tripletList.reserve(Vh_.getFeElementsNo() * (Vh_.getDofNo() * (Vh_.getDofNo() + 1)) / 2);
+  if(symExpr == true)
+    tripletList.reserve(dim_ * (Vh_.getDofNo() + 1) / 2);
   else
-    tripletList.reserve(Vh_.getFeElementsNo() * Vh_.getDofNo() * Vh_.getDofNo());
+    tripletList.reserve(dim_ * Vh_.getDofNo());
 
   unsigned elemNo = 0;
 
@@ -76,7 +94,7 @@ void Assembler::integrateVol(const ExprWrapper<T>& expr, const bool sym)
     unsigned indexOffset = elemNo * Vh_.getDofNo();
 
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDofNo()); i++)
+      for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
       {
         geom::real sum = 0.0;
         for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
@@ -89,14 +107,28 @@ void Assembler::integrateVol(const ExprWrapper<T>& expr, const bool sym)
     elemNo++;
   }
 
-  A_.setFromTriplets(tripletList.begin(), tripletList.end());
+  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+
+  curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
   // I remove numerical zeros, I hope it works well
-  A_.prune(A_.coeff(0,0));
+  curA.prune(A_.coeff(0,0));
+
+  if(sym_ == symExpr)
+    A_ += curA;
+  else if(sym_ == false && symExpr == true)
+    A_ += curA.selfadjointView<Eigen::Upper>();
+  else
+  {
+    std::cerr << "The symmetry has been broken" << std::endl;
+    sym_ = false;
+    A_ = A_.selfadjointView<Eigen::Upper>();
+    A_ += curA;
+  }
 }
 
 template <typename T>
-void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, const bool sym)
+void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
 {
   const T& exprDerived(expr);
 
@@ -104,8 +136,8 @@ void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, const bool sym)
   std::vector<triplet> tripletList;
 
   // If the variational form is symmetric I store only half elements
-  if(sym == true)
-    tripletList.reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * (Vh_.getDofNo() + 1 ) * 2);
+  if(symExpr == true)
+    tripletList.reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * (Vh_.getDofNo() + 1) * 2);
   else
     tripletList.reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * Vh_.getDofNo() * 4);
 
@@ -115,33 +147,47 @@ void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, const bool sym)
                                             it->getElem(1) * Vh_.getDofNo() };
 
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDofNo()); i++)
+      for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
         for(int side1 = 0; side1 < 2; side1++)
           for(int side2 = 0; side2 < 2; side2++)
           {
+            if(symExpr == true && indexOffset[side1] > indexOffset[side2] && i == j)
+              continue;
+
             geom::real sum = 0.0;
 
             for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
               sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
 
-            unsigned rowIndex = (sym == true ? std::min(i + indexOffset[side1], j + indexOffset[side2]) : i + indexOffset[side1] );
-            unsigned colIndex = (sym == true ? std::max(i + indexOffset[side1], j + indexOffset[side2]) : j + indexOffset[side2] );
+            unsigned rowIndex = (symExpr == true ? std::min(i + indexOffset[side1], j + indexOffset[side2]) : i + indexOffset[side1] );
+            unsigned colIndex = (symExpr == true ? std::max(i + indexOffset[side1], j + indexOffset[side2]) : j + indexOffset[side2] );
 
             tripletList.emplace_back(rowIndex, colIndex, sum);
           }
   }
 
-  A_.setFromTriplets(tripletList.begin(), tripletList.end());
+  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+
+  curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
   // I remove numerical zeros, I hope it works well
-  A_.prune(A_.coeff(0,0));
+  curA.prune(A_.coeff(0,0));
 
-  // auto B_ = A_;
-  // A_ = B_.selfadjointView<Eigen::Upper>() + B_.selfadjointView<Eigen::StrictlyLower>();
+  if(sym_ == symExpr)
+    A_ += curA;
+  else if(sym_ == false && symExpr == true)
+    A_ += curA.selfadjointView<Eigen::Upper>();
+  else
+  {
+    std::cerr << "The symmetry has been broken" << std::endl;
+    sym_ = false;
+    A_ = A_.selfadjointView<Eigen::Upper>();
+    A_ += curA;
+  }
 }
 
 template <typename T>
-void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, const bool sym)
+void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bool symExpr)
 {
   const T& exprDerived(expr);
 
@@ -151,7 +197,7 @@ void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, 
   // If the variational form is symmetric I store only half elements,
   // I overestimate considering all the external faces with the same type of
   // boundary conditions
-  if(sym == true)
+  if(symExpr == true)
     tripletList.reserve(Vh_.getFeFacesExtNo() * Vh_.getDofNo() * (Vh_.getDofNo() + 1) / 2);
   else
     tripletList.reserve(Vh_.getFeFacesExtNo() * Vh_.getDofNo() * Vh_.getDofNo());
@@ -162,7 +208,7 @@ void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, 
       unsigned indexOffset = it->getElem() * Vh_.getDofNo();
 
       for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-        for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDofNo()); i++)
+        for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
         {
           geom::real sum = 0.0;
 
@@ -177,10 +223,24 @@ void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, 
   // the memory consnmption.
   tripletList.shrink_to_fit();
 
-  A_.setFromTriplets(tripletList.begin(), tripletList.end());
+  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+
+  curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
   // I remove numerical zeros, I hope it works well
-  A_.prune(A_.coeff(0,0));
+  curA.prune(A_.coeff(0,0));
+
+  if(sym_ == symExpr)
+    A_ += curA;
+  else if(sym_ == false && symExpr == true)
+    A_ += curA.selfadjointView<Eigen::Upper>();
+  else
+  {
+    std::cerr << "The symmetry has been broken" << std::endl;
+    sym_ = false;
+    A_ = A_.selfadjointView<Eigen::Upper>();
+    A_ += curA;
+  }
 }
 
 template <typename T>
