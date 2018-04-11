@@ -47,6 +47,17 @@ unsigned Mesh::getPolyhedraNo() const
   return polyhedra_.size();
 }
 
+real Mesh::getMaxDiameter() const
+{
+  real hmax = polyhedra_[0].getDiameter();
+
+  for(unsigned i = 1; i < polyhedra_.size(); i++)
+    if(polyhedra_[i].getDiameter() > hmax)
+      hmax = polyhedra_[i].getDiameter();
+
+  return hmax;
+}
+
 void Mesh::printAll(std::ostream& out) const
 {
   unsigned lineNo = std::max(vertices_.size(), tetrahedra_.size());
@@ -158,4 +169,4 @@ void Mesh::print(unsigned lineNo, std::ostream& out) const
   out << "----------------------" << std::endl;
 }
 
-}
+} // namespace geom

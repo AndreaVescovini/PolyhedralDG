@@ -33,9 +33,10 @@ void FeFaceExt::compute_basis()
     // I map the quadrature point from the refrence triangle to the face of the
     // reference tetrahedron and then to the physical one, finally I rescale it
     // in order to compute the scaled legendre polynomial.
-    Eigen::Vector3d physicPt = ((face_.getTet1().getMap() *
-                                 QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
-                                 triaRule_.getPoint(p).homogeneous()) - mb).array() / hb.array();
+    Eigen::Vector3d physicPt = (face_.getTet1().getMap() *
+                               (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+                                              triaRule_.getPoint(p).homogeneous())
+                               - mb).array() / hb.array();
 
     // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
@@ -83,9 +84,8 @@ unsigned FeFaceExt::getBClabel() const
 
 Eigen::Vector3d FeFaceExt::getQuadPoint(unsigned q) const
 {
-  return face_.getTet1().getMap() *
-         QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
-         triaRule_.getPoint(q).homogeneous();
+  return face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+                                     triaRule_.getPoint(q).homogeneous());
 }
 
 geom::real FeFaceExt::getAreaDoubled() const

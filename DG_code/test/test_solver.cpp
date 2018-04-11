@@ -1,7 +1,7 @@
 #include "Mesh.hpp"
 #include "FeSpace.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Assembler.hpp"
+#include "Problem.hpp"
 #include "Operators.hpp"
 #include "ExprOperators.hpp"
 #include <cmath>
@@ -10,7 +10,7 @@ using namespace dgfem;
 
 int main()
 {
-  std::string fileName = "../meshes/cube_str6t.mesh";
+  std::string fileName = "../meshes/cube_str48t.mesh";
 
   geom::MeshReaderPoly reader;
   geom::Mesh Th(fileName, reader);
@@ -31,7 +31,7 @@ int main()
   Function f([](Eigen::Vector3d x) { return 0.0; });
   Function gd([](Eigen::Vector3d x) { return x(0); });
 
-  Assembler prob(Vh, true);
+  Problem prob(Vh, true);
 
   bool symform = true;
 
@@ -51,7 +51,7 @@ int main()
   std::cout << prob.getSolution() << '\n' <<  std::endl;
 
   std::cout << "\nSolving with ConjugateGradient" << std::endl;
-  prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 100);
+  prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 2 * prob.getDim());
   std::cout << prob.getSolution() << std::endl;
 
   return 0;

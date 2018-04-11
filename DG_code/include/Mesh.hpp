@@ -26,9 +26,12 @@ public:
   const FaceExt& getFaceExt(unsigned n) const;
   const FaceInt& getFaceInt(unsigned n) const;
   const Polyhedron& getPolyhedron(unsigned n) const;
+
   unsigned getFacesExtNo() const;
   unsigned getFacesIntNo() const;
   unsigned getPolyhedraNo() const;
+
+  real getMaxDiameter() const;
 
   // Prints all the informations about the mesh
   void printAll(std::ostream& out = std::cout) const;
@@ -62,6 +65,6 @@ private:
   void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
 
-}
+} // namespace geom
 
 #endif // _MESH_HPP_

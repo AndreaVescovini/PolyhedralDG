@@ -1,5 +1,5 @@
-#ifndef _ASSEMBLER_HPP_
-#define _ASSEMBLER_HPP_
+#ifndef _PROBLEM_HPP_
+#define _PROBLEM_HPP_
 
 #include "FeSpace.hpp"
 #include "geom.hpp"
@@ -10,14 +10,15 @@
 #include "ExprWrapper.hpp"
 #include <iterator>
 #include <algorithm>
+#include <functional>
 
 namespace dgfem
 {
 
-class Assembler
+class Problem
 {
 public:
-  explicit Assembler(const FeSpace& Vh, bool sym = false);
+  explicit Problem(const FeSpace& Vh, bool sym = false);
 
   template <typename T>
   void integrateVol(const ExprWrapper<T>& expr, bool symExpr = false);
@@ -39,7 +40,11 @@ public:
   void solveCG(const Eigen::VectorXd& x0, unsigned iterMax,
                geom::real tol = Eigen::NumTraits<geom::real>::epsilon());
 
+  geom::real computeErrorL2(const std::function<geom::real (Eigen::Vector3d)>& uex) const;
+  geom::real computeErrorH10(const std::function<Eigen::Vector3d (Eigen::Vector3d)>& uexGrad) const;
+
   void isSymmetric(bool sym);
+  bool getSymmetry() const;
 
   const Eigen::SparseMatrix<geom::real> getMatrix() const;
   const Eigen::VectorXd getRhs() const;
@@ -49,11 +54,7 @@ public:
   void clearMatrix();
   void clearRhs();
 
-  void printMatrix(std::ostream& out = std::cout) const;
-  void printMatrixSym(std::ostream& out = std::cout) const;
-  void printRhs(std::ostream& out = std::cout) const;
-
-  virtual ~Assembler() = default;
+  virtual ~Problem() = default;
 
 private:
   const FeSpace& Vh_;
@@ -73,7 +74,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void Assembler::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
+void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
 {
   // I exploit the conversion to derived
   const T& exprDerived(expr);
@@ -128,7 +129,7 @@ void Assembler::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
 }
 
 template <typename T>
-void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
+void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
 {
   const T& exprDerived(expr);
 
@@ -187,7 +188,7 @@ void Assembler::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
 }
 
 template <typename T>
-void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bool symExpr)
+void Problem::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bool symExpr)
 {
   const T& exprDerived(expr);
 
@@ -244,7 +245,7 @@ void Assembler::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, 
 }
 
 template <typename T>
-void Assembler::integrateVolRhs(const ExprWrapper<T>& expr)
+void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 {
   const T& exprDerived(expr);
 
@@ -266,7 +267,7 @@ void Assembler::integrateVolRhs(const ExprWrapper<T>& expr)
 }
 
 template <typename T>
-void Assembler::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
+void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
 {
   const T& exprDerived(expr);
 
@@ -276,12 +277,16 @@ void Assembler::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabe
       unsigned indexOffset = it->getElem() * Vh_.getDofNo();
       for(unsigned i = 0; i < Vh_.getDofNo(); i++)
         for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+        {
           b_(i + indexOffset) += exprDerived(*it, i, q) *
                                  it->getWeight(q) *
                                  it->getAreaDoubled();
+          // if(indexOffset == 184 && i == 3)
+            // std::cout << b_(187) << ' ' << exprDerived(*it, i, q) << ' ' << it->getWeight(q) << ' ' << it->getAreaDoubled() << std::endl;
+        }
     }
 }
 
 } // namespace dgfem
 
-#endif // _ASSEMBLER_HPP_
+#endif // _PROBLEM_HPP_
