@@ -1,40 +1,73 @@
 #http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#gcc
 
+#------------
+# Directories
+#------------
 SOURCE_DIR = src
 HEADER_DIR = include
 BUILD_DIR = obj
 TEST_DIR = test
 EXE_DIR = bin
-MESH_DIR = ../meshes/
 DEP_DIR = .d
 
+#----------------------------------------------------
+# Sources, objects files and executables of the tests
+#- --------------------------------------------------
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
 TEST_OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(TEST_SRCS:.cpp=.o)))
+EXE = $(addprefix $(EXE_DIR)/, $(basename $(notdir $(TEST_SRCS))))
 
+#--------------------------------
+# Other sources and objects files
+#--------------------------------
 SRCS = $(wildcard $(SOURCE_DIR)/*.cpp)
 OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.cpp=.o)))
 
+#-----------------------------------------------------------------------
+# Files containing the debendencies of objects files, they are generated
+# compiling with DEPFLAGS
+#-----------------------------------------------------------------------
 DEPS = $(addprefix $(DEP_DIR)/, $(notdir $(OBJS:.o=.d)))
 DEPS += $(addprefix $(DEP_DIR)/, $(notdir $(TEST_OBJS:.o=.d)))
 
+#---------
+# Compiler
+#---------
 CXX = g++
+
+#------------------
+# Compilation flags
+#------------------
 OPTFLAGS += -O2 -DNDEBUG
-CXXFLAGS += -Wall -Wextra -pedantic -std=c++11 $(OPTFLAGS)
+WFLAGS += -Wall -Wextra -pedantic
+STDFLAG = -std=c++11
+
+CXXFLAGS += $(WFLAGS) $(STDFLAG) $(OPTFLAGS)
 CPPFLAGS += -I./$(HEADER_DIR) -I$(mkEigenInc)
-# LD_FLAGS =
-# LD_LIBS =
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.Td
 
-EXE = $(addprefix $(EXE_DIR)/, $(basename $(notdir $(TEST_SRCS))))
+# LD_FLAGS =
+# LD_LIBS =
 
-$(shell mkdir -p $(DEP_DIR) >/dev/null)
+#---------------------------
+# Assure that DEP_DIR exists
+#---------------------------
+$(shell mkdir -p $(DEP_DIR))
 
 all: $(EXE)
 
-.PHONY: all clean distclean run
 .DEFAULT_GOAL = all
-.PRECIOUS: $(DEP_DIR)/%.d
 
+#----------------
+# Special targets
+#----------------
+.PHONY: all clean distclean run
+.PRECIOUS: $(DEP_DIR)/%.d
+.SECONDARY: $(OBJS) $(TEST_OBJS)
+
+#------
+# Rules
+#------
 $(EXE_DIR)/%: $(BUILD_DIR)/%.o $(OBJS)
 	@mkdir -p $(EXE_DIR)
 	$(CXX) $(CXXFLAGS) $^ $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
