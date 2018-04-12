@@ -18,7 +18,8 @@ DEPS = $(addprefix $(DEP_DIR)/, $(notdir $(OBJS:.o=.d)))
 DEPS += $(addprefix $(DEP_DIR)/, $(notdir $(TEST_OBJS:.o=.d)))
 
 CXX = g++
-CXXFLAGS += -Wall -std=c++11
+OPTFLAGS += -O2 -DNDEBUG
+CXXFLAGS += -Wall -Wextra -pedantic -std=c++11 $(OPTFLAGS)
 CPPFLAGS += -I./$(HEADER_DIR) -I$(mkEigenInc)
 # LD_FLAGS =
 # LD_LIBS =

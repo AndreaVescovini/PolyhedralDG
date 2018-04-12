@@ -5,35 +5,38 @@
 #include "Operators.hpp"
 #include "ExprOperators.hpp"
 #include <cmath>
+#include <Eigen/Core>
+#include "chrono.hpp"
 
 using namespace dgfem;
 
 int main()
 {
+  Timings::Chrono ch;
+  ch.start();
+
   std::vector<std::string> fileNames;
   // fileNames.push_back("../meshes/cube_str6t.mesh");
-  fileNames.push_back("../meshes/cube_str48p.mesh");
-  fileNames.push_back("../meshes/cube_str384p.mesh");
-  fileNames.push_back("../meshes/cube_str1296p.mesh");
-  fileNames.push_back("../meshes/cube_str3072p.mesh");
+  // fileNames.push_back("../meshes/cube_str48t.mesh");
+  // fileNames.push_back("../meshes/cube_str384t.mesh");
+  // fileNames.push_back("../meshes/cube_str1296t.mesh");
+  fileNames.push_back("../meshes/cube_str3072ht.mesh");
 
-  auto uex = [](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); };
-  auto source = [&uex](Eigen::Vector3d x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +
-                                                              x(1)*x(1)*x(2)*x(2) +
-                                                              x(0)*x(0)*x(2)*x(2) );};
-  auto uexGrad = [&uex](Eigen::Vector3d x) -> Eigen::Vector3d { return uex(x)*Eigen::Vector3d(x(1)*x(2),
-                                                                                              x(0)*x(2),
-                                                                                              x(0)*x(1)); };
+  auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
+  auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +
+                                                                     x(1)*x(1)*x(2)*x(2) +
+                                                                     x(0)*x(0)*x(2)*x(2) );};
+  auto uexGrad = [&uex](const Eigen::Vector3d& x) -> Eigen::Vector3d { return uex(x)*Eigen::Vector3d(x(1)*x(2),
+                                                                                                     x(0)*x(2),
+                                                                                                     x(0)*x(1)); };
 
-  // auto uex = [](Eigen::Vector3d x) { return x(0)*x(1); };
-  // auto source = [](Eigen::Vector3d x) { return 0.0;};
-  // auto uexGrad = [](Eigen::Vector3d x) { return Eigen::Vector3d(x(1), x(0), 0.0); };
+  // auto uex = [](Eigen::Vector3d x) -> double { return x(0); };
+  // auto source = [](Eigen::Vector3d x) -> double { return 0.0;};
+  // auto uexGrad = [](Eigen::Vector3d x)-> Eigen::Vector3d { return Eigen::Vector3d(1.0, 0.0, 0.0); };
 
   // auto uex = [](Eigen::Vector3d x) { return x(0)*x(0)*x(0)+10*x(1)*x(2)*x(2); };
   // auto source = [](Eigen::Vector3d x) { return -20*x(1)-6*x(0);};
   // auto uexGrad = [](Eigen::Vector3d x) { return Eigen::Vector3d(3*x(0)*x(0), 10*x(2)*x(2), 20*x(1)*x(2)); };
-
-
 
   geom::MeshReaderPoly reader;
 
@@ -76,8 +79,9 @@ int main()
     std::cout << "Error L2 = " << errL2.back() << std::endl;
     std::cout << "Error H10 = " << errH10.back() << '\n' << std::endl;
 
-    // std::cout << prob.getRhs() << std::endl;
+    // std::cout << prob.getSolution() << std::endl;
   }
+
 
   for(unsigned i = 0; i < fileNames.size() - 1; i++)
   {
@@ -86,5 +90,9 @@ int main()
 
     std::cout << "Order L2 = " << orderConvL2 << " - Order H10 = " << orderConvH10 << std::endl;
   }
+
+  ch.stop();
+  std::cout << ch << std::endl;
+
   return 0;
 }

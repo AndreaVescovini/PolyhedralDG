@@ -5,7 +5,7 @@
 namespace dgfem
 {
 
-FeElement::FeElement(const TheElem& elem, unsigned order, unsigned dofNo,
+FeElement::FeElement(const TheElem& elem, unsigned dofNo,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRuleManager::Rule3D& tetraRule)
   : elem_{elem}, dofNo_{dofNo}, basisComposition_{basisComposition}, tetraRule_{tetraRule}

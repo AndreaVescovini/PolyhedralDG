@@ -14,8 +14,7 @@ namespace dgfem
 class FeFace
 {
 public:
-  FeFace(unsigned order, unsigned dofNo,
-         const std::vector<std::array<unsigned, 3>>& basisComposition,
+  FeFace(unsigned dofNo, const std::vector<std::array<unsigned, 3>>& basisComposition,
          const QuadRuleManager::Rule2D& triaRule);
 
   unsigned getDofNo() const;

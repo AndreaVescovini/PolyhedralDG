@@ -125,7 +125,7 @@ void FeSpace::initialize()
   feElements_.reserve(elemNo);
   for(unsigned i = 0; i < elemNo; i++)
   {
-    feElements_.emplace_back(Th_.getPolyhedron(i), order_, dofNo_,
+    feElements_.emplace_back(Th_.getPolyhedron(i), dofNo_,
                              basisComposition_, tetraRule_);
   }
 

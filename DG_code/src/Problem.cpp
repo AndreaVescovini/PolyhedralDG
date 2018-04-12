@@ -92,7 +92,7 @@ void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, geom::real to
   std::cout << "Estimated error "<< solver.error() << std::endl;
 }
 
-geom::real Problem::computeErrorL2(const std::function<geom::real (Eigen::Vector3d)>& uex) const
+geom::real Problem::computeErrorL2(const std::function<geom::real (const Eigen::Vector3d&)>& uex) const
 {
   geom::real errSquared = 0.0;
 
@@ -119,7 +119,7 @@ geom::real Problem::computeErrorL2(const std::function<geom::real (Eigen::Vector
   return std::sqrt(errSquared);
 }
 
-geom::real Problem::computeErrorH10(const std::function<Eigen::Vector3d (Eigen::Vector3d)>& uexGrad) const
+geom::real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const
 {
   geom::real errSquared = 0.0;
 

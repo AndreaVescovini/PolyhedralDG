@@ -9,7 +9,7 @@ namespace dgfem
 FeFaceInt::FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRule<Eigen::Vector2d>& triaRule)
-  : FeFace(order, dofNo, basisComposition, triaRule), face_{face}
+  : FeFace(dofNo, basisComposition, triaRule), face_{face}
 {
   compute_basis();
   penaltyParam_ = order * order / std::min(face.getTet1().getPoly().getDiameter(),

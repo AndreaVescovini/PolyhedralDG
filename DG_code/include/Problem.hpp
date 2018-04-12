@@ -40,8 +40,8 @@ public:
   void solveCG(const Eigen::VectorXd& x0, unsigned iterMax,
                geom::real tol = Eigen::NumTraits<geom::real>::epsilon());
 
-  geom::real computeErrorL2(const std::function<geom::real (Eigen::Vector3d)>& uex) const;
-  geom::real computeErrorH10(const std::function<Eigen::Vector3d (Eigen::Vector3d)>& uexGrad) const;
+  geom::real computeErrorL2(const std::function<geom::real (const Eigen::Vector3d&)>& uex) const;
+  geom::real computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const;
 
   void isSymmetric(bool sym);
   bool getSymmetry() const;
@@ -65,7 +65,6 @@ private:
   Eigen::VectorXd u_;
 
   bool sym_;
-
 
 };
 
@@ -281,8 +280,6 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
           b_(i + indexOffset) += exprDerived(*it, i, q) *
                                  it->getWeight(q) *
                                  it->getAreaDoubled();
-          // if(indexOffset == 184 && i == 3)
-            // std::cout << b_(187) << ' ' << exprDerived(*it, i, q) << ' ' << it->getWeight(q) << ' ' << it->getAreaDoubled() << std::endl;
         }
     }
 }

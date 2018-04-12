@@ -10,7 +10,7 @@ using namespace dgfem;
 
 int main()
 {
-  std::string fileName = "../meshes/cube_str48t.mesh";
+  std::string fileName = "../meshes/cube_str6t.mesh";
 
   geom::MeshReaderPoly reader;
   geom::Mesh Th(fileName, reader);
@@ -28,33 +28,28 @@ int main()
   PenaltyScaling gamma(10.0);
   Normal n;
 
-  // Function f([](Eigen::Vector3d x) {
-  //   return -std::exp(x(0)*x(1)*x(2)) * (x(0)*x(0)*x(1)*x(1) +
-  //                                       x(1)*x(1)*x(2)*x(2) +
-  //                                       x(0)*x(0)*x(2)*x(2) ); });
-  // Function gd([](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); });
+  Function f([](Eigen::Vector3d x) {
+    return -std::exp(x(0)*x(1)*x(2)) * (x(0)*x(0)*x(1)*x(1) +
+                                        x(1)*x(1)*x(2)*x(2) +
+                                        x(0)*x(0)*x(2)*x(2) ); });
+  Function gd([](Eigen::Vector3d x) { return std::exp(x(0)*x(1)*x(2)); });
 
-  auto uex = [](Eigen::Vector3d x) { return x(0); };
-  auto source = [](Eigen::Vector3d x) { return 0.0;};
-  Function f(source);
-  Function gd(uex);
-
-  Problem sym(Vh);
+  Problem sym(Vh, true);
   Problem nonsym(Vh);
 
-  // sym.integrateVol(dot(uGrad, vGrad), true);
-  // sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
-  // sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
-  // nonsym.integrateVol(dot(uGrad, vGrad), false);
-  // nonsym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), false);
-  // nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
+  sym.integrateVol(dot(uGrad, vGrad), true);
+  sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
+  sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
+  nonsym.integrateVol(dot(uGrad, vGrad), false);
+  nonsym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), false);
+  nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
 
-  // sym.integrateVolRhs(f * v);
-  sym.integrateFacesExtRhs(/*-gd * dot(n, vGrad) + gamma * */gd * v);
+  sym.integrateVolRhs(f * v);
+  sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
 
-  // std::cout << sym.getRhs() << std::endl;
-  // std::cout << sym.getMatrix().selfadjointView<Eigen::Upper>() << std::endl;
-  // std::cout << nonsym.getMatrix() << std::endl;
+  std::cout << sym.getRhs() << std::endl;
+  std::cout << sym.getMatrix().selfadjointView<Eigen::Upper>() << std::endl;
+  std::cout << nonsym.getMatrix() << std::endl;
 
   return 0;
 }

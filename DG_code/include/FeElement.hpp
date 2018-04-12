@@ -21,7 +21,7 @@ public:
 // order, the consequent number of degrees of freedom dofNo, the possible composition
 // of polynomilas of degree less or equal to order into monomials basisComposition,
 // a quadrature rule tetraRule.
-  FeElement(const TheElem& elem, unsigned order, unsigned dofNo,
+  FeElement(const TheElem& elem, unsigned dofNo,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule3D& tetraRule);
 

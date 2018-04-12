@@ -148,7 +148,7 @@ public:
 class Function : public ExprWrapper<Function>
 {
 public:
-  using fun3real = std::function<geom::real (Eigen::Vector3d)>;
+  using fun3real = std::function<geom::real (const Eigen::Vector3d&)>;
 
   explicit Function(const fun3real& fun);
 
@@ -161,7 +161,7 @@ public:
   virtual ~Function() = default;
 
 private:
-  const fun3real& fun_;
+  fun3real fun_;
 
 };
 

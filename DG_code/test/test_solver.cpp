@@ -28,7 +28,7 @@ int main()
   PenaltyScaling gamma(10.0);
   Normal n;
 
-  Function f([](Eigen::Vector3d x) { return 0.0; });
+  Function f([](Eigen::Vector3d /* x */) { return 0.0; });
   Function gd([](Eigen::Vector3d x) { return x(0); });
 
   Problem prob(Vh, true);
