@@ -11,6 +11,7 @@
 #include <iterator>
 #include <algorithm>
 #include <functional>
+#include <string>
 
 namespace dgfem
 {
@@ -43,13 +44,15 @@ public:
   geom::real computeErrorL2(const std::function<geom::real (const Eigen::Vector3d&)>& uex) const;
   geom::real computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const;
 
-  void isSymmetric(bool sym);
-  bool getSymmetry() const;
+  void exportSolutionVTK(const std::string& fileName) const;
 
-  const Eigen::SparseMatrix<geom::real> getMatrix() const;
-  const Eigen::VectorXd getRhs() const;
-  const Eigen::VectorXd getSolution() const;
-  unsigned getDim() const;
+  inline void isSymmetric(bool sym);
+  inline bool getSymmetry() const;
+
+  inline const Eigen::SparseMatrix<geom::real> getMatrix() const;
+  inline const Eigen::VectorXd getRhs() const;
+  inline const Eigen::VectorXd getSolution() const;
+  inline unsigned getDim() const;
 
   void clearMatrix();
   void clearRhs();
@@ -68,9 +71,9 @@ private:
 
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 
 template <typename T>
 void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
@@ -282,6 +285,36 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
                                  it->getAreaDoubled();
         }
     }
+}
+
+inline bool Problem::getSymmetry() const
+{
+  return sym_;
+}
+
+inline void Problem::isSymmetric(bool sym)
+{
+  sym_ = sym;
+}
+
+inline const Eigen::SparseMatrix<geom::real> Problem::getMatrix() const
+{
+  return A_;
+}
+
+inline const Eigen::VectorXd Problem::getRhs() const
+{
+  return b_;
+}
+
+inline const Eigen::VectorXd Problem::getSolution() const
+{
+  return u_;
+}
+
+inline unsigned Problem::getDim() const
+{
+  return dim_;
 }
 
 } // namespace dgfem

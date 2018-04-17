@@ -62,47 +62,6 @@ void FeFaceExt::compute_basis()
   }
 }
 
-geom::real FeFaceExt::getPhi(unsigned p, unsigned f) const
-{
-  return phi_[sub2ind(p, f)];
-}
-
-const Eigen::Vector3d& FeFaceExt::getPhiDer(unsigned p, unsigned f) const
-{
-  return phiDer_[sub2ind(p, f)];
-}
-
-unsigned FeFaceExt::getElem() const
-{
-  return face_.getTet1().getPoly().getId();
-}
-
-unsigned FeFaceExt::getBClabel() const
-{
-  return face_.getBClabel();
-}
-
-Eigen::Vector3d FeFaceExt::getQuadPoint(unsigned q) const
-{
-  return face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
-                                     triaRule_.getPoint(q).homogeneous());
-}
-
-geom::real FeFaceExt::getAreaDoubled() const
-{
-  return face_.getAreaDoubled();
-}
-
-const Eigen::Vector3d& FeFaceExt::getNormal() const
-{
-  return face_.getNormal();
-}
-
-unsigned FeFaceExt::sub2ind(unsigned p, unsigned f) const
-{
-  return f + dofNo_ * p;
-}
-
 void FeFaceExt::printBasis(std::ostream& out = std::cout) const
 {
   out << "Face " << face_.getId() << '\n';

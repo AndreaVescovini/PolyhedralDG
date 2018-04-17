@@ -40,26 +40,6 @@ FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
   counter_++;
 }
 
-real FaceAbs::getAreaDoubled() const
-{
-  return areaDoubled_;
-}
-
-const Eigen::Vector3d& FaceAbs::getNormal() const
-{
-  return normal_;
-}
-
-void FaceAbs::setAreaDoubled(real areaDoubled)
-{
-  areaDoubled_ = areaDoubled;
-}
-
-void FaceAbs::setNormal(const Eigen::Vector3d& normal)
-{
-  normal_ = normal;
-}
-
 void FaceAbs::checkNormalSign()
 {
   // I check the correctness of the sign of the normal vector performing a dot
@@ -73,11 +53,6 @@ void FaceAbs::checkNormalSign()
     normal_ *= -1.0;
 
   // std::cout << "Checked normal sign" << std::endl;
-}
-
-unsigned FaceAbs::getId() const
-{
-  return id_;
 }
 
 void FaceAbs::resetCounter(unsigned counter)

@@ -17,13 +17,13 @@ public:
   FeFace(unsigned dofNo, const std::vector<std::array<unsigned, 3>>& basisComposition,
          const QuadRuleManager::Rule2D& triaRule);
 
-  unsigned getDofNo() const;
+  inline unsigned getDofNo() const;
 
-  unsigned getQuadPointsNo() const;
-  geom::real getWeight(unsigned q) const;
+  inline unsigned getQuadPointsNo() const;
+  inline geom::real getWeight(unsigned q) const;
   virtual Eigen::Vector3d getQuadPoint(unsigned q) const = 0;
 
-  geom::real getPenaltyParam() const;
+  inline geom::real getPenaltyParam() const;
 
   virtual geom::real getAreaDoubled() const = 0;
   virtual const Eigen::Vector3d& getNormal() const = 0;
@@ -50,6 +50,30 @@ protected:
   virtual void compute_basis() = 0;
 
 };
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline unsigned FeFace::getDofNo() const
+{
+  return dofNo_;
+}
+
+inline unsigned FeFace::getQuadPointsNo() const
+{
+  return triaRule_.getPointsNo();
+}
+
+inline geom::real FeFace::getWeight(unsigned q) const
+{
+  return triaRule_.getWeight(q);
+}
+
+inline geom::real FeFace::getPenaltyParam() const
+{
+  return penaltyParam_;
+}
 
 } // namespace dgfem
 

@@ -3,6 +3,8 @@
 #include <Eigen/SparseCholesky>
 #include <cmath>
 
+
+
 namespace dgfem
 {
 
@@ -146,34 +148,9 @@ geom::real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const E
   return std::sqrt(errSquared);
 }
 
-void Problem::isSymmetric(bool sym)
+void Problem::exportSolutionVTK(const std::string& fileName) const
 {
-  sym_ = sym;
-}
 
-bool Problem::getSymmetry() const
-{
-  return sym_;
-}
-
-const Eigen::SparseMatrix<geom::real> Problem::getMatrix() const
-{
-  return A_;
-}
-
-const Eigen::VectorXd Problem::getRhs() const
-{
-  return b_;
-}
-
-const Eigen::VectorXd Problem::getSolution() const
-{
-  return u_;
-}
-
-unsigned Problem::getDim() const
-{
-  return dim_;
 }
 
 void Problem::clearMatrix()

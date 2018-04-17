@@ -38,9 +38,14 @@ CXX = g++
 #------------------
 # Compilation flags
 #------------------
-OPTFLAGS += -O2 -DNDEBUG
 WFLAGS += -Wall -Wextra -pedantic
-STDFLAG = -std=c++11
+STDFLAG += -std=c++11
+
+ifdef RELEASE
+OPTFLAGS += -O3 -DNDEBUG #-DINLINE
+else
+OPTFLAGS += -g #-DVERBOSITY
+endif
 
 CXXFLAGS += $(WFLAGS) $(STDFLAG) $(OPTFLAGS)
 CPPFLAGS += -I./$(HEADER_DIR) -I$(mkEigenInc)

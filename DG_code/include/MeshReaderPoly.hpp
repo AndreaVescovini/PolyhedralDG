@@ -7,7 +7,8 @@
 #include "MeshReader.hpp"
 #include "Mesh.hpp"
 
-namespace geom {
+namespace geom
+{
 
 class MeshReaderPoly : public MeshReader
 {
@@ -18,8 +19,8 @@ public:
   // Method that reads the file fileName containing the mesh.
   void read(Mesh& mesh, const std::string& fileName) const;
 
-  void setSections(const std::array<std::string, 4>& sections);
-  std::array<std::string, 4> getSections() const;
+  inline void setSections(const std::array<std::string, 4>& sections);
+  inline const std::array<std::string, 4>& getSections() const;
 
   virtual ~MeshReaderPoly() = default;
 
@@ -29,6 +30,20 @@ private:
 
   bool goToSection(std::ifstream& meshFile, unsigned secNo) const;
 };
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline void MeshReaderPoly::setSections(const std::array<std::string, 4>& sections)
+{
+  sections_ = sections;
+}
+
+inline const std::array<std::string, 4>& MeshReaderPoly::getSections() const
+{
+  return sections_;
+}
 
 }
 

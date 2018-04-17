@@ -22,12 +22,12 @@ using Negate = std::negate<geom::real>;
 // Defining the scalar product
 struct DotProduct
 {
-  inline geom::real operator()(const Eigen::Vector3d& lo, const Eigen::Vector3d& ro) const
+  geom::real operator()(const Eigen::Vector3d& lo, const Eigen::Vector3d& ro) const
   {
     return lo.dot(ro);
   }
 
-  inline geom::real operator()(geom::real lo, geom::real ro) const
+  geom::real operator()(geom::real lo, geom::real ro) const
   {
     return lo * ro;
   }
@@ -173,114 +173,114 @@ private:
 
 // Overloading of the operator + for the sum
 template <typename LO, typename RO>
-inline BinaryOperator<LO, RO, Add> operator+(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, Add> operator+(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, Add>(lo, ro);
 }
 
 // template <typename LO>
-// inline BinaryOperator<LO, geom::real, Add> operator+(const ExprWrapper<LO>& lo, geom::real ro)
+// BinaryOperator<LO, geom::real, Add> operator+(const ExprWrapper<LO>& lo, geom::real ro)
 // {
 //   return BinaryOperator<LO, geom::real, Add>(lo, ro);
 // }
 //
 // template <typename RO>
-// inline BinaryOperator<geom::real, RO, Add> operator+(geom::real lo, const ExprWrapper<RO>& ro)
+// BinaryOperator<geom::real, RO, Add> operator+(geom::real lo, const ExprWrapper<RO>& ro)
 // {
 //   return BinaryOperator<geom::real, RO, Add>(lo, ro);
 // }
 
 // Overloading of the operator - for the subtraction
 template <typename LO, typename RO>
-inline BinaryOperator<LO, RO, Subtract> operator-(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, Subtract> operator-(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, Subtract>(lo, ro);
 }
 
 // template <typename LO>
-// inline BinaryOperator<LO, geom::real, Subtract> operator-(const ExprWrapper<LO>& lo, geom::real ro)
+// BinaryOperator<LO, geom::real, Subtract> operator-(const ExprWrapper<LO>& lo, geom::real ro)
 // {
 //   return BinaryOperator<LO, geom::real, Subtract>(lo, ro);
 // }
 //
 // template <typename RO>
-// inline BinaryOperator<geom::real, RO, Subtract> operator-(geom::real lo, const ExprWrapper<RO>& ro)
+// BinaryOperator<geom::real, RO, Subtract> operator-(geom::real lo, const ExprWrapper<RO>& ro)
 // {
 //   return BinaryOperator<geom::real, RO, Subtract>(lo, ro);
 // }
 
 // Overloading of the operator * for the multiplication
 template <typename LO, typename RO>
-inline BinaryOperator<LO, RO, Multiply> operator*(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, Multiply> operator*(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, Multiply>(lo, ro);
 }
 
 template <typename LO>
-inline BinaryOperator<LO, geom::real, Multiply> operator*(const ExprWrapper<LO>& lo, geom::real ro)
+BinaryOperator<LO, geom::real, Multiply> operator*(const ExprWrapper<LO>& lo, geom::real ro)
 {
   return BinaryOperator<LO, geom::real, Multiply>(lo, ro);
 }
 
 template <typename RO>
-inline BinaryOperator<geom::real, RO, Multiply> operator*(geom::real lo, const ExprWrapper<RO>& ro)
+BinaryOperator<geom::real, RO, Multiply> operator*(geom::real lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<geom::real, RO, Multiply>(lo, ro);
 }
 //
 // template <typename LO>
-// inline BinaryOperator<LO, fun3, Multiply> operator*(const ExprWrapper<LO>& lo, const fun3& ro)
+// BinaryOperator<LO, fun3, Multiply> operator*(const ExprWrapper<LO>& lo, const fun3& ro)
 // {
 //   return BinaryOperator<LO, fun3, Multiply>(lo, ro);
 // }
 //
 // template <typename RO>
-// inline BinaryOperator<fun3, RO, Multiply> operator*(const fun3& lo, const ExprWrapper<RO>& ro)
+// BinaryOperator<fun3, RO, Multiply> operator*(const fun3& lo, const ExprWrapper<RO>& ro)
 // {
 //   return BinaryOperator<fun3, RO, Multiply>(lo, ro);
 // }
 
 // Overloading of the operator / for the division
 template <typename LO, typename RO>
-inline BinaryOperator<LO, RO, Divide> operator/(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, Divide> operator/(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, Divide>(lo, ro);
 }
 
 template <typename LO>
-inline BinaryOperator<LO, geom::real, Divide> operator/(const ExprWrapper<LO>& lo, geom::real ro)
+BinaryOperator<LO, geom::real, Divide> operator/(const ExprWrapper<LO>& lo, geom::real ro)
 {
   return BinaryOperator<LO, geom::real, Divide>(lo, ro);
 }
 
 template <typename RO>
-inline BinaryOperator<geom::real, RO, Divide> operator/(geom::real lo, const ExprWrapper<RO>& ro)
+BinaryOperator<geom::real, RO, Divide> operator/(geom::real lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<geom::real, RO, Divide>(lo, ro);
 }
 //
 // template <typename LO>
-// inline BinaryOperator<LO, fun3, Divide> operator/(const ExprWrapper<LO>& lo, const fun3& ro)
+// BinaryOperator<LO, fun3, Divide> operator/(const ExprWrapper<LO>& lo, const fun3& ro)
 // {
 //   return BinaryOperator<LO, fun3, Divide>(lo, ro);
 // }
 //
 // template <typename RO>
-// inline BinaryOperator<fun3, RO, Divide> operator/(const fun3& lo, const ExprWrapper<RO>& ro)
+// BinaryOperator<fun3, RO, Divide> operator/(const fun3& lo, const ExprWrapper<RO>& ro)
 // {
 //   return BinaryOperator<fun3, RO, Divide>(lo, ro);
 // }
 
 // Overloading of the unary operator - for the negation
 template <typename RO>
-inline UnaryOperator<RO, Negate> operator-(const ExprWrapper<RO>& ro)
+UnaryOperator<RO, Negate> operator-(const ExprWrapper<RO>& ro)
 {
   return UnaryOperator<RO, Negate>(ro);
 }
 
 // Scalar Product
 template <typename LO, typename RO>
-inline BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
+BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, DotProduct>(lo, ro);
 }

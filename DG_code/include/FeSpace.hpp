@@ -27,23 +27,23 @@ public:
   FeSpace(TheMesh& Th, unsigned order);
 
   void setOrder(unsigned order);
-  unsigned getOrder() const;
-  unsigned getDofNo() const;
+  inline unsigned getOrder() const;
+  inline unsigned getDofNo() const;
 
-  const FeElement& getFeElement(unsigned i) const;
-  const FeFaceInt& getFeFaceInt(unsigned i) const;
-  const FeFaceExt& getFeFaceExt(unsigned i) const;
+  inline const FeElement& getFeElement(unsigned i) const;
+  inline const FeFaceInt& getFeFaceInt(unsigned i) const;
+  inline const FeFaceExt& getFeFaceExt(unsigned i) const;
 
-  unsigned getFeElementsNo() const;
-  unsigned getFeFacesIntNo() const;
-  unsigned getFeFacesExtNo() const;
+  inline unsigned getFeElementsNo() const;
+  inline unsigned getFeFacesIntNo() const;
+  inline unsigned getFeFacesExtNo() const;
 
-  std::vector<FeElement>::const_iterator feElementsCbegin() const;
-  std::vector<FeElement>::const_iterator feElementsCend() const;
-  std::vector<FeFaceInt>::const_iterator feFacesIntCbegin() const;
-  std::vector<FeFaceInt>::const_iterator feFacesIntCend() const;
-  std::vector<FeFaceExt>::const_iterator feFacesExtCbegin() const;
-  std::vector<FeFaceExt>::const_iterator feFacesExtCend() const;
+  inline std::vector<FeElement>::const_iterator feElementsCbegin() const;
+  inline std::vector<FeElement>::const_iterator feElementsCend() const;
+  inline std::vector<FeFaceInt>::const_iterator feFacesIntCbegin() const;
+  inline std::vector<FeFaceInt>::const_iterator feFacesIntCend() const;
+  inline std::vector<FeFaceExt>::const_iterator feFacesExtCbegin() const;
+  inline std::vector<FeFaceExt>::const_iterator feFacesExtCend() const;
 
   void printElemBasis(std::ostream& out = std::cout) const;
   void printElemBasisDer(std::ostream& out = std::cout) const;
@@ -76,6 +76,80 @@ private:
   void initialize();
 
 };
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline unsigned FeSpace::getOrder() const
+{
+  return order_;
+}
+
+inline unsigned FeSpace::getDofNo() const
+{
+  return dofNo_;
+}
+
+inline const FeElement& FeSpace::getFeElement(unsigned i) const
+{
+  return feElements_[i];
+}
+
+inline const FeFaceInt& FeSpace::getFeFaceInt(unsigned i) const
+{
+  return feFacesInt_[i];
+}
+
+inline const FeFaceExt& FeSpace::getFeFaceExt(unsigned i) const
+{
+  return feFacesExt_[i];
+}
+
+inline unsigned FeSpace::getFeElementsNo() const
+{
+  return feElements_.size();
+}
+
+inline unsigned FeSpace::getFeFacesIntNo() const
+{
+  return feFacesInt_.size();
+}
+
+inline unsigned FeSpace::getFeFacesExtNo() const
+{
+  return feFacesExt_.size();
+}
+
+inline std::vector<FeElement>::const_iterator FeSpace::feElementsCbegin() const
+{
+  return feElements_.cbegin();
+}
+
+inline std::vector<FeElement>::const_iterator FeSpace::feElementsCend() const
+{
+  return feElements_.cend();
+}
+
+inline std::vector<FeFaceInt>::const_iterator FeSpace::feFacesIntCbegin() const
+{
+  return feFacesInt_.cbegin();
+}
+
+inline std::vector<FeFaceInt>::const_iterator FeSpace::feFacesIntCend() const
+{
+  return feFacesInt_.cend();
+}
+
+inline std::vector<FeFaceExt>::const_iterator FeSpace::feFacesExtCbegin() const
+{
+  return feFacesExt_.cbegin();
+}
+
+inline std::vector<FeFaceExt>::const_iterator FeSpace::feFacesExtCend() const
+{
+  return feFacesExt_.cend();
+}
 
 }
 

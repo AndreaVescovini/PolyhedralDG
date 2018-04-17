@@ -7,7 +7,8 @@
 #include <Eigen/Core>
 #include "geom.hpp"
 
-namespace geom {
+namespace geom
+{
 
 class Vertex
 {
@@ -19,17 +20,17 @@ public:
   Vertex(Vertex&&) = default;
   Vertex& operator=(Vertex&&) = default;
 
-  const Eigen::Vector3d& getCoords() const;
+  inline const Eigen::Vector3d& getCoords() const;
 
   template <typename D>
   void setCoords(const Eigen::MatrixBase<D>& coords);
-  
-  real getX() const;
-  real getY() const;
-  real getZ() const;
-  unsigned getId() const;
 
-  real distance(const Vertex& v2) const;
+  inline real getX() const;
+  inline real getY() const;
+  inline real getZ() const;
+  inline unsigned getId() const;
+
+  inline real distance(const Vertex& v2) const;
 
   // Function that resets the counter (to be used at the beginning of the
   // reading of a new mesh, to assure that ids start from 0).
@@ -43,7 +44,7 @@ public:
   // friend bool compX(const Vertex& lhs, const Vertex& rhs);
   // friend bool compY(const Vertex& lhs, const Vertex& rhs);
   // friend bool compZ(const Vertex& lhs, const Vertex& rhs);
-  friend bool compId(const Vertex& lhs, const Vertex& rhs);
+  inline friend bool compId(const Vertex& lhs, const Vertex& rhs);
 
 private:
   const unsigned id_;
@@ -67,7 +68,8 @@ void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
 
 } // namespace geom
 
-namespace std {
+namespace std
+{
 
 using geom::Vertex;
 
@@ -93,5 +95,49 @@ struct hash<geom::Vertex>
 };
 
 } // namespace std
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+namespace geom
+{
+
+inline const Eigen::Vector3d& Vertex::getCoords() const
+{
+  return coords_;
+}
+
+inline real Vertex::getX() const
+{
+  return coords_[0];
+}
+
+inline real Vertex::getY() const
+{
+  return coords_[1];
+}
+
+inline real Vertex::getZ() const
+{
+  return coords_[2];
+}
+
+inline unsigned Vertex::getId() const
+{
+  return id_;
+}
+
+inline real Vertex::distance(const Vertex& v2) const
+{
+  return (this->getCoords() - v2.getCoords()).norm();
+}
+
+inline bool compId(const Vertex& lhs, const Vertex& rhs)
+{
+  return lhs.id_ < rhs.id_;
+}
+
+} // namespace geom
 
 #endif // _VERTEX_HPP_

@@ -27,30 +27,30 @@ public:
 
 // Returns the number of degrees of freedom that in 3D is
 // dofNo = (order+1)*(order+2)*(order+3)/(3!)
-  unsigned getDofNo() const;
+  inline unsigned getDofNo() const;
 
 // Returns the number of tetrhedra that compose elem_
-  unsigned getTetrahedraNo() const;
+  inline unsigned getTetrahedraNo() const;
 
 // Returns the number of quadrature points of tetraRule_
-  unsigned getQuadPointsNo() const;
+  inline unsigned getQuadPointsNo() const;
 
 // Return the absolute value of the determinant of the jacobian of the i-th tetrahedron
-  geom::real getAbsDetJac(unsigned i) const;
+  inline geom::real getAbsDetJac(unsigned i) const;
 
 // Returns the value of the basis function f, computed at the quadrature node p in
 // the tetrahedron t
-  geom::real getPhi(unsigned t, unsigned p, unsigned f) const;
+  inline geom::real getPhi(unsigned t, unsigned p, unsigned f) const;
 
 // Returns the vector of the gradient of the basis function f, computed at the
 // quadrature node p in the tetrahedron t
-  const Eigen::Vector3d& getPhiDer(unsigned t, unsigned p, unsigned f) const;
+  inline const Eigen::Vector3d& getPhiDer(unsigned t, unsigned p, unsigned f) const;
 
 // Returns the q-th quadrature weight
-  geom::real getWeight(unsigned q) const;
+  inline geom::real getWeight(unsigned q) const;
 
 // Returns the q-th quadrature point in the tetrahedron t
-  Eigen::Vector3d getQuadPoint(unsigned t, unsigned q) const;
+  inline Eigen::Vector3d getQuadPoint(unsigned t, unsigned q) const;
 
 // Prints all the computed values of the basis functions
   void printBasis(std::ostream& out = std::cout) const;
@@ -89,8 +89,57 @@ private:
 // Auxiliary function that, given the number of the tetrahedron t, quadrature
 // point p and basis function f, return the index in which the corresponding value
 // is stored in phi_ and phiDer_
-  unsigned sub2ind(unsigned t, unsigned p, unsigned f) const;
+  inline unsigned sub2ind(unsigned t, unsigned p, unsigned f) const;
 };
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline unsigned FeElement::getDofNo() const
+{
+  return dofNo_;
+}
+
+inline unsigned FeElement::getTetrahedraNo() const
+{
+  return elem_.getTetrahedraNo();
+}
+
+inline unsigned FeElement::getQuadPointsNo() const
+{
+  return tetraRule_.getPointsNo();
+}
+
+inline geom::real FeElement::getAbsDetJac(unsigned i) const
+{
+  return elem_.getTetra(i).getAbsDetJacobian();
+}
+
+inline geom::real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
+{
+  return phi_[sub2ind(t, p, f)];
+}
+
+inline const Eigen::Vector3d& FeElement::getPhiDer(unsigned t, unsigned p, unsigned f) const
+{
+  return phiDer_[sub2ind(t, p, f)];
+}
+
+inline geom::real FeElement::getWeight(unsigned q) const
+{
+  return tetraRule_.getWeight(q);
+}
+
+inline Eigen::Vector3d FeElement::getQuadPoint(unsigned t, unsigned q) const
+{
+  return elem_.getTetra(t).getMap() * tetraRule_.getPoint(q);
+}
+
+inline unsigned FeElement::sub2ind(unsigned t, unsigned p, unsigned f) const
+{
+  return f + dofNo_ * (p + t * tetraRule_.getPointsNo());
+}
 
 } // namespace dgfem
 

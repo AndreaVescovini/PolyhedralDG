@@ -125,16 +125,6 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   meshFile.close();
 }
 
-void MeshReaderPoly::setSections(const std::array<std::string, 4>& sections)
-{
-  sections_ = sections;
-}
-
-std::array<std::string, 4> MeshReaderPoly::getSections() const
-{
-  return sections_;
-}
-
 bool MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
 {
   std::string curLine = "";

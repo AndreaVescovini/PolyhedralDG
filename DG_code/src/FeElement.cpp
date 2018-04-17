@@ -62,51 +62,6 @@ void FeElement::compute_basis()
   }
 }
 
-unsigned FeElement::getDofNo() const
-{
-  return dofNo_;
-}
-
-unsigned FeElement::getTetrahedraNo() const
-{
-  return elem_.getTetrahedraNo();
-}
-
-geom::real FeElement::getAbsDetJac(unsigned i) const
-{
-  return elem_.getTetra(i).getAbsDetJacobian();
-}
-
-unsigned FeElement::getQuadPointsNo() const
-{
-  return tetraRule_.getPointsNo();
-}
-
-geom::real FeElement::getWeight(unsigned q) const
-{
-  return tetraRule_.getWeight(q);
-}
-
-Eigen::Vector3d FeElement::getQuadPoint(unsigned t, unsigned q) const
-{
-  return elem_.getTetra(t).getMap() * tetraRule_.getPoint(q);
-}
-
-geom::real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
-{
-  return phi_[sub2ind(t, p, f)];
-}
-
-const Eigen::Vector3d& FeElement::getPhiDer(unsigned t, unsigned p, unsigned f) const
-{
-  return phiDer_[sub2ind(t, p, f)];
-}
-
-unsigned FeElement::sub2ind(unsigned t, unsigned p, unsigned f) const
-{
-  return f + dofNo_ * (p + t * tetraRule_.getPointsNo());
-}
-
 void FeElement::printBasis(std::ostream& out) const
 {
   // Loop over tetrahedra

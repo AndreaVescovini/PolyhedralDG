@@ -41,7 +41,9 @@ private:
   std::vector<geom::real> weights_;
 };
 
-//-------------------------------IMPLEMENTATION---------------------------------
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
 
 template <typename T>
 QuadRule<T>::QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<geom::real>& weights)

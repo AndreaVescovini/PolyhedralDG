@@ -4,7 +4,8 @@
 #include <memory>
 #include "Face.hpp"
 
-namespace geom {
+namespace geom
+{
 
 Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 {
@@ -14,37 +15,6 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
   std::cout << "Faces have been computed." << std::endl;
   computePolyInfo();
   std::cout << "Informations about polyhedra have been computed." << std::endl;
-}
-
-const FaceExt& Mesh::getFaceExt(unsigned n) const
-{
-  return facesExt_[n];
-}
-
-const FaceInt& Mesh::getFaceInt(unsigned n) const
-{
-  return facesInt_[n];
-}
-
-const Polyhedron& Mesh::getPolyhedron(unsigned n) const
-{
-  return polyhedra_[n];
-}
-
-unsigned Mesh::getFacesExtNo() const
-{
-  return facesExt_.size();
-}
-
-unsigned Mesh::getFacesIntNo() const
-{
-  return facesInt_.size();
-}
-
-unsigned Mesh::getPolyhedraNo() const
-{
-  // da mettere inline
-  return polyhedra_.size();
 }
 
 real Mesh::getMaxDiameter() const

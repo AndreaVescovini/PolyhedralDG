@@ -20,14 +20,15 @@ public:
   // The defolut constructor also sets the id using the counter.
   Polyhedron();
 
-  real getDiameter() const;
-  void addTetra(Tetrahedron& tet);
-  void addVertex(Vertex& v);
-  const Tetrahedron& getTetra(unsigned i) const;
-  Tetrahedron& getTetra(unsigned i);
-  unsigned getTetrahedraNo() const;
-  unsigned getId() const;
-  const Eigen::AlignedBox3d& getBoundingBox() const;
+  inline void addTetra(Tetrahedron& tet);
+  inline void addVertex(Vertex& v);
+
+  inline real getDiameter() const;
+  inline const Tetrahedron& getTetra(unsigned i) const;
+  inline Tetrahedron& getTetra(unsigned i);
+  inline unsigned getTetrahedraNo() const;
+  inline unsigned getId() const;
+  inline const Eigen::AlignedBox3d& getBoundingBox() const;
 
   // Function that starting from the unordered set of vertices computes the
   // cartesian bounding box of the polyhedron.
@@ -55,6 +56,50 @@ private:
   static unsigned counter_;
 };
 
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline void Polyhedron::addTetra(Tetrahedron& tet)
+{
+  tetrahedra_.emplace_back(tet);
 }
+
+inline void Polyhedron::addVertex(Vertex& v)
+{
+  vertices_.emplace(v);
+}
+
+inline real Polyhedron::getDiameter() const
+{
+  return diameter_;
+}
+
+inline const Tetrahedron& Polyhedron::getTetra(unsigned i) const
+{
+  return tetrahedra_[i];
+}
+
+inline Tetrahedron& Polyhedron::getTetra(unsigned i)
+{
+  return tetrahedra_[i];
+}
+
+inline unsigned Polyhedron::getTetrahedraNo() const
+{
+  return tetrahedra_.size();
+}
+
+inline unsigned Polyhedron::getId() const
+{
+  return id_;
+}
+
+inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
+{
+  return boundingBox_;
+}
+
+} // namespace geom
 
 #endif // _POLYHEDRON_HPP_

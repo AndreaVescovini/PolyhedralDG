@@ -77,45 +77,6 @@ void FeFaceInt::compute_basis()
   }
 }
 
-geom::real FeFaceInt::getPhi(int side, unsigned p, unsigned f) const
-{
-  return phi_[sub2ind(side, p, f)];
-}
-
-const Eigen::Vector3d& FeFaceInt::getPhiDer(int side, unsigned p, unsigned f) const
-{
-  return phiDer_[sub2ind(side, p, f)];
-}
-
-unsigned FeFaceInt::getElem(int side) const
-{
-  if(side == 0)
-    return face_.getTet1().getPoly().getId();
-  else
-    return face_.getTet2().getPoly().getId();
-}
-
-Eigen::Vector3d FeFaceInt::getQuadPoint(unsigned q) const
-{
-  return face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
-                                     triaRule_.getPoint(q).homogeneous());
-}
-
-geom::real FeFaceInt::getAreaDoubled() const
-{
-  return face_.getAreaDoubled();
-}
-
-const Eigen::Vector3d& FeFaceInt::getNormal() const
-{
-  return face_.getNormal();
-}
-
-unsigned FeFaceInt::sub2ind(int side, unsigned p, unsigned f) const
-{
-  return side + 2 * (f + p * dofNo_);
-}
-
 void FeFaceInt::printBasis(std::ostream& out = std::cout) const
 {
   out << "Face " << face_.getId() << '\n';

@@ -24,8 +24,8 @@ public:
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, unsigned BClabel,
           Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
 
-  unsigned getBClabel() const;
-  void setBClabel(unsigned BClabel);
+  inline unsigned getBClabel() const;
+  inline void setBClabel(unsigned BClabel);
 
   virtual ~FaceExt() = default;
 
@@ -37,6 +37,20 @@ private:
   void print(std::ostream& out) const override;
 };
 
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline unsigned FaceExt::getBClabel() const
+{
+  return BClabel_;
 }
+
+inline void FaceExt::setBClabel(unsigned BClabel)
+{
+  BClabel_ = BClabel;
+}
+
+} // namespace geom
 
 #endif // _FACE_EXT_HPP_

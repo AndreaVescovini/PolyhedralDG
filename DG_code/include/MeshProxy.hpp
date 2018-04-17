@@ -8,7 +8,8 @@
 #include "FaceExt.hpp"
 #include "Polyhedron.hpp"
 
-namespace geom {
+namespace geom
+{
 
 // using geom::Vertex;
 // using geom::Tetrahedron;

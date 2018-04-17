@@ -9,7 +9,8 @@
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom {
+namespace geom
+{
 
 class Face
 {
@@ -22,15 +23,15 @@ public:
 
   // Ci mancano i copy constructor e i move constructor
 
-  const Tetrahedron& getTet1() const;
-  Tetrahedron& getTet1();
-  unsigned getFaceNoTet1() const;
-  void setTet1(Tetrahedron& tet1);
-  void setTet1(Tetrahedron* tet1);
-  void setFaceNoTet1(unsigned faceNoTet1);
+  inline const Tetrahedron& getTet1() const;
+  inline Tetrahedron& getTet1();
+  inline unsigned getFaceNoTet1() const;
+  inline void setTet1(Tetrahedron& tet1);
+  inline void setTet1(Tetrahedron* tet1);
+  inline void setFaceNoTet1(unsigned faceNoTet1);
 
-  const Vertex& getVertex(unsigned i) const;
-  Vertex& getVertex(unsigned i);
+  inline const Vertex& getVertex(unsigned i) const;
+  inline Vertex& getVertex(unsigned i);
 
   virtual ~Face() = default;
 
@@ -45,7 +46,7 @@ protected:
   unsigned faceNoTet1_;
 };
 
-}
+} // namespace geom
 
 namespace std {
 
@@ -77,6 +78,55 @@ struct hash<unique_ptr<geom::Face>>
   }
 };
 
+} // namespace std
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+namespace geom
+{
+
+inline const Tetrahedron& Face::getTet1() const
+{
+  return *tet1_;
 }
+
+inline Tetrahedron& Face::getTet1()
+{
+  return *tet1_;
+}
+
+inline unsigned Face::getFaceNoTet1() const
+{
+  return faceNoTet1_;
+}
+
+inline void Face::setTet1(Tetrahedron& tet1)
+{
+  tet1_ = &tet1;
+}
+
+inline void Face::setTet1(Tetrahedron* tet1)
+{
+  tet1_ = tet1;
+}
+
+inline void Face::setFaceNoTet1(unsigned faceNoTet1)
+{
+  faceNoTet1_ = faceNoTet1;
+}
+
+inline const Vertex& Face::getVertex(unsigned i) const
+{
+  return vertices_[i];
+}
+
+inline Vertex& Face::getVertex(unsigned i)
+{
+  return vertices_[i];
+}
+
+} // namespace geom
 
 #endif // _FACE_HPP_

@@ -23,13 +23,13 @@ public:
 
   Mesh(const std::string& fileName, MeshReader& reader);
 
-  const FaceExt& getFaceExt(unsigned n) const;
-  const FaceInt& getFaceInt(unsigned n) const;
-  const Polyhedron& getPolyhedron(unsigned n) const;
+  inline const FaceExt& getFaceExt(unsigned n) const;
+  inline const FaceInt& getFaceInt(unsigned n) const;
+  inline const Polyhedron& getPolyhedron(unsigned n) const;
 
-  unsigned getFacesExtNo() const;
-  unsigned getFacesIntNo() const;
-  unsigned getPolyhedraNo() const;
+  inline unsigned getFacesExtNo() const;
+  inline unsigned getFacesIntNo() const;
+  inline unsigned getPolyhedraNo() const;
 
   real getMaxDiameter() const;
 
@@ -64,6 +64,40 @@ private:
 
   void print(unsigned lineNo, std::ostream& out = std::cout) const;
 };
+
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline const FaceExt& Mesh::getFaceExt(unsigned n) const
+{
+  return facesExt_[n];
+}
+
+inline const FaceInt& Mesh::getFaceInt(unsigned n) const
+{
+  return facesInt_[n];
+}
+
+inline const Polyhedron& Mesh::getPolyhedron(unsigned n) const
+{
+  return polyhedra_[n];
+}
+
+inline unsigned Mesh::getFacesExtNo() const
+{
+  return facesExt_.size();
+}
+
+inline unsigned Mesh::getFacesIntNo() const
+{
+  return facesInt_.size();
+}
+
+inline unsigned Mesh::getPolyhedraNo() const
+{
+  return polyhedra_.size();
+}
 
 } // namespace geom
 

@@ -32,28 +32,28 @@ public:
   static const Rule2D& getTriaRule(unsigned doe);
 
 // Returns the number of available quadrature rules over tetrahedra
-  static unsigned getTetraRuleNo();
+  inline static unsigned getTetraRuleNo();
 
 // Returns the number of available quadrature rules over triangles
-  static unsigned getTriaRuleNo();
+  inline static unsigned getTriaRuleNo();
 
 // Returns a const interator to the first quadrature rule over tetrahedra
-  static CIter<Rule3D> tetraCbegin();
+  inline static CIter<Rule3D> tetraCbegin();
 
 // Returns a const iterator to the rule after the end over tetrhedra
-  static CIter<Rule3D> tetraCend();
+  inline static CIter<Rule3D> tetraCend();
 
 // Returns a const interator to the first quadrature rule over triangles
-  static CIter<Rule2D> triaCbegin();
+  inline static CIter<Rule2D> triaCbegin();
 
 // Returns a const iterator to the rule after the end over triangles
-  static CIter<Rule2D> triaCend();
+  inline static CIter<Rule2D> triaCend();
 
 // Returns the matrix corresponding to the map from the standard 2d-simplex to the
 // face faceNo of the standard 3d-simplex. The matrix is 3x3 so it must be applied
 // to a 2d vector with homogeneous coordinates (i.e. a 3x1 vector with a 1 as
 // last element)
-  static const Eigen::Matrix3d& getFaceMap(unsigned faceNo);
+  inline static const Eigen::Matrix3d& getFaceMap(unsigned faceNo);
 
   // static void addTetraRule(const QuadRule<Eigen::Vector3d>& rule);
   // static void addTriaRule(const QuadRule<Eigen::Vector2d>& rule);
@@ -75,6 +75,45 @@ private:
   static std::array<Eigen::Matrix3d, 4> faceMaps_;
 };
 
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline unsigned QuadRuleManager::getTetraRuleNo()
+{
+  return tetraRules_.size();
 }
+
+inline unsigned QuadRuleManager::getTriaRuleNo()
+{
+  return triaRules_.size();
+}
+
+inline QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCbegin()
+{
+  return tetraRules_.cbegin();
+}
+
+inline QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCend()
+{
+  return tetraRules_.cend();
+}
+
+inline QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCbegin()
+{
+  return triaRules_.cbegin();
+}
+
+inline QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCend()
+{
+  return triaRules_.cend();
+}
+
+inline const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
+{
+  return faceMaps_[faceNo];
+}
+
+} // namespace dgfem
 
 #endif // _QUAD_RULE_MANAGER_HPP_

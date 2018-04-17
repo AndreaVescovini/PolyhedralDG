@@ -10,42 +10,6 @@ Polyhedron::Polyhedron()
   counter_++;
 }
 
-real Polyhedron::getDiameter() const
-{
-  return diameter_;
-}
-
-void Polyhedron::addTetra(Tetrahedron& tet)
-{
-  tetrahedra_.emplace_back(tet);
-}
-
-void Polyhedron::addVertex(Vertex& v)
-{
-  vertices_.emplace(v);
-}
-
-const Tetrahedron& Polyhedron::getTetra(unsigned i) const
-{
-  return tetrahedra_[i];
-}
-
-unsigned Polyhedron::getTetrahedraNo() const
-{
-  return tetrahedra_.size();
-}
-
-unsigned Polyhedron::getId() const
-{
-  return id_;
-}
-
-const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
-{
-  return boundingBox_;
-}
-
-
 void Polyhedron::computeBB()
 {
   // I store in boundingBox_ the min and max vertices coordinates.
@@ -76,4 +40,4 @@ void Polyhedron::resetCounter(unsigned counter)
 
 unsigned Polyhedron::counter_ = 0;
 
-}
+} // namespace geom

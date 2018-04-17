@@ -23,41 +23,6 @@ const QuadRuleManager::Rule2D& QuadRuleManager::getTriaRule(unsigned doe)
   return triaRules_[doe - 1];
 }
 
-unsigned QuadRuleManager::getTetraRuleNo()
-{
-  return tetraRules_.size();
-}
-
-unsigned QuadRuleManager::getTriaRuleNo()
-{
-  return triaRules_.size();
-}
-
-QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCbegin()
-{
-  return tetraRules_.cbegin();
-}
-
-QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCend()
-{
-  return tetraRules_.cend();
-}
-
-QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCbegin()
-{
-  return triaRules_.cbegin();
-}
-
-QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCend()
-{
-  return triaRules_.cend();
-}
-
-const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
-{
-  return faceMaps_[faceNo];
-}
-
 // Here the quadrature rules over the standard 3d-simplex are defined.
 // There are 8 rules with degree of exactness up to 8.
 std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
@@ -465,4 +430,4 @@ std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
                        -1.0, -1.0, 1.0).finished()
 };
 
-}
+} // namespace dgfem

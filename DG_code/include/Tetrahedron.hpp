@@ -25,16 +25,16 @@ public:
   Tetrahedron(Tetrahedron&&) = default;
   Tetrahedron& operator=(Tetrahedron&&) = default;
 
-  const Vertex& getVertex(unsigned i) const;
-  Vertex& getVertex(unsigned i);
-  const Polyhedron& getPoly() const;// forse questo metodo è da togliere
-  Polyhedron& getPoly(); // forse questo const è da togliere
-  void setPoly(Polyhedron* poly);
-  void setPoly(Polyhedron& poly);
-  unsigned getId() const;
+  inline const Vertex& getVertex(unsigned i) const;
+  inline Vertex& getVertex(unsigned i);
+  inline const Polyhedron& getPoly() const;// forse questo metodo è da togliere
+  inline Polyhedron& getPoly(); // forse questo const è da togliere
+  inline void setPoly(Polyhedron* poly);
+  inline void setPoly(Polyhedron& poly);
+  inline unsigned getId() const;
 
-  const Eigen::Transform<real, 3, Eigen::AffineCompact>& getMap() const;
-  real getAbsDetJacobian() const;
+  inline const Eigen::Transform<real, 3, Eigen::AffineCompact>& getMap() const;
+  inline real getAbsDetJacobian() const;
 
   static void resetCounter(unsigned counter = 0);
 
@@ -53,6 +53,55 @@ private:
 
 std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra);
 
+//----------------------------------------------------------------------------//
+//-------------------------------IMPLEMENTATION-------------------------------//
+//----------------------------------------------------------------------------//
+
+inline const Vertex& Tetrahedron::getVertex(unsigned i) const
+{
+  return vertices_[i];
 }
+
+inline Vertex& Tetrahedron::getVertex(unsigned i)
+{
+  return vertices_[i];
+}
+
+inline const Polyhedron& Tetrahedron::getPoly() const
+{
+  return *poly_;
+}
+
+inline Polyhedron& Tetrahedron::getPoly()
+{
+  return *poly_;
+}
+
+inline void Tetrahedron::setPoly(Polyhedron* poly)
+{
+  poly_ = poly;
+}
+
+inline void Tetrahedron::setPoly(Polyhedron& poly)
+{
+  this->setPoly(&poly);
+}
+
+inline unsigned Tetrahedron::getId() const
+{
+  return id_;
+}
+
+inline const Eigen::Transform<real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() const
+{
+  return map_;
+}
+
+inline real Tetrahedron::getAbsDetJacobian() const
+{
+  return absDetJacobian_;
+}
+
+} // namespace geom
 
 #endif // _TETRAHEDRON_HPP_

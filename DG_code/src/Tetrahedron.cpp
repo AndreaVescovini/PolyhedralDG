@@ -22,51 +22,6 @@ Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
                          Polyhedron& poly)
   : Tetrahedron(v1, v2, v3, v4, &poly) {}
 
-const Vertex& Tetrahedron::getVertex(unsigned i) const
-{
-  return vertices_[i];
-}
-
-Vertex& Tetrahedron::getVertex(unsigned i)
-{
-  return vertices_[i];
-}
-
-const Polyhedron& Tetrahedron::getPoly() const
-{
-  return *poly_;
-}
-
-Polyhedron& Tetrahedron::getPoly()
-{
-  return *poly_;
-}
-
-void Tetrahedron::setPoly(Polyhedron* poly)
-{
-  poly_ = poly;
-}
-
-void Tetrahedron::setPoly(Polyhedron& poly)
-{
-  setPoly(&poly);
-}
-
-unsigned Tetrahedron::getId() const
-{
-  return id_;
-}
-
-const Eigen::Transform<real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() const
-{
-  return map_;
-}
-
-real Tetrahedron::getAbsDetJacobian() const
-{
-  return absDetJacobian_;
-}
-
 void Tetrahedron::resetCounter(unsigned counter)
 {
   counter_ = counter;
@@ -84,4 +39,4 @@ std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra)
 
 unsigned Tetrahedron::counter_ = 0;
 
-}
+} // namespace geom
