@@ -1,19 +1,23 @@
 #ifndef _VERTEX_HPP_
 #define _VERTEX_HPP_
 
+#include "PolyDG.hpp"
+
+#include <Eigen/Core>
+
 #include <array>
 #include <iostream>
 #include <functional>
-#include <Eigen/Core>
-#include "geom.hpp"
 
-namespace geom
+
+
+namespace PolyDG
 {
 
 class Vertex
 {
 public:
-  Vertex(real x = 0.0, real y = 0.0, real z = 0.0);
+  Vertex(Real x = 0.0, Real y = 0.0, Real z = 0.0);
 
   Vertex(const Vertex&) = default;
   Vertex& operator=(const Vertex&) = default;
@@ -25,16 +29,16 @@ public:
   template <typename D>
   void setCoords(const Eigen::MatrixBase<D>& coords);
 
-  inline real getX() const;
-  inline real getY() const;
-  inline real getZ() const;
+  inline Real getX() const;
+  inline Real getY() const;
+  inline Real getZ() const;
   inline unsigned getId() const;
 
-  inline real distance(const Vertex& v2) const;
+  inline Real distance(const Vertex& v2) const;
 
   // Function that resets the counter (to be used at the beginning of the
   // reading of a new mesh, to assure that ids start from 0).
-  static void resetCounter(unsigned counter = 0);
+  inline static void resetCounter(unsigned counter = 0);
 
   virtual ~Vertex() = default;
 
@@ -66,29 +70,27 @@ void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
   coords_ = coords;
 }
 
-} // namespace geom
+} // namespace PolyDG
 
 namespace std
 {
-
-using geom::Vertex;
 
 // I specify the equal_to and hash structs in order to use in the right way
 // unordered sets of vertices, comparing only the index to see weather two
 // elements are equivalent.
 template<>
-struct equal_to<geom::Vertex>
+struct equal_to<PolyDG::Vertex>
 {
-  bool operator()(const geom::Vertex& lhs, const geom::Vertex& rhs) const
+  bool operator()(const PolyDG::Vertex& lhs, const PolyDG::Vertex& rhs) const
   {
     return equal_to<unsigned>()(lhs.getId(), rhs.getId());
   }
 };
 
 template<>
-struct hash<geom::Vertex>
+struct hash<PolyDG::Vertex>
 {
-  std::size_t operator()(const geom::Vertex& v) const
+  std::size_t operator()(const PolyDG::Vertex& v) const
   {
     return hash<unsigned>()(v.getId());
   }
@@ -100,7 +102,7 @@ struct hash<geom::Vertex>
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-namespace geom
+namespace PolyDG
 {
 
 inline const Eigen::Vector3d& Vertex::getCoords() const
@@ -108,17 +110,17 @@ inline const Eigen::Vector3d& Vertex::getCoords() const
   return coords_;
 }
 
-inline real Vertex::getX() const
+inline Real Vertex::getX() const
 {
   return coords_[0];
 }
 
-inline real Vertex::getY() const
+inline Real Vertex::getY() const
 {
   return coords_[1];
 }
 
-inline real Vertex::getZ() const
+inline Real Vertex::getZ() const
 {
   return coords_[2];
 }
@@ -128,7 +130,7 @@ inline unsigned Vertex::getId() const
   return id_;
 }
 
-inline real Vertex::distance(const Vertex& v2) const
+inline Real Vertex::distance(const Vertex& v2) const
 {
   return (this->getCoords() - v2.getCoords()).norm();
 }
@@ -138,6 +140,11 @@ inline bool compId(const Vertex& lhs, const Vertex& rhs)
   return lhs.id_ < rhs.id_;
 }
 
-} // namespace geom
+inline void Vertex::resetCounter(unsigned counter)
+{
+  counter_ = counter;
+}
+
+} // namespace PolyDG
 
 #endif // _VERTEX_HPP_

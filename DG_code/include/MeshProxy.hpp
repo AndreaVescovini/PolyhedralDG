@@ -1,20 +1,21 @@
 #ifndef _MESH_PROXY_HPP_
 #define _MESH_PROXY_HPP_
 
-#include <vector>
 #include "Mesh.hpp"
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
 #include "Polyhedron.hpp"
 
-namespace geom
+#include <vector>
+
+namespace PolyDG
 {
 
-// using geom::Vertex;
-// using geom::Tetrahedron;
-// using geom::FaceExt;
-// using geom::Polyhedron;
+// using PolyDG::Vertex;
+// using PolyDG::Tetrahedron;
+// using PolyDG::FaceExt;
+// using PolyDG::Polyhedron;
 
 class Mesh;
 
@@ -34,6 +35,6 @@ private:
   Mesh& mesh_;
 };
 
-}
+} // namespace PolyDG
 
 #endif // _MESH_PROXY_HPP_

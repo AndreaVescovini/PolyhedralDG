@@ -4,16 +4,17 @@
 #include "Problem.hpp"
 #include "Operators.hpp"
 #include "ExprOperators.hpp"
+
 #include <cmath>
 
-using namespace dgfem;
+using namespace PolyDG;
 
 int main()
 {
   std::string fileName = "../meshes/cube_str6t.mesh";
 
-  geom::MeshReaderPoly reader;
-  geom::Mesh Th(fileName, reader);
+  PolyDG::MeshReaderPoly reader;
+  PolyDG::Mesh Th(fileName, reader);
 
   unsigned r = 1;
   FeSpace Vh(Th, r);
@@ -39,13 +40,13 @@ int main()
 
   sym.integrateVol(dot(uGrad, vGrad), true);
   sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
-  sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, true);
+  sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1,  true);
   nonsym.integrateVol(dot(uGrad, vGrad), false);
   nonsym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), false);
   nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
 
   sym.integrateVolRhs(f * v);
-  sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+  sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
   std::cout << sym.getRhs() << std::endl;
   std::cout << sym.getMatrix().selfadjointView<Eigen::Upper>() << std::endl;

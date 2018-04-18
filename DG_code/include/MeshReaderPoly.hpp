@@ -1,13 +1,14 @@
 #ifndef _MESH_READER_POLY_HPP_
 #define _MESH_READER_POLY_HPP_
 
-#include <string>
-#include <array>
-#include <fstream>
 #include "MeshReader.hpp"
 #include "Mesh.hpp"
 
-namespace geom
+#include <string>
+#include <array>
+#include <fstream>
+
+namespace PolyDG
 {
 
 class MeshReaderPoly : public MeshReader
@@ -45,6 +46,6 @@ inline const std::array<std::string, 4>& MeshReaderPoly::getSections() const
   return sections_;
 }
 
-}
+} // namespace PolyDG
 
 #endif // _MESH_READER_POLY_HPP_

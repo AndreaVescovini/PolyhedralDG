@@ -6,11 +6,11 @@ int main()
 {
   std::string fileName = "../meshes/cube_str6t.mesh";
 
-  geom::MeshReaderPoly reader;
-  geom::Mesh Th(fileName, reader);
+  PolyDG::MeshReaderPoly reader;
+  PolyDG::Mesh Th(fileName, reader);
 
   unsigned r = 1;
-  dgfem::FeSpace Vh(Th, r, 2, 2);
+  PolyDG::FeSpace Vh(Th, r, 2, 2);
 
   Vh.printElemBasis();
   Vh.printElemBasisDer();

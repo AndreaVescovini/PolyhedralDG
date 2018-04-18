@@ -1,6 +1,7 @@
 #include "MeshProxy.hpp"
 
-namespace geom {
+namespace PolyDG
+{
 
 MeshProxy::MeshProxy(Mesh& mesh)
   : mesh_{mesh} {}
@@ -25,4 +26,4 @@ std::vector<Polyhedron>& MeshProxy::getPolyhedraRef() const
   return mesh_.polyhedra_;
 }
 
-}
+} // namespace PolyDG

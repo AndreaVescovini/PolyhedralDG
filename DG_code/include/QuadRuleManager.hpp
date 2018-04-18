@@ -2,10 +2,12 @@
 #define _QUAD_RULE_MANAGER_HPP_
 
 #include "QuadRule.hpp"
+
 #include <Eigen/Core>
+
 #include <vector>
 
-namespace dgfem
+namespace PolyDG
 {
 
 class QuadRuleManager
@@ -114,6 +116,6 @@ inline const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
   return faceMaps_[faceNo];
 }
 
-} // namespace dgfem
+} // namespace PolyDG
 
 #endif // _QUAD_RULE_MANAGER_HPP_

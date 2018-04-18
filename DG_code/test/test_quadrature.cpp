@@ -1,7 +1,8 @@
-#include <iostream>
 #include "QuadRuleManager.hpp"
 
-using namespace dgfem;
+#include <iostream>
+
+using namespace PolyDG;
 
 int main()
 {

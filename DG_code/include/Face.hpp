@@ -1,15 +1,17 @@
 #ifndef _FACE_HPP_
 #define _FACE_HPP_
 
-#include <array>
-#include <functional>
-#include <Eigen/Core>
-#include <memory>
-#include "geom.hpp"
+#include "PolyDG.hpp"
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom
+#include <Eigen/Core>
+
+#include <array>
+#include <functional>
+#include <memory>
+
+namespace PolyDG
 {
 
 class Face
@@ -46,7 +48,7 @@ protected:
   unsigned faceNoTet1_;
 };
 
-} // namespace geom
+} // namespace PolyDG
 
 namespace std {
 
@@ -55,25 +57,25 @@ namespace std {
 // of vertices.
 
 template<>
-struct equal_to<unique_ptr<geom::Face>>
+struct equal_to<unique_ptr<PolyDG::Face>>
 {
-  bool operator()(const unique_ptr<geom::Face>& lhs, const unique_ptr<geom::Face>& rhs) const
+  bool operator()(const unique_ptr<PolyDG::Face>& lhs, const unique_ptr<PolyDG::Face>& rhs) const
   {
-    bool res = equal_to<geom::Vertex>()(lhs->getVertex(0), rhs->getVertex(0)) &&
-               equal_to<geom::Vertex>()(lhs->getVertex(1), rhs->getVertex(1)) &&
-               equal_to<geom::Vertex>()(lhs->getVertex(2), rhs->getVertex(2));
+    bool res = equal_to<PolyDG::Vertex>()(lhs->getVertex(0), rhs->getVertex(0)) &&
+               equal_to<PolyDG::Vertex>()(lhs->getVertex(1), rhs->getVertex(1)) &&
+               equal_to<PolyDG::Vertex>()(lhs->getVertex(2), rhs->getVertex(2));
     return res;
   }
 };
 
 template<>
-struct hash<unique_ptr<geom::Face>>
+struct hash<unique_ptr<PolyDG::Face>>
 {
-  std::size_t operator()(const unique_ptr<geom::Face>& f) const
+  std::size_t operator()(const unique_ptr<PolyDG::Face>& f) const
   {
-    std::size_t res = hash<geom::Vertex>()(f->getVertex(0)) +
-                      hash<geom::Vertex>()(f->getVertex(1)) * 37 +
-                      hash<geom::Vertex>()(f->getVertex(2)) * 37 * 37 + 23;
+    std::size_t res = hash<PolyDG::Vertex>()(f->getVertex(0)) +
+                      hash<PolyDG::Vertex>()(f->getVertex(1)) * 37 +
+                      hash<PolyDG::Vertex>()(f->getVertex(2)) * 37 * 37 + 23;
     return res;
   }
 };
@@ -84,7 +86,7 @@ struct hash<unique_ptr<geom::Face>>
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-namespace geom
+namespace PolyDG
 {
 
 inline const Tetrahedron& Face::getTet1() const
@@ -127,6 +129,6 @@ inline Vertex& Face::getVertex(unsigned i)
   return vertices_[i];
 }
 
-} // namespace geom
+} // namespace PolyDG
 
 #endif // _FACE_HPP_

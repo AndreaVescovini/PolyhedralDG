@@ -1,9 +1,10 @@
 #include "FeFaceInt.hpp"
 #include "Legendre.hpp"
+
 #include <cmath>
 #include <algorithm>
 
-namespace dgfem
+namespace PolyDG
 {
 
 FeFaceInt::FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
@@ -47,8 +48,8 @@ void FeFaceInt::compute_basis()
     // Loop over basis functions
     for(unsigned f = 0; f < dofNo_; f++)
     {
-      std::array<std::array<geom::real, 2>, 3> polval;
-      std::array<std::array<geom::real, 2>, 3> polval2;
+      std::array<std::array<Real, 2>, 3> polval;
+      std::array<std::array<Real, 2>, 3> polval2;
 
       // Loop over the three coordinates
       for(unsigned i = 0; i < 3; i++)
@@ -125,4 +126,4 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
   out << '\n';
 }
 
-}
+} // namespace PolyDG

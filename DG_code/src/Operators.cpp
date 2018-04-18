@@ -1,12 +1,12 @@
 #include "Operators.hpp"
 
-namespace dgfem
+namespace PolyDG
 {
 
-PenaltyScaling::PenaltyScaling(geom::real sigma)
+PenaltyScaling::PenaltyScaling(Real sigma)
   : sigma_{sigma} {}
 
 Function::Function(const fun3real& fun)
   : fun_{fun} {}
 
-} // namespace dgfem
+} // namespace PolyDG

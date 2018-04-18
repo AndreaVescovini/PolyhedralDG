@@ -1,35 +1,37 @@
 #ifndef _FE_FACE_EXT_HPP_
 #define _FE_FACE_EXT_HPP_
 
+#include "PolyDG.hpp"
 #include "FeFace.hpp"
 #include "FaceExt.hpp"
 #include "QuadRuleManager.hpp"
-#include <vector>
-#include <array>
-#include "geom.hpp"
+
 #include <Eigen/Core>
 
-namespace dgfem
+#include <vector>
+#include <array>
+
+namespace PolyDG
 {
 
 class FeFaceExt : public FeFace
 {
 public:
-  using TheFace = geom::FaceExt;
+  using TheFace = PolyDG::FaceExt;
 
   FeFaceExt(const TheFace& face, unsigned order, unsigned dofNo,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule2D& triaRule);
 
-  inline geom::real getPhi(unsigned p, unsigned f) const;
+  inline Real getPhi(unsigned p, unsigned f) const;
   inline const Eigen::Vector3d& getPhiDer(unsigned p, unsigned f) const;
 
   inline unsigned getElem() const;
-  inline unsigned getBClabel() const;
+  inline BCtype getBClabel() const;
 
   inline Eigen::Vector3d getQuadPoint(unsigned q) const override;
 
-  inline geom::real getAreaDoubled() const override;
+  inline Real getAreaDoubled() const override;
   inline const Eigen::Vector3d& getNormal() const override;
 
   void printBasis(std::ostream& out) const override;
@@ -53,7 +55,7 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline geom::real FeFaceExt::getPhi(unsigned p, unsigned f) const
+inline Real FeFaceExt::getPhi(unsigned p, unsigned f) const
 {
   return phi_[sub2ind(p, f)];
 }
@@ -68,7 +70,7 @@ inline unsigned FeFaceExt::getElem() const
   return face_.getTet1().getPoly().getId();
 }
 
-inline unsigned FeFaceExt::getBClabel() const
+inline BCtype FeFaceExt::getBClabel() const
 {
   return face_.getBClabel();
 }
@@ -79,7 +81,7 @@ inline Eigen::Vector3d FeFaceExt::getQuadPoint(unsigned q) const
                                      triaRule_.getPoint(q).homogeneous());
 }
 
-inline geom::real FeFaceExt::getAreaDoubled() const
+inline Real FeFaceExt::getAreaDoubled() const
 {
   return face_.getAreaDoubled();
 }
@@ -94,6 +96,6 @@ inline unsigned FeFaceExt::sub2ind(unsigned p, unsigned f) const
   return f + dofNo_ * p;
 }
 
-} // namespace dgfem
+} // namespace PolyDG
 
 #endif // _FE_FACE_EXT_HPP_

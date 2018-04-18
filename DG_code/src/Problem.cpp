@@ -1,11 +1,13 @@
 #include "Problem.hpp"
+
 #include <Eigen/SparseLU>
 #include <Eigen/SparseCholesky>
+#include <Eigen/IterativeLinearSolvers>
+
 #include <cmath>
+#include <fstream>
 
-
-
-namespace dgfem
+namespace PolyDG
 {
 
 Problem::Problem(const FeSpace& Vh, bool sym)
@@ -14,7 +16,7 @@ Problem::Problem(const FeSpace& Vh, bool sym)
 
 void Problem::solveLU()
 {
-  Eigen::SparseLU<Eigen::SparseMatrix<geom::real>> solver;
+  Eigen::SparseLU<Eigen::SparseMatrix<Real>> solver;
 
   if(sym_ == true)
   {
@@ -46,8 +48,8 @@ void Problem::solveChol()
     return;
   }
 
-  Eigen::SimplicialLLT<Eigen::SparseMatrix<geom::real>, Eigen::Upper> solver;
-  // Eigen::SimplicialLDLT<Eigen::SparseMatrix<geom::real>, Eigen::Upper> solver;
+  // Eigen::SimplicialLLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
+  Eigen::SimplicialLDLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
 
   A_.makeCompressed();
   solver.compute(A_);
@@ -65,7 +67,7 @@ void Problem::solveChol()
   }
 }
 
-void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, geom::real tol)
+void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
 
   if(sym_ == false)
@@ -74,8 +76,8 @@ void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, geom::real to
     return;
   }
 
-  Eigen::ConjugateGradient<Eigen::SparseMatrix<geom::real>, Eigen::Upper> solver;
-  // Eigen::ConjugateGradient<Eigen::SparseMatrix<geom::real>, Eigen::Lower|Upper> solver;
+  Eigen::ConjugateGradient<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
+  // Eigen::ConjugateGradient<Eigen::SparseMatrix<Real>, Eigen::Lower|Upper> solver;
 
   solver.setMaxIterations(iterMax);
   solver.setTolerance(tol);
@@ -94,9 +96,9 @@ void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, geom::real to
   std::cout << "Estimated error "<< solver.error() << std::endl;
 }
 
-geom::real Problem::computeErrorL2(const std::function<geom::real (const Eigen::Vector3d&)>& uex) const
+Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>& uex) const
 {
-  geom::real errSquared = 0.0;
+  Real errSquared = 0.0;
 
   unsigned elemNo = 0;
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
@@ -105,13 +107,13 @@ geom::real Problem::computeErrorL2(const std::function<geom::real (const Eigen::
     for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
       for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
       {
-        geom::real uh = 0.0;
+        Real uh = 0.0;
 
         // Evaluation of the fem function at the quadrature node
         for(unsigned i = 0; i < Vh_.getDofNo(); i++)
           uh += u_(i + indexOffset) * it->getPhi(t, q, i);
 
-        geom::real difference = uh - uex(it->getQuadPoint(t, q));
+        Real difference = uh - uex(it->getQuadPoint(t, q));
         errSquared += difference * difference * it->getWeight(q) * it->getAbsDetJac(t);
       }
 
@@ -121,9 +123,9 @@ geom::real Problem::computeErrorL2(const std::function<geom::real (const Eigen::
   return std::sqrt(errSquared);
 }
 
-geom::real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const
+Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const
 {
-  geom::real errSquared = 0.0;
+  Real errSquared = 0.0;
 
   unsigned elemNo = 0;
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
@@ -150,17 +152,25 @@ geom::real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const E
 
 void Problem::exportSolutionVTK(const std::string& fileName) const
 {
+  std::ofstream fout{fileName};
 
+  // // 1) File version and identifier
+  // out << "# ctk DataFile Versio 3.0\n";
+  //
+  // // 2) Header
+  // out << "VTK from PolyDG\n";
+  //
+  // // 3) File format
+  // out << "ASCII\n";
+  //
+  // // 4) Dataset structure
+  // out << "DATASET UNSTRUCTURED_GRID\n";
+  // out << "POINTS"
+  //
+  // // 5) Dataset attributes
+  // out << "POINT_DATA " << 4 * Vh_.getMesh().getTetrahedraNo() << " double\n"
+
+  fout.close();
 }
 
-void Problem::clearMatrix()
-{
-  A_.setZero();
-}
-
-void Problem::clearRhs()
-{
-  b_ = Eigen::VectorXd::Zero(dim_);
-}
-
-} // namespace dgfem
+} // namespace PolyDG

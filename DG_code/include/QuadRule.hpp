@@ -1,32 +1,34 @@
 #ifndef _QUAD_RULE_HPP_
 #define _QUAD_RULE_HPP_
 
+#include "PolyDG.hpp"
+
 #include <Eigen/Core>
+
 #include <vector>
 #include <initializer_list>
 #include <numeric>
 #include <cmath>
-#include "geom.hpp"
 // #include <iostream>
 
-namespace dgfem
+namespace PolyDG
 {
 
 template <typename T>
 class QuadRule
 {
 public:
-  QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<geom::real>& weights);
-  QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<geom::real> weights);
+  QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<Real>& weights);
+  QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<Real> weights);
 
   unsigned getDoe() const;
   unsigned getPointsNo() const;
   const T& getPoint(unsigned i) const;
-  geom::real getWeight(unsigned i) const;
+  Real getWeight(unsigned i) const;
 
 // Functions that returns true if the sum of the weights is the volume of the
 // simplex up to a tolerance tol and returns false otherwise.
-  bool checkRule(geom::real tol = 1e-10) const;
+  bool checkRule(Real tol = 1e-10) const;
 
   virtual ~QuadRule() = default;
 
@@ -38,7 +40,7 @@ private:
   std::vector<T> points_;
 
 // Vector of quadrature weigths
-  std::vector<geom::real> weights_;
+  std::vector<Real> weights_;
 };
 
 //----------------------------------------------------------------------------//
@@ -46,11 +48,11 @@ private:
 //----------------------------------------------------------------------------//
 
 template <typename T>
-QuadRule<T>::QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<geom::real>& weights)
+QuadRule<T>::QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<Real>& weights)
   : doe_{doe}, points_{points}, weights_{weights} {}
 
 template <typename T>
-QuadRule<T>::QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<geom::real> weights)
+QuadRule<T>::QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<Real> weights)
   : doe_{doe}, points_{points}, weights_{weights} {}
 
 template <typename T>
@@ -72,19 +74,19 @@ const T& QuadRule<T>::getPoint(unsigned i) const
 }
 
 template <typename T>
-geom::real QuadRule<T>::getWeight(unsigned i) const
+Real QuadRule<T>::getWeight(unsigned i) const
 {
   return weights_[i];
 }
 
 template <typename T>
-bool QuadRule<T>::checkRule(geom::real tol) const
+bool QuadRule<T>::checkRule(Real tol) const
 {
-  geom::real sum = std::accumulate(weights_.cbegin(), weights_.cend(), static_cast<geom::real>(0.0));
+  Real sum = std::accumulate(weights_.cbegin(), weights_.cend(), static_cast<Real>(0.0));
   // std::cout << "Sum of weigths = " << sum << std::endl;
 
   // I use the Gamma function in order to compute the factorial
-  geom::real volume = 1. / std::tgamma(points_[0].size() + 1);
+  Real volume = 1. / std::tgamma(points_[0].size() + 1);
 
   if(std::abs(sum - volume) < tol)
     return true;
@@ -92,6 +94,6 @@ bool QuadRule<T>::checkRule(geom::real tol) const
     return false;
 }
 
-}
+} // namespace PolyDG
 
 #endif // _QUAD_RULE_HPP_

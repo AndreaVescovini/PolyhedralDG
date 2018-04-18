@@ -1,12 +1,12 @@
 #ifndef _EXPR_WRAPPER_HPP_
 #define _EXPR_WRAPPER_HPP_
 
-#include "geom.hpp"
+#include "PolyDG.hpp"
 // #include "FeElement.hpp"
 // #include "FeFaceInt.hpp"
 // #include "FeFaceExt.hpp"
 
-namespace dgfem
+namespace PolyDG
 {
 
 // Wrapper class that encapsulates every expression. It defines the cast operator
@@ -21,18 +21,18 @@ public:
   void operator=(const ExprWrapper<E>&) = delete;
 
 // // Call operator for expressions that involve volume integrals
-//   geom::real operator()(const FeElement& fe, unsigned i, unsigned j,
+//   Real operator()(const FeElement& fe, unsigned i, unsigned j,
 //                         unsigned t, unsigned q) const;
 //
 // // Call operator for expressions that involve volume integrals, returning a vector
 //   Eigen::Vector3d operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
 //
 // // Call operator for expressions that involve integrals over internal faces
-//   geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j,
+//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j,
 //                         int side1, int side2, unsigned q) const;
 //
 // // Call operator for expressions that involve integrals over external faces
-//   geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+//   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
 
 // Cast operators
@@ -49,7 +49,7 @@ public:
 //-------------------------------IMPLEMENTATION---------------------------------
 
 // template <typename E>
-// geom::real ExprWrapper<E>::operator()(const FeElement& fe, unsigned i, unsigned j,
+// Real ExprWrapper<E>::operator()(const FeElement& fe, unsigned i, unsigned j,
 //                                       unsigned t, unsigned q) const
 // {
 //   return asDerived().operator()(fe, i, j, t, q);
@@ -63,14 +63,14 @@ public:
 // }
 //
 // template <typename E>
-// geom::real ExprWrapper<E>::operator()(const FeFaceInt& fe, unsigned i, unsigned j,
+// Real ExprWrapper<E>::operator()(const FeFaceInt& fe, unsigned i, unsigned j,
 //                                       int side1, int side2, unsigned q) const
 // {
 //   return asDerived().operator()(fe, i, j, side1, side2, q);
 // }
 //
 // template <typename E>
-// geom::real ExprWrapper<E>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+// Real ExprWrapper<E>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
 // {
 //   return asDerived().operator()(fe, i, j, q);
 // }
@@ -99,6 +99,6 @@ ExprWrapper<E>::operator E&()
 //   return static_cast<E&>(*this);
 // }
 
-}
+} // namespace PolyDG
 
 #endif // _EXPR_WRAPPER_HPP_

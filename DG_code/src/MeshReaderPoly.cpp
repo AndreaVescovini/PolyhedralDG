@@ -1,15 +1,16 @@
 #include "MeshReaderPoly.hpp"
-
-#include <vector>
 #include "Vertex.hpp"
 #include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
 #include "Polyhedron.hpp"
 
+#include <vector>
+
 // I assume that entities are numerated from 1 to N in the meshFile, then I store
 // them in my mesh conteiners numerating from 0 to N-1
 
-namespace geom {
+namespace PolyDG
+{
 
 MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
   : sections_{sections} {}
@@ -18,12 +19,12 @@ MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
 // the data in mesh
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {
-  // using geom::Vertex;
-  // using geom::Tetrahedron;
-  // using geom::FaceExt;
-  // using geom::Polyhedron;
-  // using geom::real;
-  // using geom::labelType; // da riqualificare
+  // using PolyDG::Vertex;
+  // using PolyDG::Tetrahedron;
+  // using PolyDG::FaceExt;
+  // using PolyDG::Polyhedron;
+  // using PolyDG::Real;
+  // using PolyDG::labelType; // da riqualificare
 
   std::ifstream meshFile{fileName};
   if( meshFile.is_open() == false )
@@ -46,8 +47,8 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   vertList.reserve(verticesNo);
   Vertex::resetCounter();
 
-  std::array<real, 3> curVertex;
-  unsigned label = 0; // used to read unuseful labels
+  std::array<Real, 3> curVertex;
+  int label = 0; // used to read unuseful labels
   for(size_t i = 0; i < verticesNo; i++)
   {
     meshFile >> curVertex[0] >> curVertex[1] >> curVertex[2] >> label;
@@ -140,4 +141,4 @@ bool MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
   return true;
 }
 
-}
+} // namespace PolyDG

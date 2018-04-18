@@ -1,22 +1,24 @@
 #ifndef _FACE_INT_HPP_
 #define _FACE_INT_HPP_
 
-#include <iostream>
 #include "FaceAbs.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom {
+#include <iostream>
+
+namespace PolyDG
+{
 
 class FaceInt : public FaceAbs
 {
 public:
   FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          real area, Eigen::Vector3d normal,
+          Real area, Eigen::Vector3d normal,
           Tetrahedron& tet1, unsigned faceNoTet1,
           Tetrahedron& tet2, unsigned faceNoTet2);
 
   FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          real area, Eigen::Vector3d normal,
+          Real area, Eigen::Vector3d normal,
           Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0,
           Tetrahedron* tet2 = nullptr, unsigned faceNoTet2 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
 
@@ -80,6 +82,6 @@ inline void FaceInt::setFaceNoTet2(unsigned faceNoTet2)
   faceNoTet2_ = faceNoTet2;
 }
 
-} // namespace geom
+} // namespace PolyDG
 
 #endif // _FACE_INT_HPP_

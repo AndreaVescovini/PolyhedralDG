@@ -1,11 +1,13 @@
 #include "Legendre.hpp"
-#include <iostream>
+
 // #include <boost/math/special_functions/legendre.hpp>
+
+#include <iostream>
 
 namespace basis
 {
 
-std::array<geom::real, 2> legendre(unsigned n, geom::real x)
+std::array<PolyDG::Real, 2> legendre(unsigned n, PolyDG::Real x)
 {
   switch(n)
   {
@@ -44,4 +46,4 @@ std::array<geom::real, 2> legendre(unsigned n, geom::real x)
 
 }
 
-}
+} // namespace basis

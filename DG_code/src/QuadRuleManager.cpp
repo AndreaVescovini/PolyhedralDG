@@ -1,6 +1,6 @@
 #include "QuadRuleManager.hpp"
 
-namespace dgfem
+namespace PolyDG
 {
 
 const QuadRuleManager::Rule3D& QuadRuleManager::getTetraRule(unsigned doe)
@@ -430,4 +430,4 @@ std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
                        -1.0, -1.0, 1.0).finished()
 };
 
-} // namespace dgfem
+} // namespace PolyDG

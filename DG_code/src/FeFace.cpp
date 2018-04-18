@@ -1,6 +1,6 @@
 #include "FeFace.hpp"
 
-namespace dgfem
+namespace PolyDG
 {
 
 FeFace::FeFace(unsigned dofNo,
@@ -8,4 +8,4 @@ FeFace::FeFace(unsigned dofNo,
                const QuadRule<Eigen::Vector2d>& triaRule)
   : dofNo_{dofNo}, basisComposition_{basisComposition}, triaRule_{triaRule} {}
 
-} // namespace dgfem
+} // namespace PolyDG

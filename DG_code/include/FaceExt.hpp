@@ -1,38 +1,39 @@
 #ifndef _FACE_EXT_HPP_
 #define _FACE_EXT_HPP_
 
-#include <iostream>
+#include "PolyDG.hpp"
 #include "FaceAbs.hpp"
 #include "Tetrahedron.hpp"
 
-namespace geom {
+#include <iostream>
+
+namespace PolyDG
+{
 
 class FaceExt : public FaceAbs
 {
 public:
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3,
-          real area, Eigen::Vector3d normal, unsigned BClabel,
+          Real area, Eigen::Vector3d normal, BCtype bcLabel,
           Tetrahedron& tet1, unsigned faceNoTet1);
 
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3,
-          real area, Eigen::Vector3d normal, unsigned BClabel,
+          Real area, Eigen::Vector3d normal, BCtype bcLabel,
           Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
 
-  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, unsigned BClabel,
+  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCtype bcLabel,
           Tetrahedron& tet1 , unsigned faceNoTet1);
 
-  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, unsigned BClabel,
+  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCtype bcLabel,
           Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
 
-  inline unsigned getBClabel() const;
-  inline void setBClabel(unsigned BClabel);
+  inline BCtype getBClabel() const;
+  inline void setBClabel(BCtype bcLabel);
 
   virtual ~FaceExt() = default;
 
 private:
-  // I store an unsigned correspoing to the boundary condition assigned to this
-  // external face.
-  unsigned BClabel_; // mettere l'enum
+  BCtype bcLabel_;
 
   void print(std::ostream& out) const override;
 };
@@ -41,16 +42,16 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline unsigned FaceExt::getBClabel() const
+inline BCtype FaceExt::getBClabel() const
 {
-  return BClabel_;
+  return bcLabel_;
 }
 
-inline void FaceExt::setBClabel(unsigned BClabel)
+inline void FaceExt::setBClabel(BCtype bcLabel)
 {
-  BClabel_ = BClabel;
+  bcLabel_ = bcLabel;
 }
 
-} // namespace geom
+} // namespace PolyDG
 
 #endif // _FACE_EXT_HPP_

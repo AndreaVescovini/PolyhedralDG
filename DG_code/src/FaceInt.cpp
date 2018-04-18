@@ -1,15 +1,16 @@
 #include "FaceInt.hpp"
 
-namespace geom {
+namespace PolyDG
+{
 
 FaceInt::FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real area, Eigen::Vector3d normal,
+                 Real area, Eigen::Vector3d normal,
                  Tetrahedron& tet1, unsigned faceNoTet1,
                  Tetrahedron& tet2, unsigned faceNoTet2)
   :  FaceInt(v1, v2, v3, area, normal, &tet1, faceNoTet1, &tet2, faceNoTet2) {}
 
 FaceInt::FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real area, Eigen::Vector3d normal,
+                 Real area, Eigen::Vector3d normal,
                  Tetrahedron* tet1, unsigned faceNoTet1,
                  Tetrahedron* tet2, unsigned faceNoTet2)
   :  FaceAbs(v1, v2, v3, area, normal, tet1, faceNoTet1),
@@ -35,4 +36,4 @@ void FaceInt::print(std::ostream& out) const
       << ", A:" << areaDoubled_ << ", N:" << normal_.transpose();
 }
 
-} // namespace geom
+} // namespace PolyDG

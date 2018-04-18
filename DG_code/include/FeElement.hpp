@@ -1,23 +1,25 @@
 #ifndef _FE_ELEMENT_HPP_
 #define _FE_ELEMENT_HPP_
 
+#include "PolyDG.hpp"
 #include "Polyhedron.hpp"
-#include "geom.hpp"
 #include "QuadRuleManager.hpp"
+
 #include <Eigen/Core>
+
 #include <vector>
 #include <array>
 #include <iostream>
 
-namespace dgfem
+namespace PolyDG
 {
 
 class FeElement
 {
 public:
-  using TheElem = geom::Polyhedron;
+  using TheElem = PolyDG::Polyhedron;
 
-// Constructor that takes a geometrical polyhedron elem, the order of polynomials
+// Constructor that takes a PolyDGetrical polyhedron elem, the order of polynomials
 // order, the consequent number of degrees of freedom dofNo, the possible composition
 // of polynomilas of degree less or equal to order into monomials basisComposition,
 // a quadrature rule tetraRule.
@@ -36,18 +38,18 @@ public:
   inline unsigned getQuadPointsNo() const;
 
 // Return the absolute value of the determinant of the jacobian of the i-th tetrahedron
-  inline geom::real getAbsDetJac(unsigned i) const;
+  inline Real getAbsDetJac(unsigned i) const;
 
 // Returns the value of the basis function f, computed at the quadrature node p in
 // the tetrahedron t
-  inline geom::real getPhi(unsigned t, unsigned p, unsigned f) const;
+  inline Real getPhi(unsigned t, unsigned p, unsigned f) const;
 
 // Returns the vector of the gradient of the basis function f, computed at the
 // quadrature node p in the tetrahedron t
   inline const Eigen::Vector3d& getPhiDer(unsigned t, unsigned p, unsigned f) const;
 
 // Returns the q-th quadrature weight
-  inline geom::real getWeight(unsigned q) const;
+  inline Real getWeight(unsigned q) const;
 
 // Returns the q-th quadrature point in the tetrahedron t
   inline Eigen::Vector3d getQuadPoint(unsigned t, unsigned q) const;
@@ -76,7 +78,7 @@ private:
   const QuadRuleManager::Rule3D& tetraRule_;
 
 // Vector containing all the values of the basis functions over this element
-  std::vector<geom::real> phi_;
+  std::vector<Real> phi_;
 
 // Vector containing all the values of the gradient of the basis functions over
 // this element
@@ -111,12 +113,12 @@ inline unsigned FeElement::getQuadPointsNo() const
   return tetraRule_.getPointsNo();
 }
 
-inline geom::real FeElement::getAbsDetJac(unsigned i) const
+inline Real FeElement::getAbsDetJac(unsigned i) const
 {
   return elem_.getTetra(i).getAbsDetJacobian();
 }
 
-inline geom::real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
+inline Real FeElement::getPhi(unsigned t, unsigned p, unsigned f) const
 {
   return phi_[sub2ind(t, p, f)];
 }
@@ -126,7 +128,7 @@ inline const Eigen::Vector3d& FeElement::getPhiDer(unsigned t, unsigned p, unsig
   return phiDer_[sub2ind(t, p, f)];
 }
 
-inline geom::real FeElement::getWeight(unsigned q) const
+inline Real FeElement::getWeight(unsigned q) const
 {
   return tetraRule_.getWeight(q);
 }
@@ -141,6 +143,6 @@ inline unsigned FeElement::sub2ind(unsigned t, unsigned p, unsigned f) const
   return f + dofNo_ * (p + t * tetraRule_.getPointsNo());
 }
 
-} // namespace dgfem
+} // namespace PolyDG
 
 #endif // _FE_ELEMENT_HPP_

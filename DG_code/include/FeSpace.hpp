@@ -6,17 +6,20 @@
 #include "FeFaceInt.hpp"
 #include "FeFaceExt.hpp"
 #include "QuadRuleManager.hpp"
+
+#include <Eigen/Core>
+
 #include <vector>
 #include <array>
-#include <Eigen/Core>
 #include <iostream>
 
-namespace dgfem {
+namespace PolyDG
+{
 
 class FeSpace
 {
 public:
-  using TheMesh = geom::Mesh;
+  using TheMesh = PolyDG::Mesh;
 
 // Constructor that takes a mesh Th, the order of polynomials order and the required
 // degrees of exactness for quadrature formulas
@@ -37,6 +40,8 @@ public:
   inline unsigned getFeElementsNo() const;
   inline unsigned getFeFacesIntNo() const;
   inline unsigned getFeFacesExtNo() const;
+
+  inline const TheMesh& getMesh() const;
 
   inline std::vector<FeElement>::const_iterator feElementsCbegin() const;
   inline std::vector<FeElement>::const_iterator feElementsCend() const;
@@ -121,6 +126,11 @@ inline unsigned FeSpace::getFeFacesExtNo() const
   return feFacesExt_.size();
 }
 
+inline const FeSpace::TheMesh& FeSpace::getMesh() const
+{
+  return Th_;
+}
+
 inline std::vector<FeElement>::const_iterator FeSpace::feElementsCbegin() const
 {
   return feElements_.cbegin();
@@ -151,6 +161,6 @@ inline std::vector<FeFaceExt>::const_iterator FeSpace::feFacesExtCend() const
   return feFacesExt_.cend();
 }
 
-}
+} // namespace PolyDG
 
 #endif // _FE_SPACE_HPP_

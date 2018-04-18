@@ -4,16 +4,17 @@
 #include "Problem.hpp"
 #include "Operators.hpp"
 #include "ExprOperators.hpp"
+
 #include <cmath>
 
-using namespace dgfem;
+using namespace PolyDG;
 
 int main()
 {
   std::string fileName = "../meshes/cube_str48t.mesh";
 
-  geom::MeshReaderPoly reader;
-  geom::Mesh Th(fileName, reader);
+  PolyDG::MeshReaderPoly reader;
+  PolyDG::Mesh Th(fileName, reader);
 
   unsigned r = 1;
   FeSpace Vh(Th, r);
@@ -40,7 +41,7 @@ int main()
   prob.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, symform);
 
   prob.integrateVolRhs(f * v);
-  prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+  prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
   std::cout << "\nSolving with SparseLU" << std::endl;
   prob.solveLU();

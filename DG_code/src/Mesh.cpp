@@ -1,10 +1,12 @@
 #include "Mesh.hpp"
+#include "Face.hpp"
+
 #include <algorithm>
 #include <unordered_set>
 #include <memory>
-#include "Face.hpp"
 
-namespace geom
+
+namespace PolyDG
 {
 
 Mesh::Mesh(const std::string& fileName, MeshReader& reader)
@@ -17,9 +19,9 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
   std::cout << "Informations about polyhedra have been computed." << std::endl;
 }
 
-real Mesh::getMaxDiameter() const
+Real Mesh::getMaxDiameter() const
 {
-  real hmax = polyhedra_[0].getDiameter();
+  Real hmax = polyhedra_[0].getDiameter();
 
   for(unsigned i = 1; i < polyhedra_.size(); i++)
     if(polyhedra_[i].getDiameter() > hmax)
@@ -41,7 +43,7 @@ void Mesh::printHead(std::ostream& out) const
 
 void Mesh::computeFaces()
 {
-  std::unordered_set<std::unique_ptr<geom::Face>> temp;
+  std::unordered_set<std::unique_ptr<PolyDG::Face>> temp;
   temp.reserve(tetrahedra_.size() * 4);
   facesInt_.reserve(tetrahedra_.size() * 2);
 
@@ -54,7 +56,7 @@ void Mesh::computeFaces()
       // std::cout << "Tetraedro " << t.getId() << " " << faceNo << std::endl;
 
       // The i-th face is that one without the (3-i)-th vertex.
-      auto res = temp.emplace(new geom::Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
+      auto res = temp.emplace(new PolyDG::Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
                                              t.getVertex(static_cast<unsigned>(faceNo < 2) + 1),
                                              t.getVertex(static_cast<unsigned>(faceNo < 3) + 2),
                                              t, 3 - faceNo));
@@ -78,7 +80,7 @@ void Mesh::computeFaces()
   // of the face.
   for(FaceExt& f : facesExt_)
   {
-    std::unique_ptr<geom::Face> fext(new geom::Face(f));
+    std::unique_ptr<PolyDG::Face> fext(new PolyDG::Face(f));
     auto got = temp.find(fext);
     // Metterci dei move?
     // f.setNormal((*got)->getNormal());
@@ -139,4 +141,4 @@ void Mesh::print(unsigned lineNo, std::ostream& out) const
   out << "----------------------" << std::endl;
 }
 
-} // namespace geom
+} // namespace PolyDG

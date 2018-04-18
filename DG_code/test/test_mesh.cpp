@@ -1,13 +1,14 @@
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 #include "FeSpace.hpp"
+
 #include <string>
 
 int main()
 {
-  using geom::MeshReaderPoly;
-  using geom::Mesh;
-  using dgfem::FeSpace;
+  using PolyDG::MeshReaderPoly;
+  using PolyDG::Mesh;
+  using PolyDG::FeSpace;
 
   std::string fileName = "../meshes/cube_str6t.mesh";
 

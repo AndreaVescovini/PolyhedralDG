@@ -1,9 +1,6 @@
 #ifndef _MESH_HPP_
 #define _MESH_HPP_
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include "MeshProxy.hpp"
 #include "MeshReader.hpp"
 #include "Vertex.hpp"
@@ -12,7 +9,12 @@
 #include "FaceInt.hpp"
 #include "Polyhedron.hpp"
 
-namespace geom {
+#include <vector>
+#include <string>
+#include <iostream>
+
+namespace PolyDG
+{
 
 class MeshReader;
 
@@ -29,9 +31,10 @@ public:
 
   inline unsigned getFacesExtNo() const;
   inline unsigned getFacesIntNo() const;
+  inline unsigned getTetrahedraNo() const;
   inline unsigned getPolyhedraNo() const;
 
-  real getMaxDiameter() const;
+  Real getMaxDiameter() const;
 
   // Prints all the informations about the mesh
   void printAll(std::ostream& out = std::cout) const;
@@ -50,10 +53,6 @@ private:
   std::vector<FaceExt> facesExt_;
   std::vector<FaceInt> facesInt_;
   std::vector<Polyhedron> polyhedra_;
-  // unsigned verticesNo_;
-  // unsigned tetrahedraNo_;
-  // unsigned polyhedraNo_;
-  // unsigned facesNo_;
 
   // Function that computes the internal faces of the mesh and completes
   // the information about the external ones.
@@ -94,11 +93,16 @@ inline unsigned Mesh::getFacesIntNo() const
   return facesInt_.size();
 }
 
+inline unsigned Mesh::getTetrahedraNo() const
+{
+  return tetrahedra_.size();
+}
+
 inline unsigned Mesh::getPolyhedraNo() const
 {
   return polyhedra_.size();
 }
 
-} // namespace geom
+} // namespace PolyDG
 
 #endif // _MESH_HPP_

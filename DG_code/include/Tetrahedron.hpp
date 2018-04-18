@@ -1,14 +1,19 @@
 #ifndef _TETRAHEDRON_HPP_
 #define _TETRAHEDRON_HPP_
 
-#include <array>
-#include <iostream>
-#include <Eigen/Geometry>
-#include "geom.hpp"
+#include "PolyDG.hpp"
 #include "Vertex.hpp"
 #include "Polyhedron.hpp"
 
-namespace geom {
+#include <Eigen/Geometry>
+
+#include <array>
+#include <iostream>
+
+
+
+namespace PolyDG
+{
 
 class Polyhedron;
 
@@ -33,10 +38,10 @@ public:
   inline void setPoly(Polyhedron& poly);
   inline unsigned getId() const;
 
-  inline const Eigen::Transform<real, 3, Eigen::AffineCompact>& getMap() const;
-  inline real getAbsDetJacobian() const;
+  inline const Eigen::Transform<Real, 3, Eigen::AffineCompact>& getMap() const;
+  inline Real getAbsDetJacobian() const;
 
-  static void resetCounter(unsigned counter = 0);
+  inline static void resetCounter(unsigned counter = 0);
 
   virtual ~Tetrahedron() = default;
 
@@ -46,8 +51,8 @@ private:
   const unsigned id_;
   std::array<std::reference_wrapper<Vertex>, 4> vertices_;
   Polyhedron* poly_;
-  Eigen::Transform<real, 3, Eigen::AffineCompact> map_;
-  real absDetJacobian_;
+  Eigen::Transform<Real, 3, Eigen::AffineCompact> map_;
+  Real absDetJacobian_;
   static unsigned counter_;
 };
 
@@ -92,16 +97,21 @@ inline unsigned Tetrahedron::getId() const
   return id_;
 }
 
-inline const Eigen::Transform<real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() const
+inline const Eigen::Transform<Real, 3, Eigen::AffineCompact>& Tetrahedron::getMap() const
 {
   return map_;
 }
 
-inline real Tetrahedron::getAbsDetJacobian() const
+inline Real Tetrahedron::getAbsDetJacobian() const
 {
   return absDetJacobian_;
 }
 
-} // namespace geom
+inline void Tetrahedron::resetCounter(unsigned counter)
+{
+  counter_ = counter;
+}
+
+} // namespace PolyDG
 
 #endif // _TETRAHEDRON_HPP_

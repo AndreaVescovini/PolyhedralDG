@@ -1,8 +1,10 @@
 #include "Face.hpp"
-#include <algorithm>
+
 #include <Eigen/Geometry>
 
-namespace geom {
+#include <algorithm>
+
+namespace PolyDG {
 
 Face::Face(Vertex& v1, Vertex& v2, Vertex& v3,
            Tetrahedron& tet1, unsigned faceNoTet1)
@@ -16,4 +18,4 @@ Face::Face(Vertex& v1, Vertex& v2, Vertex& v3,
   std::sort(vertices_.begin(), vertices_.end(), compId);
 }
 
-} // namespace geom
+} // namespace PolyDG

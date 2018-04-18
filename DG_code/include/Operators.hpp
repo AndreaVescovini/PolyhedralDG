@@ -1,14 +1,15 @@
 #ifndef _OPERATORS_HPP_
 #define _OPERATORS_HPP_
 
+#include "PolyDG.hpp"
 #include "FeElement.hpp"
 #include "FeFaceInt.hpp"
 #include "FeFaceExt.hpp"
-#include "geom.hpp"
 #include "ExprWrapper.hpp"
+
 #include <functional>
 
-namespace dgfem
+namespace PolyDG
 {
 
 class Stiff : public ExprWrapper<Stiff>
@@ -16,7 +17,7 @@ class Stiff : public ExprWrapper<Stiff>
 public:
   Stiff() = default;
 
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
 
   virtual ~Stiff() = default;
 };
@@ -26,7 +27,7 @@ class Mass : public ExprWrapper<Mass>
 public:
   Mass() = default;
 
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
 
   virtual ~Mass() = default;
 };
@@ -58,9 +59,9 @@ class PhiI : public ExprWrapper<PhiI>
 public:
   PhiI() = default;
 
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  inline geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+  inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
 
   virtual ~PhiI() = default;
 };
@@ -70,7 +71,7 @@ class PhiJ : public ExprWrapper<PhiJ>
 public:
   PhiJ() = default;
 
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
 
   virtual ~PhiJ() = default;
 };
@@ -122,16 +123,16 @@ public:
 class PenaltyScaling : public ExprWrapper<PenaltyScaling>
 {
 public:
-  explicit PenaltyScaling(geom::real sigma = 1.0);
+  explicit PenaltyScaling(Real sigma = 1.0);
 
-  inline geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  inline geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
-  inline geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~PenaltyScaling() = default;
 
 private:
-  geom::real sigma_;
+  Real sigma_;
 };
 
 class Normal : public ExprWrapper<Normal>
@@ -148,15 +149,15 @@ public:
 class Function : public ExprWrapper<Function>
 {
 public:
-  using fun3real = std::function<geom::real (const Eigen::Vector3d&)>;
+  using fun3real = std::function<Real (const Eigen::Vector3d&)>;
 
   explicit Function(const fun3real& fun);
 
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  inline geom::real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  inline geom::real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
-  inline geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  inline geom::real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
+  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
+  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
+  inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~Function() = default;
 
@@ -169,12 +170,12 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline geom::real Stiff::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+inline Real Stiff::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
 {
   return fe.getPhiDer(t, q, i).dot(fe.getPhiDer(t, q, j));
 }
 
-inline geom::real Mass::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+inline Real Mass::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
 {
   return fe.getPhi(t, q, i) * fe.getPhi(t, q, j);
 }
@@ -199,22 +200,22 @@ inline const Eigen::Vector3d& GradPhiJ::operator()(const FeElement& fe, unsigned
   return fe.getPhiDer(t, q, j);
 }
 
-inline geom::real PhiI::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+inline Real PhiI::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
 {
   return fe.getPhi(t, q, i);
 }
 
-inline geom::real PhiI::operator()(const FeElement& fe, unsigned i, unsigned /* j */, unsigned t, unsigned q) const
+inline Real PhiI::operator()(const FeElement& fe, unsigned i, unsigned /* j */, unsigned t, unsigned q) const
 {
   return this->operator()(fe, i, t, q);
 }
 
-inline geom::real PhiI::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+inline Real PhiI::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
 {
   return fe.getPhi(q, i);
 }
 
-inline geom::real PhiJ::operator()(const FeElement& fe, unsigned /* i */, unsigned j, unsigned t, unsigned q) const
+inline Real PhiJ::operator()(const FeElement& fe, unsigned /* i */, unsigned j, unsigned t, unsigned q) const
 {
   return fe.getPhi(t, q, j);
 }
@@ -259,17 +260,17 @@ inline const Eigen::Vector3d& AverGradPhiJ::operator()(const FeFaceExt& fe, unsi
   return fe.getPhiDer(q, j);
 }
 
-inline geom::real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* q */) const
+inline Real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* q */) const
 {
   return sigma_ * fe.getPenaltyParam();
 }
 
-inline geom::real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned /* q */) const
+inline Real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned /* q */) const
 {
   return sigma_ * fe.getPenaltyParam();
 }
 
-inline geom::real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, unsigned /* q */) const
+inline Real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, unsigned /* q */) const
 {
   return sigma_ * fe.getPenaltyParam();
 }
@@ -284,31 +285,31 @@ inline const Eigen::Vector3d& Normal::operator()(const FeFaceExt& fe, unsigned /
   return fe.getNormal();
 }
 
-inline geom::real Function::operator()(const FeElement& fe, unsigned /* i */, unsigned t, unsigned q) const
+inline Real Function::operator()(const FeElement& fe, unsigned /* i */, unsigned t, unsigned q) const
 {
   return fun_(fe.getQuadPoint(t, q));
 }
 
-inline geom::real Function::operator()(const FeElement& fe, unsigned /* i */, unsigned /* j */, unsigned t, unsigned q) const
+inline Real Function::operator()(const FeElement& fe, unsigned /* i */, unsigned /* j */, unsigned t, unsigned q) const
 {
   return fun_(fe.getQuadPoint(t, q));
 }
 
-inline geom::real Function::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned q) const
+inline Real Function::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned q) const
 {
   return fun_(fe.getQuadPoint(q));
 }
 
-inline geom::real Function::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned q) const
+inline Real Function::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned q) const
 {
   return fun_(fe.getQuadPoint(q));
 }
 
-inline geom::real Function::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, unsigned q) const
+inline Real Function::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, unsigned q) const
 {
   return fun_(fe.getQuadPoint(q));
 }
 
-} // namespace dgfem
+} // namespace PolyDG
 
 #endif // _OPERATORS_HPP_

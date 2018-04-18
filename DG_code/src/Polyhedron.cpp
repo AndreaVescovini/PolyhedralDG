@@ -1,8 +1,10 @@
 #include "Polyhedron.hpp"
+
 #include <algorithm>
 #include <iterator>
 
-namespace geom {
+namespace PolyDG
+{
 
 Polyhedron::Polyhedron()
   : id_{counter_}, diameter_{0.0}
@@ -33,11 +35,6 @@ void Polyhedron::computeDiameter()
       diameter_ = std::max(diameter_, i->get().distance(*j));
 }
 
-void Polyhedron::resetCounter(unsigned counter)
-{
-  counter_ = counter;
-}
-
 unsigned Polyhedron::counter_ = 0;
 
-} // namespace geom
+} // namespace PolyDG

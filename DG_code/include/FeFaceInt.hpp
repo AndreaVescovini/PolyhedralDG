@@ -1,34 +1,36 @@
 #ifndef _FE_FACE_INT_HPP_
 #define _FE_FACE_INT_HPP_
 
+#include "PolyDG.hpp"
 #include "FeFace.hpp"
 #include "FaceInt.hpp"
 #include "QuadRuleManager.hpp"
-#include <vector>
-#include <array>
-#include "geom.hpp"
+
 #include <Eigen/Core>
 
-namespace dgfem
+#include <vector>
+#include <array>
+
+namespace PolyDG
 {
 
 class FeFaceInt : public FeFace
 {
 public:
-  using TheFace = geom::FaceInt;
+  using TheFace = PolyDG::FaceInt;
 
   FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule2D& triaRule);
 
-  inline geom::real getPhi(int side, unsigned p, unsigned f) const;
+  inline Real getPhi(int side, unsigned p, unsigned f) const;
   inline const Eigen::Vector3d& getPhiDer(int side, unsigned p, unsigned f) const;
 
   inline unsigned getElem(int side) const;
 
   inline Eigen::Vector3d getQuadPoint(unsigned q) const override;
 
-  inline geom::real getAreaDoubled() const override;
+  inline Real getAreaDoubled() const override;
   inline const Eigen::Vector3d& getNormal() const override;
 
   void printBasis(std::ostream& out) const override;
@@ -53,7 +55,7 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline geom::real FeFaceInt::getPhi(int side, unsigned p, unsigned f) const
+inline Real FeFaceInt::getPhi(int side, unsigned p, unsigned f) const
 {
   return phi_[sub2ind(side, p, f)];
 }
@@ -74,7 +76,7 @@ inline Eigen::Vector3d FeFaceInt::getQuadPoint(unsigned q) const
                                      triaRule_.getPoint(q).homogeneous());
 }
 
-inline geom::real FeFaceInt::getAreaDoubled() const
+inline Real FeFaceInt::getAreaDoubled() const
 {
   return face_.getAreaDoubled();
 }
@@ -89,6 +91,6 @@ inline unsigned FeFaceInt::sub2ind(int side, unsigned p, unsigned f) const
   return side + 2 * (f + p * dofNo_);
 }
 
-} // namespace dgfem
+} // namespace PolyDG
 
 #endif // _FE_FACE_INT_HPP_

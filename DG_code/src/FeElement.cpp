@@ -1,8 +1,9 @@
 #include "FeElement.hpp"
 #include "Legendre.hpp"
+
 #include <cmath>
 
-namespace dgfem
+namespace PolyDG
 {
 
 FeElement::FeElement(const TheElem& elem, unsigned dofNo,
@@ -40,7 +41,7 @@ void FeElement::compute_basis()
       // loop over basis functions
       for(unsigned f = 0; f < dofNo_; f++)
       {
-        std::array<std::array<geom::real, 2>, 3> polval;
+        std::array<std::array<Real, 2>, 3> polval;
         for(unsigned i = 0; i < 3; i++)
         {
           // polval stores the value of the Legendre polynomial and its derivative
@@ -104,4 +105,4 @@ void FeElement::printBasisDer(std::ostream& out) const
   }
 }
 
-} // namespace dgfem
+} // namespace PolyDG

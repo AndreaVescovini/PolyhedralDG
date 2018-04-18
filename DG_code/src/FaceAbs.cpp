@@ -1,16 +1,18 @@
 #include "FaceAbs.hpp"
-#include <algorithm>
+
 #include <Eigen/Geometry>
 
-namespace geom {
+#include <algorithm>
+
+namespace PolyDG {
 
 FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real areaDoubled, Eigen::Vector3d normal,
+                 Real areaDoubled, Eigen::Vector3d normal,
                  Tetrahedron& tet1, unsigned faceNoTet1)
   :  FaceAbs(v1, v2, v3, areaDoubled, normal, &tet1, faceNoTet1) {}
 
 FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-                 real areaDoubled, Eigen::Vector3d normal,
+                 Real areaDoubled, Eigen::Vector3d normal,
                  Tetrahedron* tet1, unsigned faceNoTet1)
   :  Face(v1, v2, v3, tet1, faceNoTet1),
      id_{counter_}, areaDoubled_{areaDoubled}, normal_{normal}
@@ -55,11 +57,6 @@ void FaceAbs::checkNormalSign()
   // std::cout << "Checked normal sign" << std::endl;
 }
 
-void FaceAbs::resetCounter(unsigned counter)
-{
-  counter_ = counter;
-}
-
 std::ostream& operator<<(std::ostream& out, const FaceAbs& FaceAbs)
 {
   FaceAbs.print(out);
@@ -68,4 +65,4 @@ std::ostream& operator<<(std::ostream& out, const FaceAbs& FaceAbs)
 
 unsigned FaceAbs::counter_ = 0;
 
-}
+} // namespace PolyDG

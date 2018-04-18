@@ -1,16 +1,19 @@
 #ifndef _POLYHEDRON_HPP_
 #define _POLYHEDRON_HPP_
 
+#include "PolyDG.hpp"
+#include "Vertex.hpp"
+#include "Tetrahedron.hpp"
+
+#include <Eigen/Geometry>
+
 #include <vector>
 #include <array>
 #include <functional>
 #include <unordered_set>
-#include <Eigen/Geometry>
-#include "geom.hpp"
-#include "Vertex.hpp"
-#include "Tetrahedron.hpp"
 
-namespace geom {
+namespace PolyDG
+{
 
 class Tetrahedron;
 
@@ -23,7 +26,7 @@ public:
   inline void addTetra(Tetrahedron& tet);
   inline void addVertex(Vertex& v);
 
-  inline real getDiameter() const;
+  inline Real getDiameter() const;
   inline const Tetrahedron& getTetra(unsigned i) const;
   inline Tetrahedron& getTetra(unsigned i);
   inline unsigned getTetrahedraNo() const;
@@ -39,7 +42,7 @@ public:
   // inside the polyhderon.
   void computeDiameter();
 
-  static void resetCounter(unsigned counter = 0);
+  inline static void resetCounter(unsigned counter = 0);
 
   virtual ~Polyhedron() = default;
 
@@ -51,7 +54,7 @@ private:
   std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> vertices_;
   // std::array<interval, 3> boundingBox_;
   Eigen::AlignedBox3d boundingBox_;
-  real diameter_;
+  Real diameter_;
 
   static unsigned counter_;
 };
@@ -70,7 +73,7 @@ inline void Polyhedron::addVertex(Vertex& v)
   vertices_.emplace(v);
 }
 
-inline real Polyhedron::getDiameter() const
+inline Real Polyhedron::getDiameter() const
 {
   return diameter_;
 }
@@ -100,6 +103,11 @@ inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
   return boundingBox_;
 }
 
-} // namespace geom
+inline void Polyhedron::resetCounter(unsigned counter)
+{
+  counter_ = counter;
+}
+
+} // namespace PolyDG
 
 #endif // _POLYHEDRON_HPP_

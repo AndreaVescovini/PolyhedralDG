@@ -1,6 +1,6 @@
 #include "FeSpace.hpp"
 
-namespace dgfem {
+namespace PolyDG {
 
 FeSpace::FeSpace(TheMesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
   : Th_{Th}, order_{order},

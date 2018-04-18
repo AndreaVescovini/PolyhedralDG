@@ -1,10 +1,12 @@
 #ifndef _MESH_READER_HPP_
 #define _MESH_READER_HPP_
 
-#include <string>
 #include "Mesh.hpp"
 
-namespace geom {
+#include <string>
+
+namespace PolyDG
+{
 
 class Mesh;
 
@@ -18,6 +20,6 @@ public:
   virtual ~MeshReader() = default;
 };
 
-}
+} // namespace PolyDG
 
 #endif // _MESH_READER_HPP_

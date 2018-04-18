@@ -1,19 +1,21 @@
 #ifndef _PROBLEM_HPP_
 #define _PROBLEM_HPP_
 
+#include "PolyDG.hpp"
 #include "FeSpace.hpp"
-#include "geom.hpp"
-#include <Eigen/Sparse>
+#include "ExprWrapper.hpp"
+
 #include <Eigen/Core>
+#include <Eigen/Sparse>
+
 #include <vector>
 #include <iostream>
-#include "ExprWrapper.hpp"
 #include <iterator>
 #include <algorithm>
 #include <functional>
 #include <string>
 
-namespace dgfem
+namespace PolyDG
 {
 
 class Problem
@@ -28,41 +30,41 @@ public:
   void integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr = false);
 
   template <typename T>
-  void integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel = 1, bool symExpr = false);
+  void integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool symExpr = false);
 
   template <typename T>
   void integrateVolRhs(const ExprWrapper<T>& expr);
 
   template <typename T>
-  void integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel = 1);
+  void integrateFacesExtRhs(const ExprWrapper<T>& expr, BCtype bcLabel);
 
   void solveLU();
   void solveChol();
-  void solveCG(const Eigen::VectorXd& x0, unsigned iterMax,
-               geom::real tol = Eigen::NumTraits<geom::real>::epsilon());
+  void solveCG(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
+               Real tol = Eigen::NumTraits<Real>::epsilon());
 
-  geom::real computeErrorL2(const std::function<geom::real (const Eigen::Vector3d&)>& uex) const;
-  geom::real computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const;
+  Real computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>& uex) const;
+  Real computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const;
 
   void exportSolutionVTK(const std::string& fileName) const;
 
   inline void isSymmetric(bool sym);
   inline bool getSymmetry() const;
 
-  inline const Eigen::SparseMatrix<geom::real> getMatrix() const;
+  inline const Eigen::SparseMatrix<Real> getMatrix() const;
   inline const Eigen::VectorXd getRhs() const;
   inline const Eigen::VectorXd getSolution() const;
   inline unsigned getDim() const;
 
-  void clearMatrix();
-  void clearRhs();
+  inline void clearMatrix();
+  inline void clearRhs();
 
   virtual ~Problem() = default;
 
 private:
   const FeSpace& Vh_;
   unsigned dim_;
-  Eigen::SparseMatrix<geom::real> A_;
+  Eigen::SparseMatrix<Real> A_;
   // std::vector<triplet> tripletList
   Eigen::VectorXd b_;
   Eigen::VectorXd u_;
@@ -99,7 +101,7 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
       for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
       {
-        geom::real sum = 0.0;
+        Real sum = 0.0;
         for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
           for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
             sum += exprDerived(*it, i, j, t, q) * it->getWeight(q) * it->getAbsDetJac(t);
@@ -110,7 +112,7 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
     elemNo++;
   }
 
-  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+  Eigen::SparseMatrix<Real> curA(dim_, dim_);
 
   curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
@@ -157,7 +159,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
             if(symExpr == true && indexOffset[side1] > indexOffset[side2] && i == j)
               continue;
 
-            geom::real sum = 0.0;
+            Real sum = 0.0;
 
             for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
               sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
@@ -169,7 +171,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
           }
   }
 
-  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+  Eigen::SparseMatrix<Real> curA(dim_, dim_);
 
   curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
@@ -190,7 +192,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
 }
 
 template <typename T>
-void Problem::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bool symExpr)
+void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool symExpr)
 {
   const T& exprDerived(expr);
 
@@ -206,14 +208,14 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bo
     tripletList.reserve(Vh_.getFeFacesExtNo() * Vh_.getDofNo() * Vh_.getDofNo());
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
-    if(it->getBClabel() == BClabel)
+    if(it->getBClabel() == bcLabel)
     {
       unsigned indexOffset = it->getElem() * Vh_.getDofNo();
 
       for(unsigned j = 0; j < Vh_.getDofNo(); j++)
         for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
         {
-          geom::real sum = 0.0;
+          Real sum = 0.0;
 
           for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
             sum += exprDerived(*it, i, j, q) * it->getWeight(q) * it->getAreaDoubled();
@@ -226,7 +228,7 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, unsigned BClabel, bo
   // the memory consnmption.
   tripletList.shrink_to_fit();
 
-  Eigen::SparseMatrix<geom::real> curA(dim_, dim_);
+  Eigen::SparseMatrix<Real> curA(dim_, dim_);
 
   curA.setFromTriplets(tripletList.begin(), tripletList.end());
 
@@ -269,12 +271,12 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 }
 
 template <typename T>
-void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, unsigned BClabel)
+void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCtype bcLabel)
 {
   const T& exprDerived(expr);
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
-    if(it->getBClabel() == BClabel)
+    if(it->getBClabel() == bcLabel)
     {
       unsigned indexOffset = it->getElem() * Vh_.getDofNo();
       for(unsigned i = 0; i < Vh_.getDofNo(); i++)
@@ -297,7 +299,7 @@ inline void Problem::isSymmetric(bool sym)
   sym_ = sym;
 }
 
-inline const Eigen::SparseMatrix<geom::real> Problem::getMatrix() const
+inline const Eigen::SparseMatrix<Real> Problem::getMatrix() const
 {
   return A_;
 }
@@ -317,6 +319,16 @@ inline unsigned Problem::getDim() const
   return dim_;
 }
 
-} // namespace dgfem
+inline void Problem::clearMatrix()
+{
+  A_.setZero();
+}
+
+inline void Problem::clearRhs()
+{
+  b_ = Eigen::VectorXd::Zero(dim_);
+}
+
+} // namespace PolyDG
 
 #endif // _PROBLEM_HPP_

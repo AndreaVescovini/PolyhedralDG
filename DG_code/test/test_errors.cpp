@@ -4,11 +4,13 @@
 #include "Problem.hpp"
 #include "Operators.hpp"
 #include "ExprOperators.hpp"
-#include <cmath>
-#include <Eigen/Core>
-#include "chrono.hpp"
 
-using namespace dgfem;
+#include "chrono.hpp"
+#include <Eigen/Core>
+
+#include <cmath>
+
+using namespace PolyDG;
 
 int main()
 {
@@ -38,7 +40,7 @@ int main()
   // auto source = [](Eigen::Vector3d x) { return -20*x(1)-6*x(0);};
   // auto uexGrad = [](Eigen::Vector3d x) { return Eigen::Vector3d(3*x(0)*x(0), 10*x(2)*x(2), 20*x(1)*x(2)); };
 
-  geom::MeshReaderPoly reader;
+  PolyDG::MeshReaderPoly reader;
 
   PhiI v;
   GradPhiJ uGrad;
@@ -58,7 +60,7 @@ int main()
 
   for(unsigned i = 0; i < fileNames.size(); i++)
   {
-    geom::Mesh Th(fileNames[i], reader);
+    PolyDG::Mesh Th(fileNames[i], reader);
     FeSpace Vh(Th, r);
 
     Problem prob(Vh, true);
@@ -68,9 +70,11 @@ int main()
     prob.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), symform);
     prob.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, symform);
     prob.integrateVolRhs(f * v);
-    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v);
+    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
+    // prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 1000);
     prob.solveChol();
+    // prob.solveLU();
 
     errL2.push_back(prob.computeErrorL2(uex));
     errH10.push_back(prob.computeErrorH10(uexGrad));
@@ -79,7 +83,7 @@ int main()
     std::cout << "Error L2 = " << errL2.back() << std::endl;
     std::cout << "Error H10 = " << errH10.back() << '\n' << std::endl;
 
-    // std::cout << prob.getSolution() << std::endl;
+    // std::cout << prob.getDim() << std::endl;
   }
 
 

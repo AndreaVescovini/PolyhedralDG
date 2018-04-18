@@ -1,8 +1,11 @@
 #include "Tetrahedron.hpp"
+
 #include <Eigen/Core>
+
 #include <cmath>
 
-namespace geom {
+namespace PolyDG
+{
 
 Tetrahedron::Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
                          Polyhedron* poly)
@@ -22,11 +25,6 @@ Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
                          Polyhedron& poly)
   : Tetrahedron(v1, v2, v3, v4, &poly) {}
 
-void Tetrahedron::resetCounter(unsigned counter)
-{
-  counter_ = counter;
-}
-
 std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra)
 {
   out << tetra.id_ << " " << "V: " << tetra.vertices_[0].get().getId() << " "
@@ -39,4 +37,4 @@ std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra)
 
 unsigned Tetrahedron::counter_ = 0;
 
-} // namespace geom
+} // namespace PolyDG
