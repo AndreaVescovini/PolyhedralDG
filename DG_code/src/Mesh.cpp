@@ -43,7 +43,7 @@ void Mesh::printHead(std::ostream& out) const
 
 void Mesh::computeFaces()
 {
-  std::unordered_set<std::unique_ptr<PolyDG::Face>> temp;
+  std::unordered_set<std::unique_ptr<Face>> temp;
   temp.reserve(tetrahedra_.size() * 4);
   facesInt_.reserve(tetrahedra_.size() * 2);
 
@@ -80,7 +80,7 @@ void Mesh::computeFaces()
   // of the face.
   for(FaceExt& f : facesExt_)
   {
-    std::unique_ptr<PolyDG::Face> fext(new PolyDG::Face(f));
+    std::unique_ptr<Face> fext(new Face(f));
     auto got = temp.find(fext);
     // Metterci dei move?
     // f.setNormal((*got)->getNormal());
@@ -99,13 +99,13 @@ void Mesh::computePolyInfo()
   for(FaceInt& f : facesInt_)
     for(unsigned i = 0; i < 3; i++)
     {
-      f.getTet1().getPoly().addVertex(f.getVertex(i));
-      f.getTet2().getPoly().addVertex(f.getVertex(i));
+      f.getTet1().getPoly().addVertexExt(f.getVertex(i));
+      f.getTet2().getPoly().addVertexExt(f.getVertex(i));
     }
 
   for(FaceExt& f : facesExt_)
     for(unsigned i = 0; i < 3; i++)
-      f.getTet1().getPoly().addVertex(f.getVertex(i));
+      f.getTet1().getPoly().addVertexExt(f.getVertex(i));
 
   for(Polyhedron& p : polyhedra_)
   {

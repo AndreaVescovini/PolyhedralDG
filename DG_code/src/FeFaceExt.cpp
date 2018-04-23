@@ -47,11 +47,11 @@ void FeFaceExt::compute_basis()
       // Loop over the three coordinates
       for(unsigned i = 0; i < 3; i++)
       {
-        polval[i] = basis::legendre(basisComposition_[f][i], physicPt[i]);
+        polval[i] = basis::legendre(basisComposition_[f][i], physicPt(i));
 
         // I rescale the results in order to have the scaled Legendre polynomials
-        polval[i][0] /= std::sqrt(hb[i]);
-        polval[i][1] /= (std::sqrt(hb[i]) * hb[i]);
+        polval[i][0] /= std::sqrt(hb(i));
+        polval[i][1] /= (std::sqrt(hb(i)) * hb(i));
       }
 
       phi_.emplace_back(polval[0][0] * polval[1][0] * polval[2][0]);

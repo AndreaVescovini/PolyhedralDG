@@ -11,7 +11,7 @@ using namespace PolyDG;
 
 int main()
 {
-  std::string fileName = "../meshes/cube_str48t.mesh";
+  std::string fileName = "/vagrant/pacs/progetto_codici/meshes/cube_str48h.mesh";
 
   PolyDG::MeshReaderPoly reader;
   PolyDG::Mesh Th(fileName, reader);
@@ -43,17 +43,19 @@ int main()
   prob.integrateVolRhs(f * v);
   prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
-  std::cout << "\nSolving with SparseLU" << std::endl;
-  prob.solveLU();
-  std::cout << prob.getSolution() << '\n' << std::endl;
+  // std::cout << "\nSolving with SparseLU" << std::endl;
+  // prob.solveLU();
+  // std::cout << prob.getSolution() << '\n' << std::endl;
 
   std::cout << "\nSolving with SparseCholesky" << std::endl;
   prob.solveChol();
   std::cout << prob.getSolution() << '\n' <<  std::endl;
 
-  std::cout << "\nSolving with ConjugateGradient" << std::endl;
-  prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 2 * prob.getDim());
-  std::cout << prob.getSolution() << std::endl;
+  // std::cout << "\nSolving with ConjugateGradient" << std::endl;
+  // prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 2 * prob.getDim());
+  // std::cout << prob.getSolution() << std::endl;
+
+  prob.exportSolutionVTK("output.vtu");
 
   return 0;
 }

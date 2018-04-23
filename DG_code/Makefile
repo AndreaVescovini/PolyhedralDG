@@ -42,7 +42,7 @@ WFLAGS += -Wall -Wextra -pedantic
 STDFLAG += -std=c++11
 
 ifdef RELEASE
-OPTFLAGS += -O3 -DNDEBUG #-DINLINE
+OPTFLAGS += -O3 -DNDEBUG -pg#-DINLINE
 else
 OPTFLAGS += -g #-DVERBOSITY
 endif

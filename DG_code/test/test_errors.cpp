@@ -22,7 +22,7 @@ int main()
   // fileNames.push_back("../meshes/cube_str48t.mesh");
   // fileNames.push_back("../meshes/cube_str384t.mesh");
   // fileNames.push_back("../meshes/cube_str1296t.mesh");
-  fileNames.push_back("../meshes/cube_str3072ht.mesh");
+  fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str3072ht.mesh");
 
   auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
   auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +

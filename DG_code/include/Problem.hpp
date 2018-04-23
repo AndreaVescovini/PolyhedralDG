@@ -62,15 +62,18 @@ public:
   virtual ~Problem() = default;
 
 private:
+  using triplet = Eigen::Triplet<double>;
+
   const FeSpace& Vh_;
   unsigned dim_;
   Eigen::SparseMatrix<Real> A_;
   // std::vector<triplet> tripletList
   Eigen::VectorXd b_;
   Eigen::VectorXd u_;
-
   bool sym_;
 
+  Real evalSolution(Real x, Real y, Real z, const FeElement& el) const;
+  void updateMatrix(const std::vector<triplet>& tripletList, bool symExpr);
 };
 
 //----------------------------------------------------------------------------//
@@ -83,7 +86,6 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
   // I exploit the conversion to derived
   const T& exprDerived(expr);
 
-  using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
 
   // If the variational form is symmetric I store only half elements
@@ -92,11 +94,9 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
   else
     tripletList.reserve(dim_ * Vh_.getDofNo());
 
-  unsigned elemNo = 0;
-
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = elemNo * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
 
     for(unsigned j = 0; j < Vh_.getDofNo(); j++)
       for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
@@ -108,28 +108,9 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool symExpr)
 
         tripletList.emplace_back(i + indexOffset, j + indexOffset, sum);
       }
-
-    elemNo++;
   }
 
-  Eigen::SparseMatrix<Real> curA(dim_, dim_);
-
-  curA.setFromTriplets(tripletList.begin(), tripletList.end());
-
-  // I remove numerical zeros, I hope it works well
-  curA.prune(A_.coeff(0,0));
-
-  if(sym_ == symExpr)
-    A_ += curA;
-  else if(sym_ == false && symExpr == true)
-    A_ += curA.selfadjointView<Eigen::Upper>();
-  else
-  {
-    std::cerr << "The symmetry has been broken" << std::endl;
-    sym_ = false;
-    A_ = A_.selfadjointView<Eigen::Upper>();
-    A_ += curA;
-  }
+  updateMatrix(tripletList, symExpr);
 }
 
 template <typename T>
@@ -137,7 +118,6 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
 {
   const T& exprDerived(expr);
 
-  using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
 
   // If the variational form is symmetric I store only half elements
@@ -171,24 +151,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
           }
   }
 
-  Eigen::SparseMatrix<Real> curA(dim_, dim_);
-
-  curA.setFromTriplets(tripletList.begin(), tripletList.end());
-
-  // I remove numerical zeros, I hope it works well
-  curA.prune(A_.coeff(0,0));
-
-  if(sym_ == symExpr)
-    A_ += curA;
-  else if(sym_ == false && symExpr == true)
-    A_ += curA.selfadjointView<Eigen::Upper>();
-  else
-  {
-    std::cerr << "The symmetry has been broken" << std::endl;
-    sym_ = false;
-    A_ = A_.selfadjointView<Eigen::Upper>();
-    A_ += curA;
-  }
+  updateMatrix(tripletList, symExpr);
 }
 
 template <typename T>
@@ -196,7 +159,6 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool
 {
   const T& exprDerived(expr);
 
-  using triplet = Eigen::Triplet<double>;
   std::vector<triplet> tripletList;
 
   // If the variational form is symmetric I store only half elements,
@@ -228,24 +190,7 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool
   // the memory consnmption.
   tripletList.shrink_to_fit();
 
-  Eigen::SparseMatrix<Real> curA(dim_, dim_);
-
-  curA.setFromTriplets(tripletList.begin(), tripletList.end());
-
-  // I remove numerical zeros, I hope it works well
-  curA.prune(A_.coeff(0,0));
-
-  if(sym_ == symExpr)
-    A_ += curA;
-  else if(sym_ == false && symExpr == true)
-    A_ += curA.selfadjointView<Eigen::Upper>();
-  else
-  {
-    std::cerr << "The symmetry has been broken" << std::endl;
-    sym_ = false;
-    A_ = A_.selfadjointView<Eigen::Upper>();
-    A_ += curA;
-  }
+  updateMatrix(tripletList, symExpr);
 }
 
 template <typename T>
@@ -253,11 +198,9 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 {
   const T& exprDerived(expr);
 
-  unsigned elemNo = 0;
-
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = elemNo * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
 
     for(unsigned i = 0; i < Vh_.getDofNo(); i++)
       for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
@@ -265,7 +208,6 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
           b_(i + indexOffset) += exprDerived(*it, i, t, q) *
                                  it->getWeight(q) *
                                  it->getAbsDetJac(t);
-    elemNo++;
   }
 
 }

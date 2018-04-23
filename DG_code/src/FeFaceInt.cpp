@@ -55,14 +55,14 @@ void FeFaceInt::compute_basis()
       for(unsigned i = 0; i < 3; i++)
       {
         // I compute the basis for both the sides of the face
-        polval[i] = basis::legendre(basisComposition_[f][i], physicPt[i]);
-        polval2[i] = basis::legendre(basisComposition_[f][i], physicPt2[i]);
+        polval[i] = basis::legendre(basisComposition_[f][i], physicPt(i));
+        polval2[i] = basis::legendre(basisComposition_[f][i], physicPt2(i));
 
         // I rescale the results in order to have the scaled Legendre polynomials
-        polval[i][0] /= std::sqrt(hb[i]);
-        polval[i][1] /= (std::sqrt(hb[i]) * hb[i]);
-        polval2[i][0] /= std::sqrt(hb2[i]);
-        polval2[i][1] /= (std::sqrt(hb2[i]) * hb2[i]);
+        polval[i][0] /= std::sqrt(hb(i));
+        polval[i][1] /= (std::sqrt(hb(i)) * hb(i));
+        polval2[i][0] /= std::sqrt(hb2(i));
+        polval2[i][1] /= (std::sqrt(hb2(i)) * hb2(i));
       }
 
       phi_.emplace_back(polval[0][0] * polval[1][0] * polval[2][0]);

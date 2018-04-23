@@ -42,6 +42,7 @@ public:
   inline unsigned getFeFacesExtNo() const;
 
   inline const TheMesh& getMesh() const;
+  inline const std::vector<std::array<unsigned, 3>>& getBasisComposition() const;
 
   inline std::vector<FeElement>::const_iterator feElementsCbegin() const;
   inline std::vector<FeElement>::const_iterator feElementsCend() const;
@@ -129,6 +130,11 @@ inline unsigned FeSpace::getFeFacesExtNo() const
 inline const FeSpace::TheMesh& FeSpace::getMesh() const
 {
   return Th_;
+}
+
+inline const std::vector<std::array<unsigned, 3>>& FeSpace::getBasisComposition() const
+{
+  return basisComposition_;
 }
 
 inline std::vector<FeElement>::const_iterator FeSpace::feElementsCbegin() const

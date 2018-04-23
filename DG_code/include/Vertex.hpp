@@ -49,6 +49,7 @@ public:
   // friend bool compY(const Vertex& lhs, const Vertex& rhs);
   // friend bool compZ(const Vertex& lhs, const Vertex& rhs);
   inline friend bool compId(const Vertex& lhs, const Vertex& rhs);
+  inline friend bool operator==(const Vertex& lhs, const Vertex& rhs);
 
 private:
   const unsigned id_;
@@ -62,13 +63,8 @@ std::ostream& operator<<(std::ostream& out, const Vertex& v);
 // bool compX(const Vertex& lhs, const Vertex& rhs);
 // bool compY(const Vertex& lhs, const Vertex& rhs);
 // bool compZ(const Vertex& lhs, const Vertex& rhs);
-bool compId(const Vertex& lhs, const Vertex& rhs);
-
-template <typename D>
-void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
-{
-  coords_ = coords;
-}
+inline bool compId(const Vertex& lhs, const Vertex& rhs);
+inline bool operator==(const Vertex& v1, const Vertex& v2);
 
 } // namespace PolyDG
 
@@ -112,17 +108,17 @@ inline const Eigen::Vector3d& Vertex::getCoords() const
 
 inline Real Vertex::getX() const
 {
-  return coords_[0];
+  return coords_(0);
 }
 
 inline Real Vertex::getY() const
 {
-  return coords_[1];
+  return coords_(1);
 }
 
 inline Real Vertex::getZ() const
 {
-  return coords_[2];
+  return coords_(2);
 }
 
 inline unsigned Vertex::getId() const
@@ -135,14 +131,25 @@ inline Real Vertex::distance(const Vertex& v2) const
   return (this->getCoords() - v2.getCoords()).norm();
 }
 
+inline void Vertex::resetCounter(unsigned counter)
+{
+  counter_ = counter;
+}
+
+template <typename D>
+void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
+{
+  coords_ = coords;
+}
+
 inline bool compId(const Vertex& lhs, const Vertex& rhs)
 {
   return lhs.id_ < rhs.id_;
 }
 
-inline void Vertex::resetCounter(unsigned counter)
+inline bool operator==(const Vertex& v1, const Vertex& v2)
 {
-  counter_ = counter;
+  return std::equal_to<Vertex>()(v1, v2);
 }
 
 } // namespace PolyDG

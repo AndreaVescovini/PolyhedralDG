@@ -24,7 +24,7 @@ public:
   Polyhedron();
 
   inline void addTetra(Tetrahedron& tet);
-  inline void addVertex(Vertex& v);
+  inline void addVertexExt(Vertex& v);
 
   inline Real getDiameter() const;
   inline const Tetrahedron& getTetra(unsigned i) const;
@@ -32,6 +32,7 @@ public:
   inline unsigned getTetrahedraNo() const;
   inline unsigned getId() const;
   inline const Eigen::AlignedBox3d& getBoundingBox() const;
+  inline unsigned getVerticesExtNo() const;
 
   // Function that starting from the unordered set of vertices computes the
   // cartesian bounding box of the polyhedron.
@@ -51,7 +52,7 @@ private:
   std::vector<std::reference_wrapper<Tetrahedron>> tetrahedra_;
 
   // Here I store vertices coming from faces
-  std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> vertices_;
+  std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> verticesExt_;
   // std::array<interval, 3> boundingBox_;
   Eigen::AlignedBox3d boundingBox_;
   Real diameter_;
@@ -68,9 +69,9 @@ inline void Polyhedron::addTetra(Tetrahedron& tet)
   tetrahedra_.emplace_back(tet);
 }
 
-inline void Polyhedron::addVertex(Vertex& v)
+inline void Polyhedron::addVertexExt(Vertex& v)
 {
-  vertices_.emplace(v);
+  verticesExt_.emplace(v);
 }
 
 inline Real Polyhedron::getDiameter() const
@@ -101,6 +102,11 @@ inline unsigned Polyhedron::getId() const
 inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
 {
   return boundingBox_;
+}
+
+inline unsigned Polyhedron::getVerticesExtNo() const
+{
+  return verticesExt_.size();
 }
 
 inline void Polyhedron::resetCounter(unsigned counter)

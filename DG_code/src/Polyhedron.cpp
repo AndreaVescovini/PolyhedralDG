@@ -22,7 +22,7 @@ void Polyhedron::computeBB()
   // boundingBox_[2][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compZ)->get().getZ();
   // boundingBox_[2][1] = std::max_element(vertices_.cbegin(), vertices_.cend(), compZ)->get().getZ();
 
-  for(auto it = vertices_.cbegin(); it != vertices_.cend(); it++)
+  for(auto it = verticesExt_.cbegin(); it != verticesExt_.cend(); it++)
     boundingBox_.extend(it->get().getCoords());
 }
 
@@ -30,8 +30,8 @@ void Polyhedron::computeDiameter()
 {
   diameter_ = 0.0;
 
-  for(auto i = vertices_.cbegin(); i != vertices_.cend(); i++)
-    for(auto j = std::next(i); j != vertices_.cend(); j++)
+  for(auto i = verticesExt_.cbegin(); i != verticesExt_.cend(); i++)
+    for(auto j = std::next(i); j != verticesExt_.cend(); j++)
       diameter_ = std::max(diameter_, i->get().distance(*j));
 }
 

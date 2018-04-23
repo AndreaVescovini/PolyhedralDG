@@ -62,7 +62,9 @@ public:
 
 private:
 // Virtual constructor, copy-constructor and destructor, because this class
-// contains only static methods and should be a simgleton
+// contains only static methods and should be a singleton
+
+// è meglio usare delete (ho letto sul libro)
   QuadRuleManager() = default;
   QuadRuleManager(const QuadRuleManager& man) = default;
   virtual ~QuadRuleManager() = default;

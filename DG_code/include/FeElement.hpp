@@ -54,6 +54,9 @@ public:
 // Returns the q-th quadrature point in the tetrahedron t
   inline Eigen::Vector3d getQuadPoint(unsigned t, unsigned q) const;
 
+// Returns the a const reference to the geomentrical element
+  inline const TheElem& getElem() const;
+
 // Prints all the computed values of the basis functions
   void printBasis(std::ostream& out = std::cout) const;
 
@@ -141,6 +144,11 @@ inline Eigen::Vector3d FeElement::getQuadPoint(unsigned t, unsigned q) const
 inline unsigned FeElement::sub2ind(unsigned t, unsigned p, unsigned f) const
 {
   return f + dofNo_ * (p + t * tetraRule_.getPointsNo());
+}
+
+inline const FeElement::TheElem& FeElement::getElem() const
+{
+  return elem_;
 }
 
 } // namespace PolyDG
