@@ -2,3 +2,7 @@
 obj/
 bin/
 .d
+
+# I ignore output files
+*.vtk
+*.vtu
