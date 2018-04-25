@@ -79,7 +79,7 @@ struct equal_to<PolyDG::Vertex>
 {
   bool operator()(const PolyDG::Vertex& lhs, const PolyDG::Vertex& rhs) const
   {
-    return equal_to<unsigned>()(lhs.getId(), rhs.getId());
+    return lhs == rhs;
   }
 };
 
@@ -128,7 +128,7 @@ inline unsigned Vertex::getId() const
 
 inline Real Vertex::distance(const Vertex& v2) const
 {
-  return (this->getCoords() - v2.getCoords()).norm();
+  return (coords_ - v2.getCoords()).norm();
 }
 
 inline void Vertex::resetCounter(unsigned counter)
@@ -147,9 +147,9 @@ inline bool compId(const Vertex& lhs, const Vertex& rhs)
   return lhs.id_ < rhs.id_;
 }
 
-inline bool operator==(const Vertex& v1, const Vertex& v2)
+inline bool operator==(const Vertex& lhs, const Vertex& rhs)
 {
-  return std::equal_to<Vertex>()(v1, v2);
+  return lhs.id_ == rhs.id_;
 }
 
 } // namespace PolyDG

@@ -1,6 +1,7 @@
 #include "FeSpace.hpp"
 
-namespace PolyDG {
+namespace PolyDG
+{
 
 FeSpace::FeSpace(TheMesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
   : Th_{Th}, order_{order},
@@ -136,4 +137,4 @@ void FeSpace::printFaceBasisDer(std::ostream& out) const
   out << "------------------------------------------------------" << std::endl;
 }
 
-}
+} // namespace PolyDG

@@ -131,23 +131,36 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool symExpr)
     std::array<unsigned, 2> indexOffset = { it->getElem(0) * Vh_.getDofNo(),
                                             it->getElem(1) * Vh_.getDofNo() };
 
-    for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
-        for(int side1 = 0; side1 < 2; side1++)
-          for(int side2 = 0; side2 < 2; side2++)
-          {
-            if(symExpr == true && indexOffset[side1] > indexOffset[side2] && i == j)
-              continue;
+    // for(unsigned j = 0; j < Vh_.getDofNo(); j++)
+    //   for(unsigned i = 0; i < (symExpr == true ? j + 1 : Vh_.getDofNo()); i++)
+    //     for(int side1 = 0; side1 < 2; side1++)
+    //       for(int side2 = 0; side2 < 2; side2++)
+    //       {
+    //         if(symExpr == true && indexOffset[side1] > indexOffset[side2] && i == j)
+    //           continue;
+    //
+    //         Real sum = 0.0;
+    //
+    //         for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+    //           sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
+    //
+    //         unsigned rowIndex = (symExpr == true ? std::min(i + indexOffset[side1], j + indexOffset[side2]) : i + indexOffset[side1] );
+    //         unsigned colIndex = (symExpr == true ? std::max(i + indexOffset[side1], j + indexOffset[side2]) : j + indexOffset[side2] );
+    //
+    //         tripletList.emplace_back(rowIndex, colIndex, sum);
+    //       }
 
+    for(int side2 = 0; side2 < 2; side2++)
+      for(int side1 = 0; side1 < (symExpr == true ? side2 + 1 : 2); side1++)
+        for(unsigned j = 0; j < Vh_.getDofNo(); j++)
+          for(unsigned i = 0; i < (symExpr == true && side1 == side2 ? j + 1 : Vh_.getDofNo()); i++)
+          {
             Real sum = 0.0;
 
             for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
               sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
 
-            unsigned rowIndex = (symExpr == true ? std::min(i + indexOffset[side1], j + indexOffset[side2]) : i + indexOffset[side1] );
-            unsigned colIndex = (symExpr == true ? std::max(i + indexOffset[side1], j + indexOffset[side2]) : j + indexOffset[side2] );
-
-            tripletList.emplace_back(rowIndex, colIndex, sum);
+            tripletList.emplace_back(i + indexOffset[side1], j + indexOffset[side2], sum);
           }
   }
 

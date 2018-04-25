@@ -37,6 +37,8 @@ public:
 
   virtual ~Face() = default;
 
+  inline friend bool operator==(const Face& lhs, const Face& rhs);
+
 protected:
   // Vertices are stored sorted on the id.
   std::array<std::reference_wrapper<Vertex>, 3> vertices_;
@@ -61,10 +63,7 @@ struct equal_to<unique_ptr<PolyDG::Face>>
 {
   bool operator()(const unique_ptr<PolyDG::Face>& lhs, const unique_ptr<PolyDG::Face>& rhs) const
   {
-    bool res = equal_to<PolyDG::Vertex>()(lhs->getVertex(0), rhs->getVertex(0)) &&
-               equal_to<PolyDG::Vertex>()(lhs->getVertex(1), rhs->getVertex(1)) &&
-               equal_to<PolyDG::Vertex>()(lhs->getVertex(2), rhs->getVertex(2));
-    return res;
+    return *lhs == *rhs;
   }
 };
 
@@ -127,6 +126,13 @@ inline const Vertex& Face::getVertex(unsigned i) const
 inline Vertex& Face::getVertex(unsigned i)
 {
   return vertices_[i];
+}
+
+inline bool operator==(const Face& lhs, const Face& rhs)
+{
+  return (lhs.vertices_[0] == rhs.vertices_[0] &&
+          lhs.vertices_[1] == rhs.vertices_[1] &&
+          lhs.vertices_[2] == rhs.vertices_[2]);
 }
 
 } // namespace PolyDG

@@ -56,19 +56,25 @@ void Mesh::computeFaces()
       // std::cout << "Tetraedro " << t.getId() << " " << faceNo << std::endl;
 
       // The i-th face is that one without the (3-i)-th vertex.
-      auto res = temp.emplace(new PolyDG::Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
-                                             t.getVertex(static_cast<unsigned>(faceNo < 2) + 1),
-                                             t.getVertex(static_cast<unsigned>(faceNo < 3) + 2),
-                                             t, 3 - faceNo));
+      auto res = temp.emplace(new Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
+                                       t.getVertex(static_cast<unsigned>(faceNo < 2) + 1),
+                                       t.getVertex(static_cast<unsigned>(faceNo < 3) + 2),
+                                       t, 3 - faceNo));
       if(res.second == false)
       {
         // If I find a face of a tetrahedron of a different polyhedron I insert it in
         // facesInt_, then in any case I erase the face from temp
-        if(t.getPoly().getId() != (*res.first)->getTet1().getPoly().getId())
+        unsigned elem1 = t.getPoly().getId();
+        unsigned elem2 = (*res.first)->getTet1().getPoly().getId();
+
+        if(elem1 != elem2)
         {
-          facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
-                                 (*res.first)->getTet1(), (*res.first)->getFaceNoTet1(),
-                                 t, 3 - faceNo);
+          if(elem1 > elem2)
+            facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
+                                   (*res.first)->getTet1(), (*res.first)->getFaceNoTet1(), t, 3 - faceNo);
+          else
+            facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
+                                    t, 3 - faceNo, (*res.first)->getTet1(), (*res.first)->getFaceNoTet1());
         }
         temp.erase(res.first);
       }

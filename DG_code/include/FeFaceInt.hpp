@@ -17,7 +17,7 @@ namespace PolyDG
 class FeFaceInt : public FeFace
 {
 public:
-  using TheFace = PolyDG::FaceInt;
+  using TheFace = FaceInt;
 
   FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
             const std::vector<std::array<unsigned, 3>>& basisComposition,

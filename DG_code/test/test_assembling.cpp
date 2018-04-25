@@ -38,18 +38,18 @@ int main()
   Problem sym(Vh, true);
   Problem nonsym(Vh);
 
-  sym.integrateVol(dot(uGrad, vGrad), true);
+  // sym.integrateVol(dot(uGrad, vGrad), true);
   sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
-  sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1,  true);
-  nonsym.integrateVol(dot(uGrad, vGrad), false);
+  // sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1,  true);
+  // nonsym.integrateVol(dot(uGrad, vGrad), false);
   nonsym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), false);
-  nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
+  // nonsym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, false);
 
-  sym.integrateVolRhs(f * v);
-  sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
+  // sym.integrateVolRhs(f * v);
+  // sym.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
-  std::cout << sym.getRhs() << std::endl;
-  std::cout << sym.getMatrix().selfadjointView<Eigen::Upper>() << std::endl;
+  // std::cout << sym.getRhs() << std::endl;
+  std::cout << sym.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
   std::cout << nonsym.getMatrix() << std::endl;
 
   return 0;

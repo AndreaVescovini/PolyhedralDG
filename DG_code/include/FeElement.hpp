@@ -17,9 +17,9 @@ namespace PolyDG
 class FeElement
 {
 public:
-  using TheElem = PolyDG::Polyhedron;
+  using TheElem = Polyhedron;
 
-// Constructor that takes a PolyDGetrical polyhedron elem, the order of polynomials
+// Constructor that takes a geometrical polyhedron elem, the order of polynomials
 // order, the consequent number of degrees of freedom dofNo, the possible composition
 // of polynomilas of degree less or equal to order into monomials basisComposition,
 // a quadrature rule tetraRule.

@@ -4,7 +4,8 @@
 
 #include <algorithm>
 
-namespace PolyDG {
+namespace PolyDG
+{
 
 FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
                  Real areaDoubled, Eigen::Vector3d normal,

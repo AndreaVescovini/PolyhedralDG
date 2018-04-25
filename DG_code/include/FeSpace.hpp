@@ -19,7 +19,7 @@ namespace PolyDG
 class FeSpace
 {
 public:
-  using TheMesh = PolyDG::Mesh;
+  using TheMesh = Mesh;
 
 // Constructor that takes a mesh Th, the order of polynomials order and the required
 // degrees of exactness for quadrature formulas

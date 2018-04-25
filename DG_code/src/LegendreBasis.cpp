@@ -87,4 +87,4 @@ Real LegendreBasisDer<6>(Real x)
   return (1386.0 * pow(x, 5) - 1260.0 * pow(x, 3) + 210.0 * x) / 16.0;
 }
 
-} // namespace basis
+} // namespace PolyDG
