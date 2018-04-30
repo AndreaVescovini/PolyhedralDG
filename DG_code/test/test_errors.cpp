@@ -19,10 +19,10 @@ int main()
 
   std::vector<std::string> fileNames;
   // fileNames.push_back("../meshes/cube_str6t.mesh");
-  fileNames.push_back("../meshes/cube_str48t.mesh");
+  // fileNames.push_back("../meshes/cube_str48t.mesh");
   // fileNames.push_back("../meshes/cube_str384t.mesh");
   // fileNames.push_back("../meshes/cube_str1296t.mesh");
-  // fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str3072h.mesh");
+  fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str3072h.mesh");
 
   // auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
   // auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +
@@ -33,8 +33,8 @@ int main()
   //                                                                                                    x(0)*x(1)); };
 
   auto uex = [](Eigen::Vector3d x) -> double { return x(0); };
-  auto source = [](Eigen::Vector3d x) -> double { return 0.0;};
-  auto uexGrad = [](Eigen::Vector3d x)-> Eigen::Vector3d { return Eigen::Vector3d(1.0, 0.0, 0.0); };
+  auto source = [](Eigen::Vector3d /*x*/) -> double { return 0.0;};
+  auto uexGrad = [](Eigen::Vector3d /*x*/)-> Eigen::Vector3d { return Eigen::Vector3d(1.0, 0.0, 0.0); };
 
   // auto uex = [](Eigen::Vector3d x) { return x(0)*x(0)*x(0)+10*x(1)*x(2)*x(2); };
   // auto source = [](Eigen::Vector3d x) { return -20*x(1)-6*x(0);};
@@ -63,7 +63,7 @@ int main()
     PolyDG::Mesh Th(fileNames[i], reader);
     FeSpace Vh(Th, r);
 
-    Problem prob(Vh, true);
+    Problem prob(Vh);
 
     bool symform = true;
     prob.integrateVol(dot(uGrad, vGrad), symform);
@@ -72,9 +72,13 @@ int main()
     prob.integrateVolRhs(f * v);
     prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
-    // prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 1000);
-    prob.solveChol();
+    prob.finalizeMatrix();
+
+    ch.stop();
+    prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 1000);
+    // prob.solveChol();
     // prob.solveLU();
+    ch.start();
 
     errL2.push_back(prob.computeErrorL2(uex));
     errH10.push_back(prob.computeErrorH10(uexGrad));

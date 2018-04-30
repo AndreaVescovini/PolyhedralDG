@@ -33,7 +33,7 @@ int main()
   Function f([](Eigen::Vector3d /* x */) { return 0.0; });
   Function gd([](Eigen::Vector3d x) { return x(0); });
 
-  Problem prob(Vh, true);
+  Problem prob(Vh);
 
   bool symform = true;
 
@@ -43,6 +43,8 @@ int main()
 
   prob.integrateVolRhs(f * v);
   prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
+
+  prob.finalizeMatrix();
 
   Timings::Watch ch;
   ch.start();

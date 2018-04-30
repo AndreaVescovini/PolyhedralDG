@@ -10,19 +10,21 @@
 #include <fstream>
 #include <unordered_set>
 #include <algorithm>
+#include <iterator>
 
 namespace PolyDG
 {
 
-Problem::Problem(const FeSpace& Vh, bool sym)
+Problem::Problem(const FeSpace& Vh)
   : Vh_{Vh}, dim_{Vh.getFeElementsNo() * Vh.getDofNo()}, A_{dim_, dim_},
-    b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)}, sym_{sym} {}
+    b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)},
+    sym_{true, true, true} {}
 
 void Problem::solveLU()
 {
   Eigen::SparseLU<Eigen::SparseMatrix<Real>> solver;
 
-  if(sym_ == true)
+  if(this->isSymmetric() == true)
   {
     solver.isSymmetric(true);
     solver.compute(A_.selfadjointView<Eigen::Upper>());
@@ -46,7 +48,7 @@ void Problem::solveLU()
 
 void Problem::solveChol()
 {
-  if(sym_ == false)
+  if(this->isSymmetric() == false)
   {
     std::cerr << "solveChol() requires a symmetric matrix" << std::endl;
     return;
@@ -73,8 +75,7 @@ void Problem::solveChol()
 
 void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
-
-  if(sym_ == false)
+  if(this->isSymmetric() == false)
   {
     std::cerr << "solveCG() requires a symmetric matrix" << std::endl;
     return;
@@ -154,7 +155,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 {
   std::ofstream fout{fileName};
 
-// Print the header
+  // Print the header
   fout << "<?xml version=\"1.0\"?>\n";
   fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
   fout << "  <UnstructuredGrid>\n";
@@ -163,7 +164,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
   {
     auto elem = it->getElem();
 
-// Compute the nodes in the Polyhedron
+  // Compute the nodes in the Polyhedron
     std::unordered_set<std::reference_wrapper<const Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> nodesSet;
     nodesSet.reserve(elem.getTetrahedraNo() + 3);
 
@@ -173,7 +174,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
 
-// Compute the solution at the nodes
+  // Compute the solution at the nodes
     std::vector<Real> uNodes(nodes.size());
     uNodes.reserve(nodes.size());
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
@@ -181,7 +182,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     fout << "    <Piece NumberOfPoints=\"" << nodes.size() << "\" NumberOfCells=\"" << elem.getTetrahedraNo() << "\">\n";
 
-// Print the nodes coordinates
+  // Print the nodes coordinates
     fout << "      <Points>\n";
     fout << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n         ";
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
@@ -189,7 +190,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </Points>\n";
 
-// Print the cells (tetrahedra) connectivity and type
+  // Print the cells (tetrahedra) connectivity and type
     fout << "      <Cells>\n";
     fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
     for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
@@ -209,7 +210,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </Cells>\n";
 
-// Print the values of the solution
+  // Print the values of the solution
     fout << "      <PointData Scalars=\"Solution\">\n";
     fout << "        <DataArray type=\"Float64\" Name=\"solution\" format=\"ascii\">\n         ";
     for(unsigned i = 0; i < uNodes.size(); i++)
@@ -217,7 +218,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </PointData>\n";
 
-// Print a value for the Polyhedron
+  // Print a value for the Polyhedron
     fout << "      <CellData Scalars=\"Mesh\">\n";
     fout << "        <DataArray type=\"Int32\" Name=\"Mesh\" format=\"ascii\">\n         ";
     for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
@@ -255,26 +256,28 @@ Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
   return result;
 }
 
-void Problem::updateMatrix(const std::vector<triplet>& tripletList, bool symExpr)
+void Problem::finalizeMatrix()
 {
-  Eigen::SparseMatrix<Real> curA(dim_, dim_);
+  std::vector<triplet> concatVec;
 
-  curA.setFromTriplets(tripletList.begin(), tripletList.end());
+  concatVec.reserve((sym_[0] == true ? 2 : 1) * triplets_[0].size() +
+                    (sym_[1] == true ? 2 : 1) * triplets_[1].size() +
+                    (sym_[2] == true ? 2 : 1) * triplets_[2].size());
 
-  // I remove numerical zeros, I hope it works well
-  curA.prune(A_.coeff(0,0));
-
-  if(sym_ == symExpr)
-    A_ += curA;
-  else if(sym_ == false && symExpr == true)
-    A_ += curA.selfadjointView<Eigen::Upper>();
-  else
+  for(unsigned i = 0; i < 3; i++)
   {
-    std::cerr << "The symmetry has been broken" << std::endl;
-    sym_ = false;
-    A_ = A_.selfadjointView<Eigen::Upper>();
-    A_ += curA;
+    if(this->isSymmetric() == false && sym_[i] == true)
+      for(const auto& t : triplets_[i])
+        if(t.row() != t.col())
+          concatVec.emplace_back(t.col(), t.row(), t.value());
+
+    concatVec.insert(concatVec.cend(),
+                   std::make_move_iterator(triplets_[i].cbegin()),
+                   std::make_move_iterator(triplets_[i].cend()));
+    triplets_[i].clear();
   }
+
+  A_.setFromTriplets(concatVec.cbegin(), concatVec.cend());
 }
 
 } // namespace PolyDG

@@ -4,7 +4,7 @@ namespace PolyDG
 {
 
 template<>
-Real LegendreBasis<0>(Real x)
+Real LegendreBasis<0>(Real /*x*/)
 {
   return 1.0;
 }
@@ -46,13 +46,13 @@ Real LegendreBasis<6>(Real x)
 }
 
 template<>
-Real LegendreBasisDer<0>(Real x)
+Real LegendreBasisDer<0>(Real /*x*/)
 {
   return 0.0;
 }
 
 template<>
-Real LegendreBasisDer<1>(Real x)
+Real LegendreBasisDer<1>(Real /*x*/)
 {
   return 1.0;
 }

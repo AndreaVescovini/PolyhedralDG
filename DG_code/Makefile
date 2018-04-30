@@ -52,7 +52,7 @@ WFLAGS += -Wall
 STDFLAG += -std=c++11
 
 ifdef RELEASE
-OPTFLAGS += -O3 -DNDEBUG # -pg #-DINLINE
+OPTFLAGS += -O3 -DNDEBUG -pg #-DINLINE
 else
 OPTFLAGS += -g #-DVERBOSITY
 WFLAGS += -Wextra -pedantic
@@ -103,7 +103,7 @@ distclean: clean
 #------
 # Rules
 #------
-$(EXE_DIR)/%: $(BUILD_DIR_TEST)/%.o
+$(EXE_DIR)/%: $(BUILD_DIR_TEST)/%.o $(STATIC_LIB)
 	@mkdir -p $(EXE_DIR)
 	$(CXX) $(CXXFLAGS) $< $(LD_FLAGS) $(LD_LIBS) $(OUTPUT_OPTION)
 
