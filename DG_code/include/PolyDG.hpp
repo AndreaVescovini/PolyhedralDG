@@ -8,7 +8,7 @@ using Real = double;
 
 using BCtype = int;
 
-enum SideType { InOut, OutIn };
+enum SideType { Out, In };
 
 } // namespace PolyDG
 

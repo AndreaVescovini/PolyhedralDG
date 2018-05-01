@@ -81,7 +81,7 @@ class JumpPhiI : public ExprWrapper<JumpPhiI>
 public:
   JumpPhiI() = default;
 
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~JumpPhiI() = default;
@@ -92,7 +92,7 @@ class JumpPhiJ : public ExprWrapper<JumpPhiJ>
 public:
   JumpPhiJ() = default;
 
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~JumpPhiJ() = default;
@@ -103,7 +103,7 @@ class AverGradPhiI : public ExprWrapper<AverGradPhiI>
 public:
   AverGradPhiI() = default;
 
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline const Eigen::Vector3d& operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~AverGradPhiI() = default;
@@ -114,7 +114,7 @@ class AverGradPhiJ : public ExprWrapper<AverGradPhiJ>
 public:
   AverGradPhiJ() = default;
 
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline const Eigen::Vector3d& operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~AverGradPhiJ() = default;
@@ -126,7 +126,7 @@ public:
   explicit PenaltyScaling(Real sigma = 1.0);
 
   inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
   virtual ~PenaltyScaling() = default;
@@ -155,7 +155,7 @@ public:
 
   inline Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   inline Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  inline Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   inline Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -220,9 +220,9 @@ inline Real PhiJ::operator()(const FeElement& fe, unsigned /* i */, unsigned j, 
   return fe.getPhi(t, q, j);
 }
 
-inline Eigen::Vector3d JumpPhiI::operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, int side1, int /* side2 */, unsigned q) const
+inline Eigen::Vector3d JumpPhiI::operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, unsigned q) const
 {
-  return fe.getPhi(side1, q, i) * (1.0 - 2.0 * side1) * fe.getNormal();
+  return fe.getPhi(si, q, i) * fe.getNormal() * (si == Out ? 1 : -1);
 }
 
 inline Eigen::Vector3d JumpPhiI::operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, unsigned q) const
@@ -230,9 +230,9 @@ inline Eigen::Vector3d JumpPhiI::operator()(const FeFaceExt& fe, unsigned i, uns
   return fe.getPhi(q, i) * fe.getNormal();
 }
 
-inline Eigen::Vector3d JumpPhiJ::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, int /* side1 */, int side2, unsigned q) const
+inline Eigen::Vector3d JumpPhiJ::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, unsigned q) const
 {
-  return fe.getPhi(side2, q, j) * (1.0 - 2.0 * side2) * fe.getNormal();
+  return fe.getPhi(sj, q, j) * fe.getNormal() * (sj == Out ? 1 : -1);
 }
 
 inline Eigen::Vector3d JumpPhiJ::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, unsigned q) const
@@ -240,9 +240,9 @@ inline Eigen::Vector3d JumpPhiJ::operator()(const FeFaceExt& fe, unsigned /* i *
   return fe.getPhi(q, j) * fe.getNormal();
 }
 
-inline Eigen::Vector3d AverGradPhiI::operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, int side1, int /* side2 */, unsigned q) const
+inline Eigen::Vector3d AverGradPhiI::operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, unsigned q) const
 {
-  return 0.5 * fe.getPhiDer(side1, q, i);
+  return 0.5 * fe.getPhiDer(si, q, i);
 }
 
 inline const Eigen::Vector3d& AverGradPhiI::operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, unsigned q) const
@@ -250,9 +250,9 @@ inline const Eigen::Vector3d& AverGradPhiI::operator()(const FeFaceExt& fe, unsi
   return fe.getPhiDer(q, i);
 }
 
-inline Eigen::Vector3d AverGradPhiJ::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, int /* side1 */, int side2, unsigned q) const
+inline Eigen::Vector3d AverGradPhiJ::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, unsigned q) const
 {
-  return 0.5 * fe.getPhiDer(side2, q, j);
+  return 0.5 * fe.getPhiDer(sj, q, j);
 }
 
 inline const Eigen::Vector3d& AverGradPhiJ::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, unsigned q) const
@@ -265,7 +265,7 @@ inline Real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, un
   return sigma_ * fe.getPenaltyParam();
 }
 
-inline Real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned /* q */) const
+inline Real PenaltyScaling::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, SideType /* si */, SideType /* sj */, unsigned /* q */) const
 {
   return sigma_ * fe.getPenaltyParam();
 }
@@ -295,7 +295,7 @@ inline Real Function::operator()(const FeElement& fe, unsigned /* i */, unsigned
   return fun_(fe.getQuadPoint(t, q));
 }
 
-inline Real Function::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, int /* side1 */, int /* side2 */, unsigned q) const
+inline Real Function::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, SideType /* si */, SideType /* sj */, unsigned q) const
 {
   return fun_(fe.getQuadPoint(q));
 }

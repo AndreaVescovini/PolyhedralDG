@@ -29,7 +29,7 @@ public:
 //
 // // Call operator for expressions that involve integrals over internal faces
 //   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j,
-//                         int side1, int side2, unsigned q) const;
+//                         SideType si, SideType sj, unsigned q) const;
 //
 // // Call operator for expressions that involve integrals over external faces
 //   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
@@ -64,9 +64,9 @@ public:
 //
 // template <typename E>
 // Real ExprWrapper<E>::operator()(const FeFaceInt& fe, unsigned i, unsigned j,
-//                                       int side1, int side2, unsigned q) const
+//                                       SideType si, SideType sj, unsigned q) const
 // {
-//   return asDerived().operator()(fe, i, j, side1, side2, q);
+//   return asDerived().operator()(fe, i, j, si, sj, q);
 // }
 //
 // template <typename E>

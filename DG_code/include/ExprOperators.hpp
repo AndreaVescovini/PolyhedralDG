@@ -43,7 +43,7 @@ public:
 
   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -63,7 +63,7 @@ public:
 
   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -83,7 +83,7 @@ public:
 
   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -103,7 +103,7 @@ public:
 //
 //   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
 //   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
 //   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
 //   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 //
@@ -123,7 +123,7 @@ public:
 //
 //   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
 //   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
 //   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
 //   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 //
@@ -142,7 +142,7 @@ public:
   BinaryOperator(const LO& lo, const RO& ro);
 
   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -162,7 +162,7 @@ public:
 
   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
 
@@ -308,9 +308,9 @@ Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, uns
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 {
-  return OP()(lo_(fe, i, j, side1, side2, q), ro_(fe, i, j, side1, side2, q));
+  return OP()(lo_(fe, i, j, si, sj, q), ro_(fe, i, j, si, sj, q));
 }
 
 template <typename LO, typename RO, typename OP>
@@ -342,9 +342,9 @@ Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, u
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 {
-  return OP()(lo_, ro_(fe, i, j, side1, side2, q));
+  return OP()(lo_, ro_(fe, i, j, si, sj, q));
 }
 
 template <typename RO, typename OP>
@@ -376,9 +376,9 @@ Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, u
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 {
-  return OP()(lo_(fe, i, j, side1, side2, q), ro_);
+  return OP()(lo_(fe, i, j, si, sj, q), ro_);
 }
 
 template <typename LO, typename OP>
@@ -410,9 +410,9 @@ Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, u
 // }
 //
 // template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+// Real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 // {
-//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, side1, side2, q));
+//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, si, sj, q));
 // }
 //
 // template <typename RO, typename OP>
@@ -444,9 +444,9 @@ Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, u
 // }
 //
 // template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+// Real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 // {
-//   return OP()(lo_(fe, i, j, side1, side2, q), ro_(fe.getQuadPoint(q)));
+//   return OP()(lo_(fe, i, j, si, sj, q), ro_(fe.getQuadPoint(q)));
 // }
 //
 // template <typename LO, typename OP>
@@ -472,9 +472,9 @@ Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, unsigne
 }
 
 template <typename LO, typename RO>
-Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 {
-  return DotProduct()(lo_(fe, i, j, side1, side2, q), ro_(fe, i, j, side1, side2, q));
+  return DotProduct()(lo_(fe, i, j, si, sj, q), ro_(fe, i, j, si, sj, q));
 }
 
 template <typename LO, typename RO>
@@ -500,9 +500,9 @@ Real UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, int side1, int side2, unsigned q) const
+Real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
 {
-  return OP()(ro_(fe, i, j, side1, side2, q));
+  return OP()(ro_(fe, i, j, si, sj, q));
 }
 
 template <typename RO, typename OP>

@@ -23,7 +23,7 @@ std::array<PolyDG::Real, 2> legendre(unsigned n, PolyDG::Real x)
 
     case 3:
       return {x * (2.5 * pow(x, 2) - 1.5),
-              7.5 * pow(x, 2) - 3.};
+              7.5 * pow(x, 2) - 1.5};
 
     case 4:
       return {(35. * pow(x, 4) - 30. * pow(x,2) + 3.) / 8.,

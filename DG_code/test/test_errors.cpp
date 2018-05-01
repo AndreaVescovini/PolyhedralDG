@@ -22,7 +22,7 @@ int main()
   // fileNames.push_back("../meshes/cube_str48t.mesh");
   // fileNames.push_back("../meshes/cube_str384t.mesh");
   // fileNames.push_back("../meshes/cube_str1296t.mesh");
-  fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str3072h.mesh");
+  fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str48h.mesh");
 
   // auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
   // auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +
@@ -54,7 +54,7 @@ int main()
   Function f(source);
   Function gd(uex);
 
-  unsigned r = 1;
+  unsigned r = 4;
 
   std::vector<double> errL2, errH10, hh;
 
@@ -74,11 +74,11 @@ int main()
 
     prob.finalizeMatrix();
 
-    ch.stop();
-    prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 1000);
-    // prob.solveChol();
+    // ch.stop();
+    // prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 1000);
+    prob.solveChol();
     // prob.solveLU();
-    ch.start();
+    // ch.start();
 
     errL2.push_back(prob.computeErrorL2(uex));
     errH10.push_back(prob.computeErrorH10(uexGrad));
@@ -88,6 +88,9 @@ int main()
     std::cout << "Error H10 = " << errH10.back() << '\n' << std::endl;
 
     // std::cout << prob.getDim() << std::endl;
+    // std::cout << prob.getRhs() << std::endl;
+    // std::cout << prob.getSolution() << std::endl;
+    // std::cout << prob.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
   }
 
 

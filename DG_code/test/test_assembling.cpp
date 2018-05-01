@@ -12,12 +12,12 @@ using namespace PolyDG;
 
 int main()
 {
-  std::string fileName = "../meshes/cube_str3072h.mesh";
+  std::string fileName = "../meshes/cube_str48h.mesh";
 
   PolyDG::MeshReaderPoly reader;
   PolyDG::Mesh Th(fileName, reader);
 
-  unsigned r = 3;
+  unsigned r = 2;
   FeSpace Vh(Th, r);
 
   PhiI v;
@@ -41,7 +41,6 @@ int main()
 
   Timings::Watch ch;
 
-
   sym.integrateVol(dot(uGrad, vGrad), true);
   sym.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), true);
   sym.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1,  true);
@@ -57,8 +56,8 @@ int main()
   ch.stop();
   std::cout << ch << std::endl;
 
-  // std::cout << sym.getRhs() << std::endl;
-  // std::cout << sym.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
+  std::cout << sym.getRhs() << std::endl;
+  std::cout << sym.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
   // std::cout << nonsym.getMatrix() << std::endl;
 
   return 0;

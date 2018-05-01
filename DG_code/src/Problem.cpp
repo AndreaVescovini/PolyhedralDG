@@ -278,6 +278,8 @@ void Problem::finalizeMatrix()
   }
 
   A_.setFromTriplets(concatVec.cbegin(), concatVec.cend());
+
+  A_.prune(A_.coeff(0,0));
 }
 
 } // namespace PolyDG

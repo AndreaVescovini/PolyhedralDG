@@ -186,22 +186,24 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
   else
     triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * Vh_.getDofNo() * 4);
 
+  std::array<SideType, 2> sides = {Out, In};
+
   for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
   {
-    std::array<unsigned, 2> indexOffset = { it->getElem(0) * Vh_.getDofNo(),
-                                            it->getElem(1) * Vh_.getDofNo() };
+    std::array<unsigned, 2> indexOffset = { it->getElem(Out) * Vh_.getDofNo(),
+                                            it->getElem(In) * Vh_.getDofNo() };
 
-    for(int side2 = 0; side2 < 2; side2++)
-      for(int side1 = 0; side1 < (sym == true ? side2 + 1 : 2); side1++)
+    for(unsigned sj = 0; sj < 2; sj++)
+      for(unsigned si = 0; si < (sym == true ? sj + 1 : 2); si++)
         for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-          for(unsigned i = 0; i < (sym == true && side1 == side2 ? j + 1 : Vh_.getDofNo()); i++)
+          for(unsigned i = 0; i < (sym == true && sides[si] == sides[sj] ? j + 1 : Vh_.getDofNo()); i++)
           {
             Real sum = 0.0;
 
             for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-              sum += exprDerived(*it, i, j, side1, side2, q) * it->getWeight(q) * it->getAreaDoubled();
+              sum += exprDerived(*it, i, j, sides[si], sides[sj], q) * it->getWeight(q) * it->getAreaDoubled();
 
-            triplets_[1].emplace_back(i + indexOffset[side1], j + indexOffset[side2], sum);
+            triplets_[1].emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
           }
   }
 }

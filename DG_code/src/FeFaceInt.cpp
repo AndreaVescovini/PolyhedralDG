@@ -83,8 +83,10 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
   out << "Face " << face_.getId() << '\n';
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
+  std::array<SideType, 2> sides = { Out, In };
+
   // Loop over sides
-  for(int side = 0; side < 2; side++)
+  for(unsigned i = 0; i < 2; i++)
   {
 
     // Loop over basis functions
@@ -93,7 +95,7 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
 
       // Loop over quadrature points
       for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
-        out << getPhi(side, p, f) << ' ';
+        out << getPhi(sides[i], p, f) << ' ';
 
       out << '\n';
     }
@@ -107,8 +109,10 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
   out << "Face " << face_.getId() << '\n';
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
+  std::array<SideType, 2> sides = { Out, In };
+
   // Loop over sides
-  for(int side = 0; side < 2; side++)
+  for(unsigned i = 0; i < 2; i++)
   {
 
     // Loop over basis functions
@@ -117,7 +121,7 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
 
       // Loop over quadrature points
       for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
-        out << getPhiDer(side, p, f).transpose() << '\n';
+        out << getPhiDer(sides[i], p, f).transpose() << '\n';
 
       out << '\n';
     }

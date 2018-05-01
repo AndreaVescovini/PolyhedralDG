@@ -66,7 +66,7 @@ Real LegendreBasisDer<2>(Real x)
 template<>
 Real LegendreBasisDer<3>(Real x)
 {
-  return 7.5 * pow(x, 2) - 3.0;
+  return 7.5 * pow(x, 2) - 1.5;
 }
 
 template<>
