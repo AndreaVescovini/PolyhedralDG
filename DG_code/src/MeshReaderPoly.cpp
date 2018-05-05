@@ -1,13 +1,11 @@
 #include "MeshReaderPoly.hpp"
-#include "Vertex.hpp"
-#include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
+#include "PolyDG.hpp"
 #include "Polyhedron.hpp"
+#include "Tetrahedron.hpp"
+#include "Vertex.hpp"
 
 #include <vector>
-
-// I assume that entities are numerated from 1 to N in the meshFile, then I store
-// them in my mesh conteiners numerating from 0 to N-1
 
 namespace PolyDG
 {
@@ -15,22 +13,20 @@ namespace PolyDG
 MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
   : sections_{sections} {}
 
-// Function that performs the reading from fileName and through the proxy saves
-// the data in mesh
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {
-  // using PolyDG::Vertex;
-  // using PolyDG::Tetrahedron;
-  // using PolyDG::FaceExt;
-  // using PolyDG::Polyhedron;
-  // using PolyDG::Real;
-  // using PolyDG::labelType; // da riqualificare
+
+  // I assume that entities are numerated from 1 to N in the meshFile,
+  // then I store them in my mesh conteiners numerating from 0 to N-1.
 
   std::ifstream meshFile{fileName};
-  if( meshFile.is_open() == false )
+  if(meshFile.is_open() == false)
+  {
     std::cerr << "Can't open mesh file. Mesh file does not exist or is corrupted" << std::endl;
+    exit(1);
+  }
 
-  // Use the proxy to access the Mesh class
+  // I use the proxy to access the Mesh class.
   MeshProxy mp(mesh);
   std::vector<Vertex>& vertList = mp.getVerticesRef();
   std::vector<Tetrahedron>& tetraList = mp.getTetrahedraRef();
@@ -39,17 +35,20 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   bool found = goToSection(meshFile, 0);
   if(found == false)
+  {
     std::cerr << "Error in mesh format, " << sections_[0] << " not found." << std::endl;
+    exit(2);
+  }
 
-  // Read vertices
-  size_t verticesNo = 0;
+  // Read vertices.
+  sizeType verticesNo = 0;
   meshFile >> verticesNo;
   vertList.reserve(verticesNo);
   Vertex::resetCounter();
 
   std::array<Real, 3> curVertex;
-  int label = 0; // used to read unuseful labels
-  for(size_t i = 0; i < verticesNo; i++)
+  int label = 0;
+  for(sizeType i = 0; i < verticesNo; i++)
   {
     meshFile >> curVertex[0] >> curVertex[1] >> curVertex[2] >> label;
     vertList.emplace_back(curVertex[0], curVertex[1], curVertex[2]);
@@ -57,46 +56,53 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   found = goToSection(meshFile, 1);
   if(found == false)
+  {
     std::cerr << "Error in mesh format, " << sections_[1] << " not found." << std::endl;
+    exit(2);
+  }
 
-  // Read tetrahedra
-  size_t tetrahedraNo = 0;
+  // Read tetrahedra.
+  sizeType tetrahedraNo = 0;
   meshFile >> tetrahedraNo;
   tetraList.reserve(tetrahedraNo);
   Tetrahedron::resetCounter();
 
   std::array<unsigned, 4> curTet;
-  for(size_t i = 0; i < tetrahedraNo; i++)
+  for(sizeType i = 0; i < tetrahedraNo; i++)
   {
     meshFile >> curTet[0] >> curTet[1] >> curTet[2] >> curTet[3] >> label;
-    tetraList.emplace_back(vertList[curTet[0]-1], vertList[curTet[1]-1],
-                           vertList[curTet[2]-1], vertList[curTet[3]-1]);
+    tetraList.emplace_back(vertList[curTet[0] - 1], vertList[curTet[1] - 1],
+                           vertList[curTet[2] - 1], vertList[curTet[3] - 1]);
   }
 
   found = goToSection(meshFile, 2);
   if(found == false)
+  {
     std::cerr << "Error in mesh format, " << sections_[2] << " not found." << std::endl;
+    exit(2);
+  }
 
-  // Read Faces
-  size_t facesExtNo = 0;
+  // Read external faces.
+  sizeType facesExtNo = 0;
   meshFile >> facesExtNo;
   faceExtList.reserve(facesExtNo);
   FaceExt::resetCounter();
 
   std::array<unsigned, 3> curFace;
-  for(size_t i = 0; i < facesExtNo; i++)
+  for(sizeType i = 0; i < facesExtNo; i++)
   {
     meshFile >> curFace[0] >> curFace[1] >> curFace[2] >> label;
-    faceExtList.emplace_back(vertList[curFace[0]-1], vertList[curFace[1]-1],
-                             vertList[curFace[2]-1], label);
+    faceExtList.emplace_back(vertList[curFace[0] - 1], vertList[curFace[1] - 1],
+                             vertList[curFace[2] - 1], label);
   }
 
-  // Se non ho trovato la sezione polyhedra considero ogni tetraedro come un poliedro
+  // If I don't find the section about polyhedra I consider every tetrahedron as
+  // a a polyhedron.
   found = goToSection(meshFile, 3);
 
-  // Read polyhedra
+  // Read polyhedra.
   Polyhedron::resetCounter();
-  size_t polyhedraNo = 0;
+  sizeType polyhedraNo = 0;
 
   if(found == true)
   {
@@ -104,11 +110,11 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     polyList.resize(polyhedraNo);
 
     unsigned poly = 0;
-    for(size_t i = 0; i < tetrahedraNo; i++)
+    for(sizeType i = 0; i < tetrahedraNo; i++)
     {
       meshFile >> poly;
-      polyList[poly-1].addTetra(tetraList[i]);
-      tetraList[i].setPoly(polyList[poly-1]);
+      polyList[poly - 1].addTetra(tetraList[i]);
+      tetraList[i].setPoly(polyList[poly - 1]);
     }
   }
   else
@@ -116,7 +122,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     polyhedraNo = tetrahedraNo;
     polyList.resize(polyhedraNo);
 
-    for(size_t i = 0; i < tetrahedraNo; i++)
+    for(sizeType i = 0; i < tetrahedraNo; i++)
     {
       polyList[i].addTetra(tetraList[i]);
       tetraList[i].setPoly(polyList[i]);
@@ -137,7 +143,7 @@ bool MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
     std::cout << sections_[3] << " not found." << std::endl;
     return false;
   }
-  // Usare invece un'exception? Leggendo al teoria sembrerebbe di no, che vada bene così perchè è una situazione che può capitare
+
   return true;
 }
 

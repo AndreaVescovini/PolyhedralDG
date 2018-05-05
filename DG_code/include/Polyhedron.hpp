@@ -2,15 +2,16 @@
 #define _POLYHEDRON_HPP_
 
 #include "PolyDG.hpp"
-#include "Vertex.hpp"
 #include "Tetrahedron.hpp"
+#include "Vertex.hpp"
 
 #include <Eigen/Geometry>
 
-#include <vector>
 #include <array>
 #include <functional>
+#include <iostream>
 #include <unordered_set>
+#include <vector>
 
 namespace PolyDG
 {
@@ -23,16 +24,22 @@ public:
   // The defolut constructor also sets the id using the counter.
   Polyhedron();
 
+  // Default copy constructor.
+  Polyhedron(const Polyhedron&) = default;
+
+  // Default move constructor.
+  Polyhedron(Polyhedron&&) = default;
+
   inline void addTetra(Tetrahedron& tet);
   inline void addVertexExt(Vertex& v);
 
-  inline Real getDiameter() const;
-  inline const Tetrahedron& getTetra(unsigned i) const;
-  inline Tetrahedron& getTetra(unsigned i);
-  inline unsigned getTetrahedraNo() const;
   inline unsigned getId() const;
+  inline const Tetrahedron& getTetra(sizeType i) const;
+  inline Tetrahedron& getTetra(sizeType i);
+  inline sizeType getTetrahedraNo() const;
+  inline sizeType getVerticesExtNo() const;
   inline const Eigen::AlignedBox3d& getBoundingBox() const;
-  inline unsigned getVerticesExtNo() const;
+  inline Real getDiameter() const;
 
   // Function that starting from the unordered set of vertices computes the
   // cartesian bounding box of the polyhedron.
@@ -47,18 +54,29 @@ public:
 
   virtual ~Polyhedron() = default;
 
+  friend std::ostream& operator<<(std::ostream& out, const Polyhedron& poly);
+
 private:
+  // Id number of the polyhedron.
   const unsigned id_;
+
+  // Vector containing the tetrahedron of which the polyhedron is made.
   std::vector<std::reference_wrapper<Tetrahedron>> tetrahedra_;
 
-  // Here I store vertices coming from faces
+  // Unordered set containing the vertices coming from faces of the polyhedron.
   std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> verticesExt_;
-  // std::array<interval, 3> boundingBox_;
+
+  // Cartesian bounding box containing the polyhedron.
   Eigen::AlignedBox3d boundingBox_;
+
+  // Diameter of the polyhedron i.e. maximum distance between two vertices.
   Real diameter_;
 
   static unsigned counter_;
 };
+
+std::ostream& operator<<(std::ostream& out, const Polyhedron& poly);
+
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
@@ -79,17 +97,17 @@ inline Real Polyhedron::getDiameter() const
   return diameter_;
 }
 
-inline const Tetrahedron& Polyhedron::getTetra(unsigned i) const
+inline const Tetrahedron& Polyhedron::getTetra(sizeType i) const
 {
   return tetrahedra_[i];
 }
 
-inline Tetrahedron& Polyhedron::getTetra(unsigned i)
+inline Tetrahedron& Polyhedron::getTetra(sizeType i)
 {
   return tetrahedra_[i];
 }
 
-inline unsigned Polyhedron::getTetrahedraNo() const
+inline sizeType Polyhedron::getTetrahedraNo() const
 {
   return tetrahedra_.size();
 }
@@ -104,7 +122,7 @@ inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
   return boundingBox_;
 }
 
-inline unsigned Polyhedron::getVerticesExtNo() const
+inline sizeType Polyhedron::getVerticesExtNo() const
 {
   return verticesExt_.size();
 }

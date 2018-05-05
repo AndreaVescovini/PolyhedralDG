@@ -1,8 +1,8 @@
 #include "FeFaceInt.hpp"
 #include "Legendre.hpp"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace PolyDG
 {
@@ -13,21 +13,21 @@ FeFaceInt::FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
   : FeFace(dofNo, basisComposition, triaRule), face_{face}
 {
   compute_basis();
-  penaltyParam_ = order * order / std::min(face.getTet1().getPoly().getDiameter(),
-                                          face.getTet2().getPoly().getDiameter());
+  penaltyParam_ = order * order / std::min(face.getTetIn().getPoly().getDiameter(),
+                                          face.getTetOut().getPoly().getDiameter());
 }
 
 void FeFaceInt::compute_basis()
 {
   // hb and hb2 contain the half of the dimensions of the bounding box of the two
   // polyhedra sharing the face. They are needed for the computation of the scaled Legendre polynomials.
-  Eigen::Vector3d hb = face_.getTet1().getPoly().getBoundingBox().sizes() / 2;
-  Eigen::Vector3d hb2 = face_.getTet2().getPoly().getBoundingBox().sizes() / 2;
+  Eigen::Vector3d hb = face_.getTetIn().getPoly().getBoundingBox().sizes() / 2;
+  Eigen::Vector3d hb2 = face_.getTetOut().getPoly().getBoundingBox().sizes() / 2;
 
   // mb and mb2 contain the center of the bounding box of the two polyhedra sharing
   // the face. They are needed for the computation of the scaled Legendre polynomials.
-  Eigen::Vector3d mb = face_.getTet1().getPoly().getBoundingBox().center();
-  Eigen::Vector3d mb2 = face_.getTet2().getPoly().getBoundingBox().center();
+  Eigen::Vector3d mb = face_.getTetIn().getPoly().getBoundingBox().center();
+  Eigen::Vector3d mb2 = face_.getTetOut().getPoly().getBoundingBox().center();
 
   unsigned quadPointsNo = triaRule_.getPointsNo();
 
@@ -40,9 +40,9 @@ void FeFaceInt::compute_basis()
     // I map the quadrature point from the refrence triangle to the face of the
     // reference tetrahedron and then to the physical one, finally I rescale it
     // in order to compute the scaled legendre polynomial.
-    Eigen::Vector3d physicPt = (face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+    Eigen::Vector3d physicPt = (face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
                                                                           triaRule_.getPoint(p).homogeneous()) - mb).array() / hb.array();
-    Eigen::Vector3d physicPt2 = (face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+    Eigen::Vector3d physicPt2 = (face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
                                                                            triaRule_.getPoint(p).homogeneous()) - mb2).array() / hb2.array();
 
     // Loop over basis functions

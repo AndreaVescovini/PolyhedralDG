@@ -1,15 +1,15 @@
 #ifndef _FE_FACE_INT_HPP_
 #define _FE_FACE_INT_HPP_
 
-#include "PolyDG.hpp"
-#include "FeFace.hpp"
 #include "FaceInt.hpp"
+#include "FeFace.hpp"
+#include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
 
 #include <Eigen/Core>
 
-#include <vector>
 #include <array>
+#include <vector>
 
 namespace PolyDG
 {
@@ -67,12 +67,12 @@ inline const Eigen::Vector3d& FeFaceInt::getPhiDer(SideType s, unsigned p, unsig
 
 inline unsigned FeFaceInt::getElem(SideType s) const
 {
-  return (s == Out ? face_.getTet1().getPoly().getId() : face_.getTet2().getPoly().getId());
+  return (s == Out ? face_.getTetIn().getPoly().getId() : face_.getTetOut().getPoly().getId());
 }
 
 inline Eigen::Vector3d FeFaceInt::getQuadPoint(unsigned q) const
 {
-  return face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+  return face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
                                      triaRule_.getPoint(q).homogeneous());
 }
 

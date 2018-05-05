@@ -6,10 +6,9 @@
 #include <Eigen/Core>
 
 #include <array>
-#include <iostream>
+#include <cstddef>
 #include <functional>
-
-
+#include <iostream>
 
 namespace PolyDG
 {
@@ -19,10 +18,11 @@ class Vertex
 public:
   Vertex(Real x = 0.0, Real y = 0.0, Real z = 0.0);
 
+  // Default copy constructor.
   Vertex(const Vertex&) = default;
-  Vertex& operator=(const Vertex&) = default;
+
+  // Default move constructor.
   Vertex(Vertex&&) = default;
-  Vertex& operator=(Vertex&&) = default;
 
   inline const Eigen::Vector3d& getCoords() const;
 
@@ -34,6 +34,7 @@ public:
   inline Real getZ() const;
   inline unsigned getId() const;
 
+  // Function that returns the distance with v2
   inline Real distance(const Vertex& v2) const;
 
   // Function that resets the counter (to be used at the beginning of the
@@ -45,9 +46,6 @@ public:
   friend std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
   // Binary comparison operators used to sort face vertices.
-  // friend bool compX(const Vertex& lhs, const Vertex& rhs);
-  // friend bool compY(const Vertex& lhs, const Vertex& rhs);
-  // friend bool compZ(const Vertex& lhs, const Vertex& rhs);
   inline friend bool compId(const Vertex& lhs, const Vertex& rhs);
   inline friend bool operator==(const Vertex& lhs, const Vertex& rhs);
 
@@ -60,11 +58,6 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Vertex& v);
-// bool compX(const Vertex& lhs, const Vertex& rhs);
-// bool compY(const Vertex& lhs, const Vertex& rhs);
-// bool compZ(const Vertex& lhs, const Vertex& rhs);
-inline bool compId(const Vertex& lhs, const Vertex& rhs);
-inline bool operator==(const Vertex& v1, const Vertex& v2);
 
 } // namespace PolyDG
 
@@ -86,7 +79,7 @@ struct equal_to<PolyDG::Vertex>
 template<>
 struct hash<PolyDG::Vertex>
 {
-  std::size_t operator()(const PolyDG::Vertex& v) const
+  size_t operator()(const PolyDG::Vertex& v) const
   {
     return hash<unsigned>()(v.getId());
   }

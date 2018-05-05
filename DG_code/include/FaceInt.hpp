@@ -12,38 +12,26 @@ namespace PolyDG
 class FaceInt : public FaceAbs
 {
 public:
-  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          Real area, Eigen::Vector3d normal,
-          Tetrahedron& tet1, unsigned faceNoTet1,
-          Tetrahedron& tet2, unsigned faceNoTet2);
+  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3);
 
-  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          Real area, Eigen::Vector3d normal,
-          Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0,
-          Tetrahedron* tet2 = nullptr, unsigned faceNoTet2 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
+  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
+          unsigned faceNoTetIn, Tetrahedron& tetOut);
 
-  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          Tetrahedron& tet1 , unsigned faceNoTet1,
-          Tetrahedron& tet2 , unsigned faceNoTet2);
+  // Default copy constructor.
+  FaceInt(const FaceInt&) = default;
 
-  FaceInt(Vertex& v1, Vertex& v2, Vertex& v3,
-          Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0, // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
-          Tetrahedron* tet2 = nullptr, unsigned faceNoTet2 = 0);
+  // Default move constructor.
+  FaceInt(FaceInt&&) = default;
 
-  inline const Tetrahedron& getTet2() const;
-  inline Tetrahedron& getTet2();
-  inline unsigned getFaceNoTet2() const;
-  inline void setTet2(Tetrahedron& tet2);
-  inline void setTet2(Tetrahedron* tet2);
-  inline void setFaceNoTet2(unsigned faceNoTet2);
+  inline const Tetrahedron& getTetOut() const;
+  inline Tetrahedron& getTetOut();
+  inline void setTetOut(Tetrahedron& tetOut);
 
   virtual ~FaceInt() = default;
 
 private:
-  // I store also the second tetrahedron that owns the face and the local number
-  // of the face in tetrahderon.
-  Tetrahedron* tet2_;
-  unsigned faceNoTet2_;
+  // Pointer to the second tetrahedron that owns the face.
+  Tetrahedron* tetOut_;
 
   void print(std::ostream& out) const override;
 };
@@ -52,34 +40,19 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline const Tetrahedron& FaceInt::getTet2() const
+inline const Tetrahedron& FaceInt::getTetOut() const
 {
-  return *tet2_;
+  return *tetOut_;
 }
 
-inline Tetrahedron& FaceInt::getTet2()
+inline Tetrahedron& FaceInt::getTetOut()
 {
-  return *tet2_;
+  return *tetOut_;
 }
 
-inline unsigned FaceInt::getFaceNoTet2() const
+inline void FaceInt::setTetOut(Tetrahedron& tetOut)
 {
-  return faceNoTet2_;
-}
-
-inline void FaceInt::setTet2(Tetrahedron& tet2)
-{
-  setTet2(&tet2);
-}
-
-inline void FaceInt::setTet2(Tetrahedron* tet2)
-{
-  tet2_ = tet2;
-}
-
-inline void FaceInt::setFaceNoTet2(unsigned faceNoTet2)
-{
-  faceNoTet2_ = faceNoTet2;
+  tetOut_ = &tetOut;
 }
 
 } // namespace PolyDG

@@ -2,15 +2,13 @@
 #define _TETRAHEDRON_HPP_
 
 #include "PolyDG.hpp"
-#include "Vertex.hpp"
 #include "Polyhedron.hpp"
+#include "Vertex.hpp"
 
 #include <Eigen/Geometry>
 
 #include <array>
 #include <iostream>
-
-
 
 namespace PolyDG
 {
@@ -20,15 +18,14 @@ class Polyhedron;
 class Tetrahedron
 {
 public:
-  Tetrahedron(Vertex& v1,  Vertex& v2, Vertex& v3, Vertex& v4,
-              Polyhedron* poly = nullptr);
-  Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4,
-              Polyhedron& poly);
+  Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4);
+  Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4, Polyhedron& poly);
 
+  // Default copy constructor.
   Tetrahedron(const Tetrahedron&) = default;
-  Tetrahedron& operator=(const Tetrahedron&) = default;
+
+  // Default move constructor.
   Tetrahedron(Tetrahedron&&) = default;
-  Tetrahedron& operator=(Tetrahedron&&) = default;
 
   inline const Vertex& getVertex(unsigned i) const;
   inline Vertex& getVertex(unsigned i);

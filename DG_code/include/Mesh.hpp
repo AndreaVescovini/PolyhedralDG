@@ -1,17 +1,18 @@
 #ifndef _MESH_HPP_
 #define _MESH_HPP_
 
-#include "MeshProxy.hpp"
-#include "MeshReader.hpp"
-#include "Vertex.hpp"
-#include "Tetrahedron.hpp"
 #include "FaceExt.hpp"
 #include "FaceInt.hpp"
+#include "MeshProxy.hpp"
+#include "MeshReader.hpp"
+#include "PolyDG.hpp"
 #include "Polyhedron.hpp"
+#include "Tetrahedron.hpp"
+#include "Vertex.hpp"
 
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
 namespace PolyDG
 {
@@ -21,20 +22,29 @@ class MeshReader;
 class Mesh
 {
 public:
-  Mesh() = default;
-
+  // Ho tolto i ldefault constructor perchè ho bisogno di chiamare computeFaces
+  // e computePolyInfo dopo la lettura del meshFile.
   Mesh(const std::string& fileName, MeshReader& reader);
 
-  inline const FaceExt& getFaceExt(unsigned n) const;
-  inline const FaceInt& getFaceInt(unsigned n) const;
-  inline const Polyhedron& getPolyhedron(unsigned n) const;
+  Mesh(const Mesh&) = default;
+  Mesh& operator=(const Mesh&) = default;
+  Mesh(Mesh&&) = default;
+  Mesh& operator=(Mesh&&) = default;
 
-  inline unsigned getFacesExtNo() const;
-  inline unsigned getFacesIntNo() const;
-  inline unsigned getTetrahedraNo() const;
-  inline unsigned getPolyhedraNo() const;
+  inline const Vertex& getVertex(sizeType n) const;
+  inline const Tetrahedron& getTetrahedron(sizeType n) const;
+  inline const FaceExt& getFaceExt(sizeType n) const;
+  inline const FaceInt& getFaceInt(sizeType n) const;
+  inline const Polyhedron& getPolyhedron(sizeType n) const;
 
-  Real getMaxDiameter() const;
+  inline sizeType getVerticesNo() const;
+  inline sizeType getTetrahedraNo() const;
+  inline sizeType getFacesExtNo() const;
+  inline sizeType getFacesIntNo() const;
+  inline sizeType getPolyhedraNo() const;
+
+  inline Real getMaxDiameter() const;
+  inline Real getMinDiameter() const;
 
   // Prints all the informations about the mesh
   void printAll(std::ostream& out = std::cout) const;
@@ -42,6 +52,10 @@ public:
   // Prints only the first five elements of each entity of the mesh.
   void printHead(std::ostream& out = std::cout) const;
 
+  // Prints a piece of information about the mesh.
+  void printInfo(std::ostream& out = std::cout) const;
+
+  // Default virtual destructor.
   virtual ~Mesh() = default;
 
   // Proxy used to modify the mesh.
@@ -54,6 +68,9 @@ private:
   std::vector<FaceInt> facesInt_;
   std::vector<Polyhedron> polyhedra_;
 
+  Real hmax_;
+  Real hmin_;
+
   // Function that computes the internal faces of the mesh and completes
   // the information about the external ones.
   void computeFaces();
@@ -61,46 +78,71 @@ private:
   // Function that computes the bounding box and the diameter of each polyhedron.
   void computePolyInfo();
 
-  void print(unsigned lineNo, std::ostream& out = std::cout) const;
+  void print(sizeType lineNo, std::ostream& out = std::cout) const;
 };
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline const FaceExt& Mesh::getFaceExt(unsigned n) const
+inline const Vertex& Mesh::getVertex(sizeType n) const
+{
+  return vertices_[n];
+}
+
+inline const Tetrahedron& Mesh::getTetrahedron(sizeType n) const
+{
+  return tetrahedra_[n];
+}
+
+inline const FaceExt& Mesh::getFaceExt(sizeType n) const
 {
   return facesExt_[n];
 }
 
-inline const FaceInt& Mesh::getFaceInt(unsigned n) const
+inline const FaceInt& Mesh::getFaceInt(sizeType n) const
 {
   return facesInt_[n];
 }
 
-inline const Polyhedron& Mesh::getPolyhedron(unsigned n) const
+inline const Polyhedron& Mesh::getPolyhedron(sizeType n) const
 {
   return polyhedra_[n];
 }
 
-inline unsigned Mesh::getFacesExtNo() const
+inline sizeType Mesh::getVerticesNo() const
 {
-  return facesExt_.size();
+  return vertices_.size();
 }
 
-inline unsigned Mesh::getFacesIntNo() const
-{
-  return facesInt_.size();
-}
-
-inline unsigned Mesh::getTetrahedraNo() const
+inline sizeType Mesh::getTetrahedraNo() const
 {
   return tetrahedra_.size();
 }
 
-inline unsigned Mesh::getPolyhedraNo() const
+inline sizeType Mesh::getFacesExtNo() const
+{
+  return facesExt_.size();
+}
+
+inline sizeType Mesh::getFacesIntNo() const
+{
+  return facesInt_.size();
+}
+
+inline sizeType Mesh::getPolyhedraNo() const
 {
   return polyhedra_.size();
+}
+
+inline Real Mesh::getMaxDiameter() const
+{
+  return hmax_;
+}
+
+inline Real Mesh::getMinDiameter() const
+{
+  return hmin_;
 }
 
 } // namespace PolyDG

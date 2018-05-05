@@ -15,6 +15,13 @@ class MeshReader
 public:
   MeshReader() = default;
 
+  MeshReader(const MeshReader&) = default;
+  MeshReader& operator=(MeshReader&) = default;
+  MeshReader(MeshReader&&) = default;
+  MeshReader& operator=(MeshReader&&) = default;
+
+  // Function that performs the reading from fileName and through the proxy saves
+  // the data in mesh.
   virtual void read(Mesh& mesh, const std::string& fileName) const = 0;
 
   virtual ~MeshReader() = default;

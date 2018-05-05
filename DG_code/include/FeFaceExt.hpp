@@ -1,15 +1,15 @@
 #ifndef _FE_FACE_EXT_HPP_
 #define _FE_FACE_EXT_HPP_
 
-#include "PolyDG.hpp"
-#include "FeFace.hpp"
 #include "FaceExt.hpp"
+#include "FeFace.hpp"
+#include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
 
 #include <Eigen/Core>
 
-#include <vector>
 #include <array>
+#include <vector>
 
 namespace PolyDG
 {
@@ -67,7 +67,7 @@ inline const Eigen::Vector3d& FeFaceExt::getPhiDer(unsigned p, unsigned f) const
 
 inline unsigned FeFaceExt::getElem() const
 {
-  return face_.getTet1().getPoly().getId();
+  return face_.getTetIn().getPoly().getId();
 }
 
 inline BCtype FeFaceExt::getBClabel() const
@@ -77,7 +77,7 @@ inline BCtype FeFaceExt::getBClabel() const
 
 inline Eigen::Vector3d FeFaceExt::getQuadPoint(unsigned q) const
 {
-  return face_.getTet1().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTet1()) *
+  return face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
                                      triaRule_.getPoint(q).homogeneous());
 }
 

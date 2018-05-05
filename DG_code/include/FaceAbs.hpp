@@ -11,28 +11,25 @@ namespace PolyDG
 class FaceAbs : public Face
 {
 public:
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, Real areaDoubled, Eigen::Vector3d normal,
-          Tetrahedron& tet1, unsigned faceNoTet1);
+  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3);
 
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, Real areaDoubled, Eigen::Vector3d normal,
-          Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
+  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn, unsigned faceNoTetIn);
 
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-          Tetrahedron& tet1, unsigned faceNoTet1);
+  // Default copy constructor.
+  FaceAbs(const FaceAbs&) = default;
 
-  FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3,
-          Tetrahedron* tet1 = nullptr, unsigned faceNoTet1 = 0); // il defoult di faceNo non è bello, zero andrebbe bene se le cose fossero numerate da 1 a N
-
-  // Mancano i copy constructor e i move constructor.
+  // Default move constructor.
+  FaceAbs(FaceAbs&&) = default;
 
   inline Real getAreaDoubled() const;
   inline const Eigen::Vector3d& getNormal() const;
-  inline void setAreaDoubled(Real areaDoubled);
-  inline void setNormal(const Eigen::Vector3d& normal);
 
-  // Function that checks weather the normal vector has the right sign or has
-  // to be reverted.
-  // **tet1_ should be different from nullptr in order to use  this function.**
+  // Function that computes the unitary normal vector to the face and the doubled
+  // area of the face.
+  void computeNormalandArea();
+
+  // Function that checks weather the normal vector has the right sign (outtward
+  // wrt tetIn_) and revertes it if needed.
   void checkNormalSign();
 
   inline unsigned getId() const;
@@ -43,9 +40,15 @@ public:
   friend std::ostream& operator<<(std::ostream& out, const FaceAbs& faceAbs);
 
 protected:
+  // Id of the face.
   const unsigned id_;
+
+  // Doubled area of the face.
   Real areaDoubled_;
+
+  // Unitary vector normal to the face in the outward direction wrt tetIn_.
   Eigen::Vector3d normal_;
+
   static unsigned counter_;
 
   virtual void print(std::ostream& out) const = 0;
@@ -65,16 +68,6 @@ inline Real FaceAbs::getAreaDoubled() const
 inline const Eigen::Vector3d& FaceAbs::getNormal() const
 {
   return normal_;
-}
-
-inline void FaceAbs::setAreaDoubled(Real areaDoubled)
-{
-  areaDoubled_ = areaDoubled;
-}
-
-inline void FaceAbs::setNormal(const Eigen::Vector3d& normal)
-{
-  normal_ = normal;
 }
 
 inline unsigned FaceAbs::getId() const

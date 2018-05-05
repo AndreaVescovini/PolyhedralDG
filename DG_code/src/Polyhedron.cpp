@@ -15,13 +15,6 @@ Polyhedron::Polyhedron()
 void Polyhedron::computeBB()
 {
   // I store in boundingBox_ the min and max vertices coordinates.
-  // boundingBox_[0][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compX)->get().getX();
-  // boundingBox_[0][1] = std::max_element(vertices_.cbegin(), vertices_.cend(), compX)->get().getX();
-  // boundingBox_[1][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compY)->get().getY();
-  // boundingBox_[1][1] = std::max_element(vertices_.cbegin(), vertices_.cend(), compY)->get().getY();
-  // boundingBox_[2][0] = std::min_element(vertices_.cbegin(), vertices_.cend(), compZ)->get().getZ();
-  // boundingBox_[2][1] = std::max_element(vertices_.cbegin(), vertices_.cend(), compZ)->get().getZ();
-
   for(auto it = verticesExt_.cbegin(); it != verticesExt_.cend(); it++)
     boundingBox_.extend(it->get().getCoords());
 }
@@ -33,6 +26,15 @@ void Polyhedron::computeDiameter()
   for(auto i = verticesExt_.cbegin(); i != verticesExt_.cend(); i++)
     for(auto j = std::next(i); j != verticesExt_.cend(); j++)
       diameter_ = std::max(diameter_, i->get().distance(*j));
+}
+
+std::ostream& operator<<(std::ostream& out, const Polyhedron& poly)
+{
+  out << poly.id_ << " " << "T:";
+  for(const Tetrahedron& tet : poly.tetrahedra_)
+    out << ' ' << tet.getId();
+
+  return out;
 }
 
 unsigned Polyhedron::counter_ = 0;

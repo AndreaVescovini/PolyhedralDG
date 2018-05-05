@@ -2,9 +2,9 @@
 #include "Face.hpp"
 
 #include <algorithm>
-#include <unordered_set>
+#include <limits>
 #include <memory>
-
+#include <unordered_set>
 
 namespace PolyDG
 {
@@ -19,20 +19,9 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
   std::cout << "Informations about polyhedra have been computed." << std::endl;
 }
 
-Real Mesh::getMaxDiameter() const
-{
-  Real hmax = polyhedra_[0].getDiameter();
-
-  for(unsigned i = 1; i < polyhedra_.size(); i++)
-    if(polyhedra_[i].getDiameter() > hmax)
-      hmax = polyhedra_[i].getDiameter();
-
-  return hmax;
-}
-
 void Mesh::printAll(std::ostream& out) const
 {
-  unsigned lineNo = std::max(vertices_.size(), tetrahedra_.size());
+  sizeType lineNo = std::max(vertices_.size(), tetrahedra_.size());
   this->print(lineNo, out);
 }
 
@@ -41,19 +30,32 @@ void Mesh::printHead(std::ostream& out) const
   this->print(5, out);
 }
 
+void Mesh::printInfo(std::ostream& out) const
+{
+  out << "--------- MESH INFO ---------" << '\n';
+  out << "Vertices: \t\t" << vertices_.size() << '\n';
+  out << "Elements (polyhedra): \t" << polyhedra_.size() << '\n';
+  out << "Tetrahedra: \t\t" << tetrahedra_.size() << '\n';
+  out << "External faces: \t" << facesExt_.size() << '\n';
+  out << "Internal faces: \t" << facesInt_.size() << '\n';
+  out << "Maximum diameter =  " << hmax_ << '\n';
+  out << "Minimum diameter =  " << hmin_ <<  '\n';
+  out << "Ratio hmax / hmin =  \t" << hmax_ / hmin_ << '\n';
+  out << "-----------------------------" << std::endl;
+}
+
 void Mesh::computeFaces()
 {
   std::unordered_set<std::unique_ptr<Face>> temp;
   temp.reserve(tetrahedra_.size() * 4);
   facesInt_.reserve(tetrahedra_.size() * 2);
 
-  for(Tetrahedron& t : tetrahedra_) // perchè non const?
+  for(Tetrahedron& t : tetrahedra_)
     for(unsigned faceNo = 0; faceNo < 4; faceNo++)
-    { // I store faces in temp, the constructor will sort vertices so that
+    {
+      // I store faces in temp, the constructor will sort vertices so that
       // the comparison will be easy, if a face is not present it will be inserted,
-      // otherwise we will get res.second == false
-
-      // std::cout << "Tetraedro " << t.getId() << " " << faceNo << std::endl;
+      // otherwise we will get res.second == false.
 
       // The i-th face is that one without the (3-i)-th vertex.
       auto res = temp.emplace(new Face(t.getVertex(static_cast<unsigned>(faceNo < 1)),
@@ -65,20 +67,22 @@ void Mesh::computeFaces()
         // If I find a face of a tetrahedron of a different polyhedron I insert it in
         // facesInt_, then in any case I erase the face from temp
         unsigned elem1 = t.getPoly().getId();
-        unsigned elem2 = (*res.first)->getTet1().getPoly().getId();
+        unsigned elem2 = (*res.first)->getTetIn().getPoly().getId();
 
         if(elem1 != elem2)
         {
           if(elem1 > elem2)
             facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
-                                   (*res.first)->getTet1(), (*res.first)->getFaceNoTet1(), t, 3 - faceNo);
+                                   (*res.first)->getTetIn(), (*res.first)->getFaceNoTetIn(), t);
           else
             facesInt_.emplace_back((*res.first)->getVertex(0), (*res.first)->getVertex(1), (*res.first)->getVertex(2),
-                                    t, 3 - faceNo, (*res.first)->getTet1(), (*res.first)->getFaceNoTet1());
+                                    t, 3 - faceNo, (*res.first)->getTetIn());
         }
         temp.erase(res.first);
       }
     }
+
+  facesInt_.shrink_to_fit();
 
   // Now in temp there are only external faces that have been inserted only once,
   // I loop over external faces and I find in the faces stored in temp the
@@ -88,12 +92,12 @@ void Mesh::computeFaces()
   {
     std::unique_ptr<Face> fext(new Face(f));
     auto got = temp.find(fext);
-    // Metterci dei move?
-    // f.setNormal((*got)->getNormal());
-    f.setTet1((*got)->getTet1());
-    f.setFaceNoTet1((*got)->getFaceNoTet1());
-    // std::cout << "Now I will check the sign of the normal" << std::endl;
+
+    f.setTetIn((*got)->getTetIn());
+    f.setFaceNoTetIn((*got)->getFaceNoTetIn());
     f.checkNormalSign();
+
+    temp.erase(got);
   }
 
 }
@@ -105,44 +109,52 @@ void Mesh::computePolyInfo()
   for(FaceInt& f : facesInt_)
     for(unsigned i = 0; i < 3; i++)
     {
-      f.getTet1().getPoly().addVertexExt(f.getVertex(i));
-      f.getTet2().getPoly().addVertexExt(f.getVertex(i));
+      f.getTetIn().getPoly().addVertexExt(f.getVertex(i));
+      f.getTetOut().getPoly().addVertexExt(f.getVertex(i));
     }
 
   for(FaceExt& f : facesExt_)
     for(unsigned i = 0; i < 3; i++)
-      f.getTet1().getPoly().addVertexExt(f.getVertex(i));
+      f.getTetIn().getPoly().addVertexExt(f.getVertex(i));
+
+  hmax_ = 0.0;
+  hmin_ = std::numeric_limits<Real>::max();
 
   for(Polyhedron& p : polyhedra_)
   {
     p.computeBB();
     p.computeDiameter();
+
+    if(p.getDiameter() > hmax_)
+      hmax_ = p.getDiameter();
+    if(p.getDiameter() < hmin_)
+      hmin_ = p.getDiameter();
   }
 }
 
-void Mesh::print(unsigned lineNo, std::ostream& out) const
+void Mesh::print(sizeType lineNo, std::ostream& out) const
 {
-  out << "-------- MESH --------" << std::endl;
+  out << "-------- MESH --------\n";
 
-  out << "VERTICES: " << vertices_.size() << std::endl;
+  out << "VERTICES: " << vertices_.size() << '\n';
+  for(sizeType i = 0; i < std::min(lineNo, vertices_.size()); i++)
+    out << vertices_[i] << '\n';
 
-  for(unsigned i = 0; i < std::min<size_t>(lineNo, vertices_.size()); i++)
-    out << vertices_[i] << std::endl;
+  out << "\nTETRAHEDRA: " << tetrahedra_.size() << '\n';
+  for(sizeType i = 0; i < std::min(lineNo, tetrahedra_.size()); i++)
+    out << tetrahedra_[i] << '\n';
 
-  out << "\nTETRAHEDRA: " << tetrahedra_.size() << ", POLYHEDRA: " << polyhedra_.size() << std::endl;
+  out << "\nEXTERNAL FACES: " << facesExt_.size() << '\n';
+  for(sizeType i = 0; i < std::min(lineNo, facesExt_.size()); i++)
+    out << facesExt_[i] << '\n';
 
-  for(unsigned i = 0; i < std::min<size_t>(lineNo, tetrahedra_.size()); i++)
-    out << tetrahedra_[i] << std::endl;
+  out << "\nINTERNAL FACES: " << facesInt_.size() << '\n';
+  for(sizeType i = 0; i < std::min(lineNo, facesInt_.size()); i++)
+    out << facesInt_[i] << '\n';
 
-  out << "\nEXTERNAL FACES: " << facesExt_.size() << std::endl;
-
-  for(unsigned i = 0; i < std::min<size_t>(lineNo, facesExt_.size()); i++)
-    out << facesExt_[i] << std::endl;
-
-  out << "\nINTERNAL FACES: " << facesInt_.size() << std::endl;
-
-    for(unsigned i = 0; i < std::min<size_t>(lineNo, facesInt_.size()); i++)
-      out << facesInt_[i] << std::endl;
+  out << "\nPOLYHEDRA: " << polyhedra_.size() << '\n';
+  for(sizeType i = 0; i < std::min(lineNo, polyhedra_.size()); i++)
+    out << polyhedra_[i] << '\n';
 
   out << "----------------------" << std::endl;
 }

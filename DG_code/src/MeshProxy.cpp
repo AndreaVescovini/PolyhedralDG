@@ -21,6 +21,11 @@ std::vector<FaceExt>& MeshProxy::getFacesExtRef() const
   return mesh_.facesExt_;
 }
 
+std::vector<FaceInt>& MeshProxy::getFacesIntRef() const
+{
+  return mesh_.facesInt_;
+}
+
 std::vector<Polyhedron>& MeshProxy::getPolyhedraRef() const
 {
   return mesh_.polyhedra_;
