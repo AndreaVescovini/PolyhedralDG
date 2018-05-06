@@ -1,17 +1,18 @@
 #ifndef _FE_SPACE_HPP_
 #define _FE_SPACE_HPP_
 
-#include "Mesh.hpp"
 #include "FeElement.hpp"
-#include "FeFaceInt.hpp"
 #include "FeFaceExt.hpp"
+#include "FeFaceInt.hpp"
+#include "Mesh.hpp"
+#include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
 
 #include <Eigen/Core>
 
-#include <vector>
 #include <array>
 #include <iostream>
+#include <vector>
 
 namespace PolyDG
 {
@@ -19,37 +20,38 @@ namespace PolyDG
 class FeSpace
 {
 public:
-  using TheMesh = Mesh;
+  template <typename T>
+  using ConstIter = typename std::vector<T>::const_iterator;
 
 // Constructor that takes a mesh Th, the order of polynomials order and the required
 // degrees of exactness for quadrature formulas
-  FeSpace(TheMesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree);
+  FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree);
 
 // Constructor that takes a mesh Th and the order of polynomials order, the quadrature
 // formulas are chosen to fit with order.
-  FeSpace(TheMesh& Th, unsigned order);
+  FeSpace(Mesh& Th, unsigned order);
 
   void setOrder(unsigned order);
   inline unsigned getOrder() const;
   inline unsigned getDofNo() const;
 
-  inline const FeElement& getFeElement(unsigned i) const;
-  inline const FeFaceInt& getFeFaceInt(unsigned i) const;
-  inline const FeFaceExt& getFeFaceExt(unsigned i) const;
+  inline const FeElement& getFeElement(sizeType i) const;
+  inline const FeFaceExt& getFeFaceExt(sizeType i) const;
+  inline const FeFaceInt& getFeFaceInt(sizeType i) const;
 
-  inline unsigned getFeElementsNo() const;
-  inline unsigned getFeFacesIntNo() const;
-  inline unsigned getFeFacesExtNo() const;
+  inline sizeType getFeElementsNo() const;
+  inline sizeType getFeFacesExtNo() const;
+  inline sizeType getFeFacesIntNo() const;
 
-  inline const TheMesh& getMesh() const;
+  inline const Mesh& getMesh() const;
   inline const std::vector<std::array<unsigned, 3>>& getBasisComposition() const;
 
-  inline std::vector<FeElement>::const_iterator feElementsCbegin() const;
-  inline std::vector<FeElement>::const_iterator feElementsCend() const;
-  inline std::vector<FeFaceInt>::const_iterator feFacesIntCbegin() const;
-  inline std::vector<FeFaceInt>::const_iterator feFacesIntCend() const;
-  inline std::vector<FeFaceExt>::const_iterator feFacesExtCbegin() const;
-  inline std::vector<FeFaceExt>::const_iterator feFacesExtCend() const;
+  inline ConstIter<FeElement> feElementsCbegin() const;
+  inline ConstIter<FeElement> feElementsCend() const;
+  inline ConstIter<FeFaceExt> feFacesExtCbegin() const;
+  inline ConstIter<FeFaceExt> feFacesExtCend() const;
+  inline ConstIter<FeFaceInt> feFacesIntCbegin() const;
+  inline ConstIter<FeFaceInt> feFacesIntCend() const;
 
   void printElemBasis(std::ostream& out = std::cout) const;
   void printElemBasisDer(std::ostream& out = std::cout) const;
@@ -60,7 +62,7 @@ public:
 
 private:
 // Reference to the mesh over which the FeSpace is built
-  const TheMesh& Th_;
+  const Mesh& Th_;
 
 // Order of polynomials
   unsigned order_;
@@ -70,8 +72,8 @@ private:
 
   std::vector<std::array<unsigned, 3>> basisComposition_;
   std::vector<FeElement> feElements_;
-  std::vector<FeFaceInt> feFacesInt_;
   std::vector<FeFaceExt> feFacesExt_;
+  std::vector<FeFaceInt> feFacesInt_;
   const QuadRuleManager::Rule3D& tetraRule_;
   const QuadRuleManager::Rule2D& triaRule_;
 
@@ -97,37 +99,37 @@ inline unsigned FeSpace::getDofNo() const
   return dofNo_;
 }
 
-inline const FeElement& FeSpace::getFeElement(unsigned i) const
+inline const FeElement& FeSpace::getFeElement(sizeType i) const
 {
   return feElements_[i];
 }
 
-inline const FeFaceInt& FeSpace::getFeFaceInt(unsigned i) const
-{
-  return feFacesInt_[i];
-}
-
-inline const FeFaceExt& FeSpace::getFeFaceExt(unsigned i) const
+inline const FeFaceExt& FeSpace::getFeFaceExt(sizeType i) const
 {
   return feFacesExt_[i];
 }
 
-inline unsigned FeSpace::getFeElementsNo() const
+inline const FeFaceInt& FeSpace::getFeFaceInt(sizeType i) const
+{
+  return feFacesInt_[i];
+}
+
+inline sizeType FeSpace::getFeElementsNo() const
 {
   return feElements_.size();
 }
 
-inline unsigned FeSpace::getFeFacesIntNo() const
-{
-  return feFacesInt_.size();
-}
-
-inline unsigned FeSpace::getFeFacesExtNo() const
+inline sizeType FeSpace::getFeFacesExtNo() const
 {
   return feFacesExt_.size();
 }
 
-inline const FeSpace::TheMesh& FeSpace::getMesh() const
+inline sizeType FeSpace::getFeFacesIntNo() const
+{
+  return feFacesInt_.size();
+}
+
+inline const Mesh& FeSpace::getMesh() const
 {
   return Th_;
 }
@@ -137,34 +139,34 @@ inline const std::vector<std::array<unsigned, 3>>& FeSpace::getBasisComposition(
   return basisComposition_;
 }
 
-inline std::vector<FeElement>::const_iterator FeSpace::feElementsCbegin() const
+inline FeSpace::ConstIter<FeElement> FeSpace::feElementsCbegin() const
 {
   return feElements_.cbegin();
 }
 
-inline std::vector<FeElement>::const_iterator FeSpace::feElementsCend() const
+inline FeSpace::ConstIter<FeElement> FeSpace::feElementsCend() const
 {
   return feElements_.cend();
 }
 
-inline std::vector<FeFaceInt>::const_iterator FeSpace::feFacesIntCbegin() const
-{
-  return feFacesInt_.cbegin();
-}
-
-inline std::vector<FeFaceInt>::const_iterator FeSpace::feFacesIntCend() const
-{
-  return feFacesInt_.cend();
-}
-
-inline std::vector<FeFaceExt>::const_iterator FeSpace::feFacesExtCbegin() const
+inline FeSpace::ConstIter<FeFaceExt> FeSpace::feFacesExtCbegin() const
 {
   return feFacesExt_.cbegin();
 }
 
-inline std::vector<FeFaceExt>::const_iterator FeSpace::feFacesExtCend() const
+inline FeSpace::ConstIter<FeFaceExt> FeSpace::feFacesExtCend() const
 {
   return feFacesExt_.cend();
+}
+
+inline FeSpace::ConstIter<FeFaceInt> FeSpace::feFacesIntCbegin() const
+{
+  return feFacesInt_.cbegin();
+}
+
+inline FeSpace::ConstIter<FeFaceInt> FeSpace::feFacesIntCend() const
+{
+  return feFacesInt_.cend();
 }
 
 } // namespace PolyDG

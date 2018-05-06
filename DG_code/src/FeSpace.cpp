@@ -3,12 +3,12 @@
 namespace PolyDG
 {
 
-FeSpace::FeSpace(TheMesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
+FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
   : Th_{Th}, order_{order},
     tetraRule_{QuadRuleManager::getTetraRule(quad3DDegree)},
     triaRule_ {QuadRuleManager::getTriaRule(quad2DDegree)}
   {
-    dofNo_ = (order + 1) * (order + 2) * (order + 3) / 6.;
+    dofNo_ = (order + 1) * (order + 2) * (order + 3) / 6;
     integerComposition();
 
     initialize();
@@ -16,7 +16,7 @@ FeSpace::FeSpace(TheMesh& Th, unsigned order, unsigned quad3DDegree, unsigned qu
 
 // ho solo il termine di stiffness con le derivate e non il termine di massa,
 // quindi posso abbassare l'ordine della quadratura nei tetraedri
-FeSpace::FeSpace(TheMesh& Th, unsigned order)
+FeSpace::FeSpace(Mesh& Th, unsigned order)
   : FeSpace(Th, order, 2*(order-1), 2*order) {}
 
 void FeSpace::setOrder(unsigned order)
@@ -52,87 +52,65 @@ void FeSpace::integerComposition()
 
 void FeSpace::initialize()
 {
-  unsigned elemNo = Th_.getPolyhedraNo();
-  feElements_.reserve(elemNo);
-  for(unsigned i = 0; i < elemNo; i++)
-  {
-    feElements_.emplace_back(Th_.getPolyhedron(i), dofNo_,
-                             basisComposition_, tetraRule_);
-  }
+  feElements_.reserve(Th_.getPolyhedraNo());
+  for(sizeType i = 0; i < Th_.getPolyhedraNo(); i++)
+    feElements_.emplace_back(Th_.getPolyhedron(i), dofNo_, basisComposition_, tetraRule_);
 
-  elemNo = Th_.getFacesExtNo();
-  feFacesExt_.reserve(elemNo);
-  for(unsigned i = 0; i < elemNo; i++)
-  {
-    feFacesExt_.emplace_back( Th_.getFaceExt(i), order_, dofNo_, basisComposition_, triaRule_);
-  }
+  feFacesExt_.reserve(Th_.getFacesExtNo());
+  for(sizeType i = 0; i < Th_.getFacesExtNo(); i++)
+    feFacesExt_.emplace_back(Th_.getFaceExt(i), order_, dofNo_, basisComposition_, triaRule_);
 
-  elemNo = Th_.getFacesIntNo();
-  feFacesInt_.reserve(elemNo);
-  for(unsigned i = 0; i < elemNo; i++)
-  {
+  feFacesInt_.reserve(Th_.getFacesIntNo());
+  for(sizeType i = 0; i < Th_.getFacesIntNo(); i++)
     feFacesInt_.emplace_back(Th_.getFaceInt(i), order_, dofNo_, basisComposition_, triaRule_);
-  }
 }
 
 void FeSpace::printElemBasis(std::ostream& out) const
 {
-  out << "-------- BASIS OVER ELEMENTS --------" << "\n";
+  out << "-------- BASIS OVER ELEMENTS --------" << '\n';
 
-  for(auto& el : feElements_)
-  {
+  for(const FeElement& el : feElements_)
     el.printBasis(out);
-  }
 
   out << "-------------------------------------" << std::endl;
 }
 
 void FeSpace::printElemBasisDer(std::ostream& out) const
 {
-  out << "-------- BASIS DERIVATIVE OVER ELEMENTS --------" << "\n";
+  out << "-------- BASIS DERIVATIVE OVER ELEMENTS --------" << '\n';
 
-  for(auto& el : feElements_)
-  {
+  for(const FeElement& el : feElements_)
     el.printBasisDer(out);
-  }
 
   out << "------------------------------------------------" << std::endl;
 }
 
 void FeSpace::printFaceBasis(std::ostream& out) const
 {
-  out << "-------- BASIS OVER INTERNAL FACES --------" << "\n";
+  out << "-------- BASIS OVER INTERNAL FACES --------" << '\n';
 
-  for(auto& face : feFacesInt_)
-  {
+  for(const FeFaceInt& face : feFacesInt_)
     face.printBasis(out);
-  }
 
-  out << "-------- BASIS OVER EXTERNAL FACES --------" << "\n";
+  out << "-------- BASIS OVER EXTERNAL FACES --------" << '\n';
 
-  for(auto& face : feFacesExt_)
-  {
+  for(const FeFaceExt& face : feFacesExt_)
     face.printBasis(out);
-  }
 
   out << "-------------------------------------------" << std::endl;
 }
 
 void FeSpace::printFaceBasisDer(std::ostream& out) const
 {
-  out << "-------- BASIS DERIVATIVE OVER INTERNAL FACES --------" << "\n";
+  out << "-------- BASIS DERIVATIVE OVER INTERNAL FACES --------" << '\n';
 
-  for(auto& face : feFacesInt_)
-  {
+  for(const FeFaceInt& face : feFacesInt_)
     face.printBasisDer(out);
-  }
 
-  out << "-------- BASIS DERIVATIVE OVEREXTERNAL FACES --------" << "\n";
+  out << "-------- BASIS DERIVATIVE OVEREXTERNAL FACES --------" << '\n';
 
-  for(auto& face : feFacesExt_)
-  {
+  for(const FeFaceExt& face : feFacesExt_)
     face.printBasisDer(out);
-  }
 
   out << "------------------------------------------------------" << std::endl;
 }

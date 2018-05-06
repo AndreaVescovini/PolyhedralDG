@@ -1,23 +1,23 @@
 #include "Problem.hpp"
-#include "Vertex.hpp"
 #include "LegendreBasis.hpp"
+#include "Vertex.hpp"
 
-#include <Eigen/SparseLU>
-#include <Eigen/SparseCholesky>
 #include <Eigen/IterativeLinearSolvers>
+#include <Eigen/SparseCholesky>
+#include <Eigen/SparseLU>
 
+#include <algorithm>
 #include <cmath>
 #include <fstream>
-#include <unordered_set>
-#include <algorithm>
 #include <iterator>
+#include <unordered_set>
 
 namespace PolyDG
 {
 
 Problem::Problem(const FeSpace& Vh)
-  : Vh_{Vh}, dim_{Vh.getFeElementsNo() * Vh.getDofNo()}, A_{dim_, dim_},
-    b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)},
+  : Vh_{Vh}, dim_{static_cast<unsigned>(Vh.getDofNo() * Vh.getFeElementsNo())},
+    A_{dim_, dim_}, b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)},
     sym_{true, true, true} {}
 
 void Problem::solveLU()
