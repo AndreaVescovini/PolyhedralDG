@@ -27,40 +27,46 @@ public:
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule3D& tetraRule);
 
-  // Returns the a const reference to the geomentrical element
+  // Default copy-constructor.
+  FeElement(const FeElement&) = default;
+
+  // Default move-constructor.
+  FeElement(FeElement&&) = default;
+
+  // Function that returns the a const reference to the geomentrical element.
   inline const Element& getElem() const;
 
-  // Returns the number of tetrhedra that compose elem_
+  // Function that returns the number of tetrhedra that compose elem_.
   inline SizeType getTetrahedraNo() const;
 
-  // Return the absolute value of the determinant of the jacobian of the i-th tetrahedron
+  // Function that return the absolute value of the determinant of the jacobian of the i-th tetrahedron.
   inline Real getAbsDetJac(SizeType i) const;
 
-  // Returns the number of degrees of freedom that in 3D is
+  // Function that returns the number of degrees of freedom that in 3D is
   // dof = (order+1)*(order+2)*(order+3)/(3!)
   inline unsigned getDof() const;
 
-  // Returns the number of quadrature points of tetraRule_
+  // Function that returns the number of quadrature points of tetraRule_.
   inline SizeType getQuadPointsNo() const;
 
-  // Returns the p-th quadrature point in the tetrahedron t
+  // Function that returns the p-th quadrature point in the tetrahedron t.
   inline Eigen::Vector3d getQuadPoint(SizeType t, SizeType p) const;
 
-  // Returns the i-th quadrature weight
+  // Function that returns the i-th quadrature weight.
   inline Real getWeight(SizeType i) const;
 
-  // Returns the value of the basis function f, computed at the quadrature node p in
-  // the tetrahedron t
+  // Function that returns the value of the basis function f, computed at the quadrature node p in
+  // the tetrahedron t.
   inline Real getPhi(SizeType t, SizeType p, SizeType f) const;
 
-  // Returns the vector of the gradient of the basis function f, computed at the
-  // quadrature node p in the tetrahedron t
+  // Function that returns the vector of the gradient of the basis function f, computed at the
+  // quadrature node p in the tetrahedron t.
   inline const Eigen::Vector3d& getPhiDer(SizeType t, SizeType p, SizeType f) const;
 
-  // Prints all the computed values of the basis functions
+  // Prints all the computed values of the basis functions.
   void printBasis(std::ostream& out = std::cout) const;
 
-  // Prints all the computed values of the gradient of the basis functions
+  // Prints all the computed values of the gradient of the basis functions.
   void printBasisDer(std::ostream& out = std::cout) const;
 
   virtual ~FeElement() = default;
@@ -88,7 +94,7 @@ private:
   std::vector<Eigen::Vector3d> phiDer_;
 
   // Auxiliary function that performs the computation of the basis functinos and
-  // fills phi_ and phiDer_
+  // fills phi_ and phiDer_.
   void compute_basis();
 
   // Auxiliary function that, given the number of the tetrahedron t, quadrature

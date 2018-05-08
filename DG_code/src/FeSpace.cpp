@@ -98,7 +98,7 @@ void FeSpace::printFaceBasisDer(std::ostream& out) const
   for(const FeFaceInt& face : feFacesInt_)
     face.printBasisDer(out);
 
-  out << "-------- BASIS DERIVATIVE OVEREXTERNAL FACES --------" << '\n';
+  out << "-------- BASIS DERIVATIVE OVER EXTERNAL FACES --------" << '\n';
 
   for(const FeFaceExt& face : feFacesExt_)
     face.printBasisDer(out);

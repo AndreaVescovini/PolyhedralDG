@@ -19,11 +19,11 @@ void FeElement::compute_basis()
   // hb contains the half of the dimensions of the bounding box of the polyhedron,
   // mb contains the center of the bounding box. They are needed for the computation
   // of the scaled Legendre polynomials.
-  Eigen::Vector3d hb = elem_.getBoundingBox().sizes() / 2;
-  Eigen::Vector3d mb = elem_.getBoundingBox().center();
+  const Eigen::Vector3d hb = elem_.getBoundingBox().sizes() / 2;
+  const Eigen::Vector3d mb = elem_.getBoundingBox().center();
 
-  SizeType quadPointsNo = tetraRule_.getPointsNo();
-  SizeType tetraNo = elem_.getTetrahedraNo();
+  const SizeType quadPointsNo = tetraRule_.getPointsNo();
+  const SizeType tetraNo = elem_.getTetrahedraNo();
 
   phi_.reserve(tetraNo * quadPointsNo * dof_);
   phiDer_.reserve(tetraNo * quadPointsNo * dof_);
@@ -36,7 +36,7 @@ void FeElement::compute_basis()
     {
       // I map the quadrature point from the reference tetrahedron to the physical one,
       // then I rescale it in order to compute the scaled legendre polynomial.
-      Eigen::Vector3d physicPt = ((elem_.getTetra(t).getMap() * tetraRule_.getPoint(p)) - mb).array() / hb.array();
+      const Eigen::Vector3d physicPt = ((elem_.getTetra(t).getMap() * tetraRule_.getPoint(p)) - mb).array() / hb.array();
 
       // loop over basis functions.
       for(unsigned f = 0; f < dof_; f++)

@@ -1,8 +1,8 @@
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 int main()
 {

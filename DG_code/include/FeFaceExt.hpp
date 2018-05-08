@@ -17,36 +17,47 @@ namespace PolyDG
 class FeFaceExt : public FeFace
 {
 public:
-  using TheFace = FaceExt;
-
-  FeFaceExt(const TheFace& face, unsigned order, unsigned dof,
+  FeFaceExt(const FaceExt& face, unsigned order, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule2D& triaRule);
 
+  // Default copy-constructor.
+  FeFaceExt(const FeFaceExt&) = default;
+
+  // Default move-constructor.
+  FeFaceExt(FeFaceExt&&) = default;
+
+  // Function that returns the value of the basis function f computed at the
+  // quadrature point p.
   inline Real getPhi(SizeType p, SizeType f) const;
+
+  // Function that returns the gradient of the basis function f computed at the
+  // quadrature point p.
   inline const Eigen::Vector3d& getPhiDer(SizeType p, SizeType f) const;
 
+  // Function that returns the id-number of the elements to which the face belongs.
   inline unsigned getElem() const;
+
+  // Function that returns the type of boundary condition of the face.
   inline BCType getBClabel() const;
 
-  inline Eigen::Vector3d getQuadPoint(SizeType p) const override;
-
-  inline Real getAreaDoubled() const override;
-  inline const Eigen::Vector3d& getNormal() const override;
-
+  // Function that prints the values of the basis functions over the face.
   void printBasis(std::ostream& out) const override;
+
+  // Function that prints the values of the gradient of the basis functions over
+  // the face.
   void printBasisDer(std::ostream& out) const override;
 
+  // Default virtual destructor.
   virtual ~FeFaceExt() = default;
 
 private:
-  const TheFace& face_;
-
-// Auxiliary function that fills phi_ and phiDer_
+  // Auxiliary function that computes the values of the basis functions and
+  // their gradient and fills phi_ and phDer_.
   void compute_basis() override;
 
-// Auxiliary function that, given the quadrature point p and basis function f,
-// returns the index in which the corresponding value is stored in phi_ and phiDer_
+  // Auxiliary function that, given the quadrature point p and basis function f,
+  // returns the index in which the corresponding value is stored in phi_ and phiDer_.
   inline SizeType sub2ind(SizeType p, SizeType f) const;
 
 };
@@ -72,23 +83,7 @@ inline unsigned FeFaceExt::getElem() const
 
 inline BCType FeFaceExt::getBClabel() const
 {
-  return face_.getBClabel();
-}
-
-inline Eigen::Vector3d FeFaceExt::getQuadPoint(SizeType p) const
-{
-  return face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
-                                     triaRule_.getPoint(p).homogeneous());
-}
-
-inline Real FeFaceExt::getAreaDoubled() const
-{
-  return face_.getAreaDoubled();
-}
-
-inline const Eigen::Vector3d& FeFaceExt::getNormal() const
-{
-  return face_.getNormal();
+  return static_cast<const FaceExt&>(face_).getBClabel();
 }
 
 inline SizeType FeFaceExt::sub2ind(SizeType p, SizeType f) const
