@@ -3,11 +3,11 @@
 namespace PolyDG
 {
 
-FaceExt::FaceExt(Vertex& v1, Vertex& v2,  Vertex& v3, BCtype bcLabel)
+FaceExt::FaceExt(Vertex& v1, Vertex& v2,  Vertex& v3, BCType bcLabel)
   :  FaceAbs(v1, v2, v3), bcLabel_{bcLabel} {}
 
 FaceExt::FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
-                 unsigned faceNoTetIn, BCtype bcLabel)
+                 unsigned faceNoTetIn, BCType bcLabel)
   :  FaceAbs(v1, v2, v3, tetIn, faceNoTetIn), bcLabel_{bcLabel} {}
 
 void FaceExt::print(std::ostream& out) const

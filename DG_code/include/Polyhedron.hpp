@@ -34,10 +34,10 @@ public:
   inline void addVertexExt(Vertex& v);
 
   inline unsigned getId() const;
-  inline const Tetrahedron& getTetra(sizeType i) const;
-  inline Tetrahedron& getTetra(sizeType i);
-  inline sizeType getTetrahedraNo() const;
-  inline sizeType getVerticesExtNo() const;
+  inline const Tetrahedron& getTetra(SizeType i) const;
+  inline Tetrahedron& getTetra(SizeType i);
+  inline SizeType getTetrahedraNo() const;
+  inline SizeType getVerticesExtNo() const;
   inline const Eigen::AlignedBox3d& getBoundingBox() const;
   inline Real getDiameter() const;
 
@@ -97,17 +97,17 @@ inline Real Polyhedron::getDiameter() const
   return diameter_;
 }
 
-inline const Tetrahedron& Polyhedron::getTetra(sizeType i) const
+inline const Tetrahedron& Polyhedron::getTetra(SizeType i) const
 {
   return tetrahedra_[i];
 }
 
-inline Tetrahedron& Polyhedron::getTetra(sizeType i)
+inline Tetrahedron& Polyhedron::getTetra(SizeType i)
 {
   return tetrahedra_[i];
 }
 
-inline sizeType Polyhedron::getTetrahedraNo() const
+inline SizeType Polyhedron::getTetrahedraNo() const
 {
   return tetrahedra_.size();
 }
@@ -122,7 +122,7 @@ inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
   return boundingBox_;
 }
 
-inline sizeType Polyhedron::getVerticesExtNo() const
+inline SizeType Polyhedron::getVerticesExtNo() const
 {
   return verticesExt_.size();
 }

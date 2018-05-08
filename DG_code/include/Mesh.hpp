@@ -31,17 +31,17 @@ public:
   Mesh(Mesh&&) = default;
   Mesh& operator=(Mesh&&) = default;
 
-  inline const Vertex& getVertex(sizeType n) const;
-  inline const Tetrahedron& getTetrahedron(sizeType n) const;
-  inline const FaceExt& getFaceExt(sizeType n) const;
-  inline const FaceInt& getFaceInt(sizeType n) const;
-  inline const Polyhedron& getPolyhedron(sizeType n) const;
+  inline const Vertex& getVertex(SizeType n) const;
+  inline const Tetrahedron& getTetrahedron(SizeType n) const;
+  inline const FaceExt& getFaceExt(SizeType n) const;
+  inline const FaceInt& getFaceInt(SizeType n) const;
+  inline const Polyhedron& getPolyhedron(SizeType n) const;
 
-  inline sizeType getVerticesNo() const;
-  inline sizeType getTetrahedraNo() const;
-  inline sizeType getFacesExtNo() const;
-  inline sizeType getFacesIntNo() const;
-  inline sizeType getPolyhedraNo() const;
+  inline SizeType getVerticesNo() const;
+  inline SizeType getTetrahedraNo() const;
+  inline SizeType getFacesExtNo() const;
+  inline SizeType getFacesIntNo() const;
+  inline SizeType getPolyhedraNo() const;
 
   inline Real getMaxDiameter() const;
   inline Real getMinDiameter() const;
@@ -78,59 +78,59 @@ private:
   // Function that computes the bounding box and the diameter of each polyhedron.
   void computePolyInfo();
 
-  void print(sizeType lineNo, std::ostream& out = std::cout) const;
+  void print(SizeType lineNo, std::ostream& out = std::cout) const;
 };
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline const Vertex& Mesh::getVertex(sizeType n) const
+inline const Vertex& Mesh::getVertex(SizeType n) const
 {
   return vertices_[n];
 }
 
-inline const Tetrahedron& Mesh::getTetrahedron(sizeType n) const
+inline const Tetrahedron& Mesh::getTetrahedron(SizeType n) const
 {
   return tetrahedra_[n];
 }
 
-inline const FaceExt& Mesh::getFaceExt(sizeType n) const
+inline const FaceExt& Mesh::getFaceExt(SizeType n) const
 {
   return facesExt_[n];
 }
 
-inline const FaceInt& Mesh::getFaceInt(sizeType n) const
+inline const FaceInt& Mesh::getFaceInt(SizeType n) const
 {
   return facesInt_[n];
 }
 
-inline const Polyhedron& Mesh::getPolyhedron(sizeType n) const
+inline const Polyhedron& Mesh::getPolyhedron(SizeType n) const
 {
   return polyhedra_[n];
 }
 
-inline sizeType Mesh::getVerticesNo() const
+inline SizeType Mesh::getVerticesNo() const
 {
   return vertices_.size();
 }
 
-inline sizeType Mesh::getTetrahedraNo() const
+inline SizeType Mesh::getTetrahedraNo() const
 {
   return tetrahedra_.size();
 }
 
-inline sizeType Mesh::getFacesExtNo() const
+inline SizeType Mesh::getFacesExtNo() const
 {
   return facesExt_.size();
 }
 
-inline sizeType Mesh::getFacesIntNo() const
+inline SizeType Mesh::getFacesIntNo() const
 {
   return facesInt_.size();
 }
 
-inline sizeType Mesh::getPolyhedraNo() const
+inline SizeType Mesh::getPolyhedraNo() const
 {
   return polyhedra_.size();
 }

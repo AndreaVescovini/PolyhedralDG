@@ -19,16 +19,16 @@ class FeFaceInt : public FeFace
 public:
   using TheFace = FaceInt;
 
-  FeFaceInt(const TheFace& face, unsigned order, unsigned dofNo,
+  FeFaceInt(const TheFace& face, unsigned order, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRuleManager::Rule2D& triaRule);
 
-  inline Real getPhi(SideType s, unsigned p, unsigned f) const;
-  inline const Eigen::Vector3d& getPhiDer(SideType s, unsigned p, unsigned f) const;
+  inline Real getPhi(SideType s, SizeType p, SizeType f) const;
+  inline const Eigen::Vector3d& getPhiDer(SideType s, SizeType p, SizeType f) const;
 
   inline unsigned getElem(SideType s) const;
 
-  inline Eigen::Vector3d getQuadPoint(unsigned q) const override;
+  inline Eigen::Vector3d getQuadPoint(SizeType p) const override;
 
   inline Real getAreaDoubled() const override;
   inline const Eigen::Vector3d& getNormal() const override;
@@ -47,7 +47,7 @@ private:
 // Auxiliary function that, given the s of the face, the quadrature point p
 // and basis function f, returns the index in which the corresponding value
 // is stored in phi_ and phiDer_
-  inline unsigned sub2ind(SideType s, unsigned p, unsigned f) const;
+  inline SizeType sub2ind(SideType s, SizeType p, SizeType f) const;
 
 };
 
@@ -55,12 +55,12 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline Real FeFaceInt::getPhi(SideType s, unsigned p, unsigned f) const
+inline Real FeFaceInt::getPhi(SideType s, SizeType p, SizeType f) const
 {
   return phi_[sub2ind(s, p, f)];
 }
 
-inline const Eigen::Vector3d& FeFaceInt::getPhiDer(SideType s, unsigned p, unsigned f) const
+inline const Eigen::Vector3d& FeFaceInt::getPhiDer(SideType s, SizeType p, SizeType f) const
 {
   return phiDer_[sub2ind(s, p, f)];
 }
@@ -70,10 +70,10 @@ inline unsigned FeFaceInt::getElem(SideType s) const
   return (s == Out ? face_.getTetIn().getPoly().getId() : face_.getTetOut().getPoly().getId());
 }
 
-inline Eigen::Vector3d FeFaceInt::getQuadPoint(unsigned q) const
+inline Eigen::Vector3d FeFaceInt::getQuadPoint(SizeType p) const
 {
   return face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
-                                     triaRule_.getPoint(q).homogeneous());
+                                     triaRule_.getPoint(p).homogeneous());
 }
 
 inline Real FeFaceInt::getAreaDoubled() const
@@ -86,9 +86,9 @@ inline const Eigen::Vector3d& FeFaceInt::getNormal() const
   return face_.getNormal();
 }
 
-inline unsigned FeFaceInt::sub2ind(SideType s, unsigned p, unsigned f) const
+inline SizeType FeFaceInt::sub2ind(SideType s, SizeType p, SizeType f) const
 {
-  return (s == In) + 2 * (f + p * dofNo_);
+  return (s == In) + 2 * (f + p * dof_);
 }
 
 } // namespace PolyDG

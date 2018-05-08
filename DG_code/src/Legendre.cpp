@@ -1,49 +1,70 @@
 #include "Legendre.hpp"
 
-// #include <boost/math/special_functions/legendre.hpp>
-
 #include <iostream>
 
-namespace basis
+namespace PolyDG
 {
 
-std::array<PolyDG::Real, 2> legendre(unsigned n, PolyDG::Real x)
+Real legendre(unsigned n, Real x)
 {
   switch(n)
   {
     case 0:
-      return {1., 0};
+      return 1.0;
 
     case 1:
-      return {x, 1.};
+      return x;
 
     case 2:
-      return {1.5 * pow(x, 2) - 0.5,
-              3. * x};
+      return 1.5 * pow(x, 2) - 0.5;
 
     case 3:
-      return {x * (2.5 * pow(x, 2) - 1.5),
-              7.5 * pow(x, 2) - 1.5};
+      return x * (2.5 * pow(x, 2) - 1.5);
 
     case 4:
-      return {(35. * pow(x, 4) - 30. * pow(x,2) + 3.) / 8.,
-              (140. * pow(x, 3) - 60. * x) / 8.};
+      return (35.0 * pow(x, 4) - 30.0 * pow(x,2) + 3.0) / 8.0;
 
     case 5:
-      return {(63. * pow(x, 5) - 70. * pow(x, 3) + 15. * x) / 8.,
-              (315. * pow(x, 4) - 210. * pow(x, 2) + 15.) / 8.};
+      return (63.0 * pow(x, 5) - 70.0 * pow(x, 3) + 15.0 * x) / 8.0;
 
     case 6:
-      return {(231. * pow(x, 6) - 315. * pow(x, 4) + 105. * pow(x, 2) - 5.) / 16.,
-              (1386. * pow(x, 5) - 1260. * pow(x, 3) + 210. * x) / 16.};
+      return (231.0 * pow(x, 6) - 315.0 * pow(x, 4) + 105.0 * pow(x, 2) - 5.0) / 16.0;
 
     default:
-    // return {boost::math::legendre_p(n, x), boost::math::legendre_p_prime(n, x)};
-      std::cerr << "Boost is needed." << std::endl;
-      return {0, 0};
-
+      std::cerr << "The required degree is not implemented." << std::endl;
+      exit(1);
   }
-
 }
 
-} // namespace basis
+Real legendreDer(unsigned n, Real x)
+{
+  switch(n)
+  {
+    case 0:
+      return 0.0;
+
+    case 1:
+      return 1.0;
+
+    case 2:
+      return 3.0 * x;
+
+    case 3:
+      return 7.5 * pow(x, 2) - 1.5;
+
+    case 4:
+      return (140.0 * pow(x, 3) - 60.0 * x) / 8.0;
+
+    case 5:
+      return (315.0 * pow(x, 4) - 210.0 * pow(x, 2) + 15.0) / 8.0;
+
+    case 6:
+      return (1386.0 * pow(x, 5) - 1260.0 * pow(x, 3) + 210.0 * x) / 16.0;
+
+    default:
+      std::cerr << "The required degree is not implemented." << std::endl;
+      exit(1);
+  }
+}
+
+} // namespace PolyDG

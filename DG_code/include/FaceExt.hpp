@@ -13,10 +13,10 @@ namespace PolyDG
 class FaceExt : public FaceAbs
 {
 public:
-  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCtype bcLabel);
+  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCType bcLabel);
 
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
-          unsigned faceNoTetIn, BCtype bcLabel);
+          unsigned faceNoTetIn, BCType bcLabel);
 
   // Default copy constructor.
   FaceExt(const FaceExt&) = default;
@@ -24,14 +24,14 @@ public:
   // Default move constructor.
   FaceExt(FaceExt&&) = default;
 
-  inline BCtype getBClabel() const;
-  inline void setBClabel(BCtype bcLabel);
+  inline BCType getBClabel() const;
+  inline void setBClabel(BCType bcLabel);
 
   virtual ~FaceExt() = default;
 
 private:
   // Label for a specific boundary condition.
-  BCtype bcLabel_;
+  BCType bcLabel_;
 
   void print(std::ostream& out) const override;
 };
@@ -40,12 +40,12 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline BCtype FaceExt::getBClabel() const
+inline BCType FaceExt::getBClabel() const
 {
   return bcLabel_;
 }
 
-inline void FaceExt::setBClabel(BCtype bcLabel)
+inline void FaceExt::setBClabel(BCType bcLabel)
 {
   bcLabel_ = bcLabel;
 }

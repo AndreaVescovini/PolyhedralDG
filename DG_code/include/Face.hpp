@@ -34,8 +34,8 @@ public:
   // Deleted move assignment operator.
   Face& operator=(Face&&) = delete;
 
-  inline const Vertex& getVertex(sizeType i) const;
-  inline Vertex& getVertex(sizeType i);
+  inline const Vertex& getVertex(SizeType i) const;
+  inline Vertex& getVertex(SizeType i);
 
   inline const Tetrahedron& getTetIn() const;
   inline Tetrahedron& getTetIn();
@@ -98,12 +98,12 @@ struct hash<unique_ptr<PolyDG::Face>>
 namespace PolyDG
 {
 
-inline const Vertex& Face::getVertex(sizeType i) const
+inline const Vertex& Face::getVertex(SizeType i) const
 {
   return vertices_[i];
 }
 
-inline Vertex& Face::getVertex(sizeType i)
+inline Vertex& Face::getVertex(SizeType i)
 {
   return vertices_[i];
 }

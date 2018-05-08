@@ -1,10 +1,10 @@
 #ifndef _EXPR_OPERATORS_HPP_
 #define _EXPR_OPERATORS_HPP_
 
-#include "PolyDG.hpp"
 #include "ExprWrapper.hpp"
 #include "FeElement.hpp"
 #include "Operators.hpp"
+#include "PolyDG.hpp"
 
 #include <functional>
 

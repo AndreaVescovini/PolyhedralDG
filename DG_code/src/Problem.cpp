@@ -1,5 +1,5 @@
+#include "Legendre.hpp"
 #include "Problem.hpp"
-#include "LegendreBasis.hpp"
 #include "Vertex.hpp"
 
 #include <Eigen/IterativeLinearSolvers>
@@ -16,7 +16,7 @@ namespace PolyDG
 {
 
 Problem::Problem(const FeSpace& Vh)
-  : Vh_{Vh}, dim_{static_cast<unsigned>(Vh.getDofNo() * Vh.getFeElementsNo())},
+  : Vh_{Vh}, dim_{static_cast<unsigned>(Vh.getDof() * Vh.getFeElementsNo())},
     A_{dim_, dim_}, b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)},
     sym_{true, true, true} {}
 
@@ -107,19 +107,19 @@ Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>&
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
-    for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
-      for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+    for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
+      for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
       {
         Real uh = 0.0;
 
         // Evaluation of the fem function at the quadrature node
-        for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-          uh += u_(i + indexOffset) * it->getPhi(t, q, i);
+        for(unsigned f = 0; f < Vh_.getDof(); f++)
+          uh += u_(f + indexOffset) * it->getPhi(t, p, f);
 
-        Real difference = uh - uex(it->getQuadPoint(t, q));
-        errSquared += difference * difference * it->getWeight(q) * it->getAbsDetJac(t);
+        Real difference = uh - uex(it->getQuadPoint(t, p));
+        errSquared += difference * difference * it->getWeight(p) * it->getAbsDetJac(t);
       }
   }
 
@@ -132,19 +132,19 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
-    for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
-      for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+    for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
+      for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
       {
         Eigen::Vector3d uhGrad = Eigen::Vector3d::Zero();
 
         // Evaluation of the fem function at the quadrature node
-        for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-          uhGrad += u_(i + indexOffset) * it->getPhiDer(t, q, i);
+        for(unsigned f = 0; f < Vh_.getDof(); f++)
+          uhGrad += u_(f + indexOffset) * it->getPhiDer(t, p, f);
 
-        Eigen::Vector3d difference = uhGrad - uexGrad(it->getQuadPoint(t, q));
-        errSquared += difference.squaredNorm() * it->getWeight(q) * it->getAbsDetJac(t);
+        Eigen::Vector3d difference = uhGrad - uexGrad(it->getQuadPoint(t, p));
+        errSquared += difference.squaredNorm() * it->getWeight(p) * it->getAbsDetJac(t);
       }
   }
 
@@ -168,8 +168,8 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     std::unordered_set<std::reference_wrapper<const Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> nodesSet;
     nodesSet.reserve(elem.getTetrahedraNo() + 3);
 
-    for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
-      for(unsigned j = 0; j < 4; j++)
+    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
+      for(SizeType j = 0; j < 4; j++)
         nodesSet.emplace(elem.getTetra(i).getVertex(j));
 
     std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
@@ -193,8 +193,8 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
   // Print the cells (tetrahedra) connectivity and type
     fout << "      <Cells>\n";
     fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
-    for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
-      for(unsigned j = 0; j < 4; j++)
+    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
+      for(SizeType j = 0; j < 4; j++)
       {
         unsigned vertexIndex = std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin();
         fout << ' ' << vertexIndex;
@@ -213,7 +213,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
   // Print the values of the solution
     fout << "      <PointData Scalars=\"Solution\">\n";
     fout << "        <DataArray type=\"Float64\" Name=\"solution\" format=\"ascii\">\n         ";
-    for(unsigned i = 0; i < uNodes.size(); i++)
+    for(SizeType i = 0; i < uNodes.size(); i++)
       fout << ' ' << uNodes[i];
     fout << "\n        </DataArray>\n";
     fout << "      </PointData>\n";
@@ -221,7 +221,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
   // Print a value for the Polyhedron
     fout << "      <CellData Scalars=\"Mesh\">\n";
     fout << "        <DataArray type=\"Int32\" Name=\"Mesh\" format=\"ascii\">\n         ";
-    for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
+    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
       fout << ' ' << elem.getId();
     fout << "\n        </DataArray>\n";
     fout << "      </CellData>\n";
@@ -238,20 +238,20 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
 {
   Real result = 0.0;
-  // unsigned indexOffset = el.getElem().getId() * Vh_.getDofNo();
-  // Eigen::Vector3d hb = el.getElem().getBoundingBox().sizes() / 2;
-  // Eigen::Vector3d mb = el.getElem().getBoundingBox().center();
-  //
-  // auto basisComposition = Vh_.getBasisComposition();
+  unsigned indexOffset = el.getElem().getId() * Vh_.getDof();
+  Eigen::Vector3d hb = el.getElem().getBoundingBox().sizes() / 2;
+  Eigen::Vector3d mb = el.getElem().getBoundingBox().center();
 
-  // for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-  // {
-  //   Real valx = LegendreBasis<basisComposition[i][0]>((x - mb(0)) / hb(0)) / std::sqrt(hb(0));
-  //   Real valy = LegendreBasis<basisComposition[i][1]>((y - mb(1)) / hb(1)) / std::sqrt(hb(1));
-  //   Real valz = LegendreBasis<basisComposition[i][2]>((z - mb(2)) / hb(2)) / std::sqrt(hb(2));
-  //
-  //   result += u_(indexOffset + i) * valx  * valy * valz;
-  // }
+  auto basisComposition = Vh_.getBasisComposition();
+
+  for(unsigned i = 0; i < Vh_.getDof(); i++)
+  {
+    Real valx = legendre(basisComposition[i][0], (x - mb(0)) / hb(0)) / std::sqrt(hb(0));
+    Real valy = legendre(basisComposition[i][1], (y - mb(1)) / hb(1)) / std::sqrt(hb(1));
+    Real valz = legendre(basisComposition[i][2], (z - mb(2)) / hb(2)) / std::sqrt(hb(2));
+
+    result += u_(indexOffset + i) * valx  * valy * valz;
+  }
 
   return result;
 }

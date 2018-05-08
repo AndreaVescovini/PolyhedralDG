@@ -6,9 +6,9 @@
 
 #include <Eigen/Core>
 
-#include <vector>
 #include <array>
 #include <iostream>
+#include <vector>
 
 namespace PolyDG
 {
@@ -16,14 +16,14 @@ namespace PolyDG
 class FeFace
 {
 public:
-  FeFace(unsigned dofNo, const std::vector<std::array<unsigned, 3>>& basisComposition,
+  FeFace(unsigned dof, const std::vector<std::array<unsigned, 3>>& basisComposition,
          const QuadRuleManager::Rule2D& triaRule);
 
-  inline unsigned getDofNo() const;
+  inline unsigned getDof() const;
 
-  inline unsigned getQuadPointsNo() const;
-  inline Real getWeight(unsigned q) const;
-  virtual Eigen::Vector3d getQuadPoint(unsigned q) const = 0;
+  inline SizeType getQuadPointsNo() const;
+  inline Real getWeight(SizeType p) const;
+  virtual Eigen::Vector3d getQuadPoint(SizeType p) const = 0;
 
   inline Real getPenaltyParam() const;
 
@@ -36,7 +36,7 @@ public:
   virtual ~FeFace() = default;
 
 protected:
-  unsigned dofNo_;
+  unsigned dof_;
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
   const QuadRuleManager::Rule2D& triaRule_;
 
@@ -57,19 +57,19 @@ protected:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline unsigned FeFace::getDofNo() const
+inline unsigned FeFace::getDof() const
 {
-  return dofNo_;
+  return dof_;
 }
 
-inline unsigned FeFace::getQuadPointsNo() const
+inline SizeType FeFace::getQuadPointsNo() const
 {
   return triaRule_.getPointsNo();
 }
 
-inline Real FeFace::getWeight(unsigned q) const
+inline Real FeFace::getWeight(SizeType p) const
 {
-  return triaRule_.getWeight(q);
+  return triaRule_.getWeight(p);
 }
 
 inline Real FeFace::getPenaltyParam() const

@@ -4,13 +4,11 @@ namespace PolyDG
 {
 
 FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
-  : Th_{Th}, order_{order},
+  : Th_{Th}, order_{order}, dof_{(order + 1) * (order + 2) * (order + 3) / 6},
     tetraRule_{QuadRuleManager::getTetraRule(quad3DDegree)},
     triaRule_ {QuadRuleManager::getTriaRule(quad2DDegree)}
   {
-    dofNo_ = (order + 1) * (order + 2) * (order + 3) / 6;
     integerComposition();
-
     initialize();
   }
 
@@ -19,19 +17,12 @@ FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2
 FeSpace::FeSpace(Mesh& Th, unsigned order)
   : FeSpace(Th, order, 2*(order-1), 2*order) {}
 
-void FeSpace::setOrder(unsigned order)
-{
-  order_ = order;
-  dofNo_ = (order + 1) * (order + 2) * (order + 3) / 6.;
-  integerComposition();
-}
-
 void FeSpace::integerComposition()
 {
-  basisComposition_.reserve(dofNo_);
+  basisComposition_.reserve(dof_);
 
   int nx = order_;
-  while (nx >= 0)
+  while(nx >= 0)
   {
     int ny = order_ - nx;
     while(ny >= 0)
@@ -53,16 +44,16 @@ void FeSpace::integerComposition()
 void FeSpace::initialize()
 {
   feElements_.reserve(Th_.getPolyhedraNo());
-  for(sizeType i = 0; i < Th_.getPolyhedraNo(); i++)
-    feElements_.emplace_back(Th_.getPolyhedron(i), dofNo_, basisComposition_, tetraRule_);
+  for(SizeType i = 0; i < Th_.getPolyhedraNo(); i++)
+    feElements_.emplace_back(Th_.getPolyhedron(i), dof_, basisComposition_, tetraRule_);
 
   feFacesExt_.reserve(Th_.getFacesExtNo());
-  for(sizeType i = 0; i < Th_.getFacesExtNo(); i++)
-    feFacesExt_.emplace_back(Th_.getFaceExt(i), order_, dofNo_, basisComposition_, triaRule_);
+  for(SizeType i = 0; i < Th_.getFacesExtNo(); i++)
+    feFacesExt_.emplace_back(Th_.getFaceExt(i), order_, dof_, basisComposition_, triaRule_);
 
   feFacesInt_.reserve(Th_.getFacesIntNo());
-  for(sizeType i = 0; i < Th_.getFacesIntNo(); i++)
-    feFacesInt_.emplace_back(Th_.getFaceInt(i), order_, dofNo_, basisComposition_, triaRule_);
+  for(SizeType i = 0; i < Th_.getFacesIntNo(); i++)
+    feFacesInt_.emplace_back(Th_.getFaceInt(i), order_, dof_, basisComposition_, triaRule_);
 }
 
 void FeSpace::printElemBasis(std::ostream& out) const

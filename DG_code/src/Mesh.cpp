@@ -21,7 +21,7 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 
 void Mesh::printAll(std::ostream& out) const
 {
-  sizeType lineNo = std::max(vertices_.size(), tetrahedra_.size());
+  SizeType lineNo = std::max(vertices_.size(), tetrahedra_.size());
   this->print(lineNo, out);
 }
 
@@ -132,28 +132,28 @@ void Mesh::computePolyInfo()
   }
 }
 
-void Mesh::print(sizeType lineNo, std::ostream& out) const
+void Mesh::print(SizeType lineNo, std::ostream& out) const
 {
   out << "-------- MESH --------\n";
 
   out << "VERTICES: " << vertices_.size() << '\n';
-  for(sizeType i = 0; i < std::min(lineNo, vertices_.size()); i++)
+  for(SizeType i = 0; i < std::min(lineNo, vertices_.size()); i++)
     out << vertices_[i] << '\n';
 
   out << "\nTETRAHEDRA: " << tetrahedra_.size() << '\n';
-  for(sizeType i = 0; i < std::min(lineNo, tetrahedra_.size()); i++)
+  for(SizeType i = 0; i < std::min(lineNo, tetrahedra_.size()); i++)
     out << tetrahedra_[i] << '\n';
 
   out << "\nEXTERNAL FACES: " << facesExt_.size() << '\n';
-  for(sizeType i = 0; i < std::min(lineNo, facesExt_.size()); i++)
+  for(SizeType i = 0; i < std::min(lineNo, facesExt_.size()); i++)
     out << facesExt_[i] << '\n';
 
   out << "\nINTERNAL FACES: " << facesInt_.size() << '\n';
-  for(sizeType i = 0; i < std::min(lineNo, facesInt_.size()); i++)
+  for(SizeType i = 0; i < std::min(lineNo, facesInt_.size()); i++)
     out << facesInt_[i] << '\n';
 
   out << "\nPOLYHEDRA: " << polyhedra_.size() << '\n';
-  for(sizeType i = 0; i < std::min(lineNo, polyhedra_.size()); i++)
+  for(SizeType i = 0; i < std::min(lineNo, polyhedra_.size()); i++)
     out << polyhedra_[i] << '\n';
 
   out << "----------------------" << std::endl;

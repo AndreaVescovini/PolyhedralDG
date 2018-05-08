@@ -5,11 +5,11 @@
 
 #include <Eigen/Core>
 
-#include <vector>
-#include <initializer_list>
-#include <numeric>
 #include <cmath>
 // #include <iostream>
+#include <initializer_list>
+#include <numeric>
+#include <vector>
 
 namespace PolyDG
 {

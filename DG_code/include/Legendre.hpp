@@ -3,19 +3,20 @@
 
 #include "PolyDG.hpp"
 
-#include <array>
-
-namespace basis
+namespace PolyDG
 {
 
-// Recursive implementation through templates of the integer power of a real number
+// Function that return the value of the Legendre polynomial of order n at the
+// point x belonging to [-1, 1]. It is implemented only for n<=6.
+Real legendre(unsigned n, PolyDG::Real x);
+
+// Function that return the value of the derivative of the Legendre polynomial
+// of order n at the point x belonging to [-1, 1]. It is implemented only for n<=6.
+Real legendreDer(unsigned n, PolyDG::Real x);
+
+// Recursive implementation through templates of the integer power of a real number.
 template<typename T>
 constexpr T pow(const T& x, unsigned n);
-
-// Function that return the value of the legendre polynomial of order n at the
-// point x belonging to [-1, 1] and the value of the derivative at the same point.
-std::array<PolyDG::Real, 2> legendre(unsigned n, PolyDG::Real x);
-
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
@@ -24,7 +25,7 @@ std::array<PolyDG::Real, 2> legendre(unsigned n, PolyDG::Real x);
 template<typename T>
 constexpr T pow(const T& x, unsigned n)
 {
-  return (n == 0) ? T(1.) : x * pow(x, n - 1);
+  return (n == 0) ? T(1.0) : x * pow(x, n - 1);
 }
 
 }

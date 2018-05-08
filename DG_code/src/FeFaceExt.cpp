@@ -6,13 +6,13 @@
 namespace PolyDG
 {
 
-FeFaceExt::FeFaceExt(const TheFace& face, unsigned order, unsigned dofNo,
+FeFaceExt::FeFaceExt(const TheFace& face, unsigned order, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRule<Eigen::Vector2d>& triaRule)
-  : FeFace(dofNo, basisComposition, triaRule), face_{face}
+  : FeFace(dof, basisComposition, triaRule), face_{face}
 {
-  compute_basis();
   penaltyParam_ = order * order / face.getTetIn().getPoly().getDiameter();
+  compute_basis();
 }
 
 void FeFaceExt::compute_basis()
@@ -23,35 +23,29 @@ void FeFaceExt::compute_basis()
   Eigen::Vector3d hb = face_.getTetIn().getPoly().getBoundingBox().sizes() / 2;
   Eigen::Vector3d mb = face_.getTetIn().getPoly().getBoundingBox().center();
 
-  unsigned quadPointsNo = triaRule_.getPointsNo();
+  SizeType quadPointsNo = triaRule_.getPointsNo();
 
-  phi_.reserve(quadPointsNo * dofNo_);
-  phiDer_.reserve(quadPointsNo * dofNo_);
+  phi_.reserve(quadPointsNo * dof_);
+  phiDer_.reserve(quadPointsNo * dof_);
 
   // Loop over quadrature points
-  for(unsigned p = 0; p < quadPointsNo; p++)
+  for(SizeType p = 0; p < quadPointsNo; p++)
   {
     // I map the quadrature point from the refrence triangle to the face of the
     // reference tetrahedron and then to the physical one, finally I rescale it
     // in order to compute the scaled legendre polynomial.
-    Eigen::Vector3d physicPt = (face_.getTetIn().getMap() *
-                               (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
-                                              triaRule_.getPoint(p).homogeneous())
-                               - mb).array() / hb.array();
+    Eigen::Vector3d physicPt = (face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
+                                                                          triaRule_.getPoint(p).homogeneous()) - mb).array() / hb.array();
 
     // Loop over basis functions
-    for(unsigned f = 0; f < dofNo_; f++)
+    for(unsigned f = 0; f < dof_; f++)
     {
       std::array<std::array<Real, 2>, 3> polval;
-
       // Loop over the three coordinates
       for(unsigned i = 0; i < 3; i++)
       {
-        polval[i] = basis::legendre(basisComposition_[f][i], physicPt(i));
-
-        // I rescale the results in order to have the scaled Legendre polynomials
-        polval[i][0] /= std::sqrt(hb(i));
-        polval[i][1] /= (std::sqrt(hb(i)) * hb(i));
+        polval[i][0] = (legendre(basisComposition_[f][i], physicPt(i)) / std::sqrt(hb(i)));
+        polval[i][1] = (legendreDer(basisComposition_[f][i], physicPt(i)) / std::sqrt(hb(i)) / hb(i));
       }
 
       phi_.emplace_back(polval[0][0] * polval[1][0] * polval[2][0]);
@@ -69,11 +63,10 @@ void FeFaceExt::printBasis(std::ostream& out = std::cout) const
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
   // Loop over the basis functions
-  for(unsigned f = 0; f < dofNo_; f++)
+  for(unsigned f = 0; f < dof_; f++)
   {
-
     // Loop over quadrature points
-    for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
+    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
       out << getPhi(p, f) << ' ';
 
     out << '\n';
@@ -87,11 +80,11 @@ void FeFaceExt::printBasisDer(std::ostream& out = std::cout) const
   out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
 
   // Loop over the basis functions
-  for(unsigned f = 0; f < dofNo_; f++)
+  for(unsigned f = 0; f < dof_; f++)
   {
 
     // Loop over the quadrature points
-    for(unsigned p = 0; p < triaRule_.getPointsNo(); p++)
+    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
       out << getPhiDer(p, f).transpose() << '\n';
 
     out << '\n';

@@ -23,25 +23,24 @@ public:
   template <typename T>
   using ConstIter = typename std::vector<T>::const_iterator;
 
-// Constructor that takes a mesh Th, the order of polynomials order and the required
-// degrees of exactness for quadrature formulas
+  // Constructor that takes a mesh Th, the order of polynomials order and
+  // the required degrees of exactness for quadrature formulas.
   FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree);
 
-// Constructor that takes a mesh Th and the order of polynomials order, the quadrature
-// formulas are chosen to fit with order.
+  // Constructor that takes a mesh Th and the order of polynomials order,
+  // the quadrature formulas are chosen to fit with order.
   FeSpace(Mesh& Th, unsigned order);
 
-  void setOrder(unsigned order);
   inline unsigned getOrder() const;
-  inline unsigned getDofNo() const;
+  inline unsigned getDof() const;
 
-  inline const FeElement& getFeElement(sizeType i) const;
-  inline const FeFaceExt& getFeFaceExt(sizeType i) const;
-  inline const FeFaceInt& getFeFaceInt(sizeType i) const;
+  inline const FeElement& getFeElement(SizeType i) const;
+  inline const FeFaceExt& getFeFaceExt(SizeType i) const;
+  inline const FeFaceInt& getFeFaceInt(SizeType i) const;
 
-  inline sizeType getFeElementsNo() const;
-  inline sizeType getFeFacesExtNo() const;
-  inline sizeType getFeFacesIntNo() const;
+  inline SizeType getFeElementsNo() const;
+  inline SizeType getFeFacesExtNo() const;
+  inline SizeType getFeFacesIntNo() const;
 
   inline const Mesh& getMesh() const;
   inline const std::vector<std::array<unsigned, 3>>& getBasisComposition() const;
@@ -61,14 +60,14 @@ public:
   virtual ~FeSpace() = default;
 
 private:
-// Reference to the mesh over which the FeSpace is built
+  // Reference to the mesh over which the FeSpace is built.
   const Mesh& Th_;
 
-// Order of polynomials
-  unsigned order_;
+  // Order of polynomials.
+  const unsigned order_;
 
-// Number of degrees of freedom that in 3D is dofNo = (order+1)*(order+2)*(order+3)/(3!)
-  unsigned dofNo_;
+  // Number of degrees of freedom that in 3D is dof = (order+1)*(order+2)*(order+3)/6
+  const unsigned dof_;
 
   std::vector<std::array<unsigned, 3>> basisComposition_;
   std::vector<FeElement> feElements_;
@@ -77,10 +76,10 @@ private:
   const QuadRuleManager::Rule3D& tetraRule_;
   const QuadRuleManager::Rule2D& triaRule_;
 
-// Auxiliary function that computes basisComposition_
+  // Auxiliary function that computes basisComposition_.
   void integerComposition();
 
-// Auxiliary function that fills feElements_, feFacesInt_ and feFacesExt_.
+  // Auxiliary function that fills feElements_, feFacesInt_ and feFacesExt_.
   void initialize();
 
 };
@@ -94,37 +93,37 @@ inline unsigned FeSpace::getOrder() const
   return order_;
 }
 
-inline unsigned FeSpace::getDofNo() const
+inline unsigned FeSpace::getDof() const
 {
-  return dofNo_;
+  return dof_;
 }
 
-inline const FeElement& FeSpace::getFeElement(sizeType i) const
+inline const FeElement& FeSpace::getFeElement(SizeType i) const
 {
   return feElements_[i];
 }
 
-inline const FeFaceExt& FeSpace::getFeFaceExt(sizeType i) const
+inline const FeFaceExt& FeSpace::getFeFaceExt(SizeType i) const
 {
   return feFacesExt_[i];
 }
 
-inline const FeFaceInt& FeSpace::getFeFaceInt(sizeType i) const
+inline const FeFaceInt& FeSpace::getFeFaceInt(SizeType i) const
 {
   return feFacesInt_[i];
 }
 
-inline sizeType FeSpace::getFeElementsNo() const
+inline SizeType FeSpace::getFeElementsNo() const
 {
   return feElements_.size();
 }
 
-inline sizeType FeSpace::getFeFacesExtNo() const
+inline SizeType FeSpace::getFeFacesExtNo() const
 {
   return feFacesExt_.size();
 }
 
-inline sizeType FeSpace::getFeFacesIntNo() const
+inline SizeType FeSpace::getFeFacesIntNo() const
 {
   return feFacesInt_.size();
 }

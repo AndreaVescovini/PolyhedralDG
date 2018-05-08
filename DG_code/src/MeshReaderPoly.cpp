@@ -41,14 +41,14 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   }
 
   // Read vertices.
-  sizeType verticesNo = 0;
+  SizeType verticesNo = 0;
   meshFile >> verticesNo;
   vertList.reserve(verticesNo);
   Vertex::resetCounter();
 
   std::array<Real, 3> curVertex;
   int label = 0;
-  for(sizeType i = 0; i < verticesNo; i++)
+  for(SizeType i = 0; i < verticesNo; i++)
   {
     meshFile >> curVertex[0] >> curVertex[1] >> curVertex[2] >> label;
     vertList.emplace_back(curVertex[0], curVertex[1], curVertex[2]);
@@ -62,13 +62,13 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   }
 
   // Read tetrahedra.
-  sizeType tetrahedraNo = 0;
+  SizeType tetrahedraNo = 0;
   meshFile >> tetrahedraNo;
   tetraList.reserve(tetrahedraNo);
   Tetrahedron::resetCounter();
 
   std::array<unsigned, 4> curTet;
-  for(sizeType i = 0; i < tetrahedraNo; i++)
+  for(SizeType i = 0; i < tetrahedraNo; i++)
   {
     meshFile >> curTet[0] >> curTet[1] >> curTet[2] >> curTet[3] >> label;
     tetraList.emplace_back(vertList[curTet[0] - 1], vertList[curTet[1] - 1],
@@ -83,13 +83,13 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
   }
 
   // Read external faces.
-  sizeType facesExtNo = 0;
+  SizeType facesExtNo = 0;
   meshFile >> facesExtNo;
   faceExtList.reserve(facesExtNo);
   FaceExt::resetCounter();
 
   std::array<unsigned, 3> curFace;
-  for(sizeType i = 0; i < facesExtNo; i++)
+  for(SizeType i = 0; i < facesExtNo; i++)
   {
     meshFile >> curFace[0] >> curFace[1] >> curFace[2] >> label;
     faceExtList.emplace_back(vertList[curFace[0] - 1], vertList[curFace[1] - 1],
@@ -102,7 +102,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   // Read polyhedra.
   Polyhedron::resetCounter();
-  sizeType polyhedraNo = 0;
+  SizeType polyhedraNo = 0;
 
   if(found == true)
   {
@@ -110,7 +110,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     polyList.resize(polyhedraNo);
 
     unsigned poly = 0;
-    for(sizeType i = 0; i < tetrahedraNo; i++)
+    for(SizeType i = 0; i < tetrahedraNo; i++)
     {
       meshFile >> poly;
       polyList[poly - 1].addTetra(tetraList[i]);
@@ -122,7 +122,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
     polyhedraNo = tetrahedraNo;
     polyList.resize(polyhedraNo);
 
-    for(sizeType i = 0; i < tetrahedraNo; i++)
+    for(SizeType i = 0; i < tetrahedraNo; i++)
     {
       polyList[i].addTetra(tetraList[i]);
       tetraList[i].setPoly(polyList[i]);

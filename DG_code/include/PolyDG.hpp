@@ -8,9 +8,9 @@ namespace PolyDG
 
 using Real = double;
 
-using sizeType = std::size_t;
+using SizeType = std::size_t;
 
-using BCtype = int;
+using BCType = int;
 
 enum SideType { Out, In };
 

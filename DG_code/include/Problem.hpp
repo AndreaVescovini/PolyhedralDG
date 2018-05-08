@@ -43,7 +43,7 @@ public:
   // of the elements of the mesh. If sym == true only the upper triangular part
   // is computed.
   template <typename T>
-  void integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool sym = false);
+  void integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool sym = false);
 
   // Function that integrates a linear form over the volume of the elements of
   // the mesh.
@@ -53,7 +53,7 @@ public:
   // Function that integrates a linear form over the external faces of the
   // elements of the mesh.
   template <typename T>
-  void integrateFacesExtRhs(const ExprWrapper<T>& expr, BCtype bcLabel);
+  void integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel);
 
   // Function that solves the linear system with a direct LU decomposition.
   void solveLU();
@@ -152,21 +152,21 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
-    triplets_[0].reserve(dim_ * (Vh_.getDofNo() + 1) / 2);
+    triplets_[0].reserve(dim_ * (Vh_.getDof() + 1) / 2);
   else
-    triplets_[0].reserve(dim_ * Vh_.getDofNo());
+    triplets_[0].reserve(dim_ * Vh_.getDof());
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
-    for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-      for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDofNo()); i++)
+    for(unsigned j = 0; j < Vh_.getDof(); j++)
+      for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
       {
         Real sum = 0.0;
-        for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
-          for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-            sum += exprDerived(*it, i, j, t, q) * it->getWeight(q) * it->getAbsDetJac(t);
+        for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
+          for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
+            sum += exprDerived(*it, i, j, t, p) * it->getWeight(p) * it->getAbsDetJac(t);
 
         triplets_[0].emplace_back(i + indexOffset, j + indexOffset, sum);
       }
@@ -182,26 +182,26 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
-    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * (2 * Vh_.getDofNo() + 1));
+    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * (2 * Vh_.getDof() + 1));
   else
-    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDofNo() * Vh_.getDofNo() * 4);
+    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
 
   std::array<SideType, 2> sides = {Out, In};
 
   for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
   {
-    std::array<unsigned, 2> indexOffset = { it->getElem(Out) * Vh_.getDofNo(),
-                                            it->getElem(In) * Vh_.getDofNo() };
+    std::array<unsigned, 2> indexOffset = { it->getElem(Out) * Vh_.getDof(),
+                                            it->getElem(In) * Vh_.getDof() };
 
     for(unsigned sj = 0; sj < 2; sj++)
       for(unsigned si = 0; si < (sym == true ? sj + 1 : 2); si++)
-        for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-          for(unsigned i = 0; i < (sym == true && sides[si] == sides[sj] ? j + 1 : Vh_.getDofNo()); i++)
+        for(unsigned j = 0; j < Vh_.getDof(); j++)
+          for(unsigned i = 0; i < (sym == true && sides[si] == sides[sj] ? j + 1 : Vh_.getDof()); i++)
           {
             Real sum = 0.0;
 
-            for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-              sum += exprDerived(*it, i, j, sides[si], sides[sj], q) * it->getWeight(q) * it->getAreaDoubled();
+            for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
+              sum += exprDerived(*it, i, j, sides[si], sides[sj], p) * it->getWeight(p) * it->getAreaDoubled();
 
             triplets_[1].emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
           }
@@ -209,7 +209,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
 }
 
 template <typename T>
-void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool sym)
+void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool sym)
 {
   const T& exprDerived(expr);
 
@@ -219,22 +219,22 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCtype bcLabel, bool
   // I overestimate considering all the external faces with the same type of
   // boundary conditions
   if(sym == true)
-    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDofNo() * (Vh_.getDofNo() + 1) / 2);
+    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * (Vh_.getDof() + 1) / 2);
   else
-    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDofNo() * Vh_.getDofNo());
+    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * Vh_.getDof());
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
     if(it->getBClabel() == bcLabel)
     {
-      unsigned indexOffset = it->getElem() * Vh_.getDofNo();
+      unsigned indexOffset = it->getElem() * Vh_.getDof();
 
-      for(unsigned j = 0; j < Vh_.getDofNo(); j++)
-        for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDofNo()); i++)
+      for(unsigned j = 0; j < Vh_.getDof(); j++)
+        for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
         {
           Real sum = 0.0;
 
-          for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-            sum += exprDerived(*it, i, j, q) * it->getWeight(q) * it->getAreaDoubled();
+          for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
+            sum += exprDerived(*it, i, j, p) * it->getWeight(p) * it->getAreaDoubled();
 
           triplets_[2].emplace_back(i + indexOffset, j + indexOffset, sum);
         }
@@ -252,32 +252,32 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDofNo();
+    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
-    for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-      for(unsigned t = 0; t < it->getTetrahedraNo(); t++)
-        for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
-          b_(i + indexOffset) += exprDerived(*it, i, t, q) *
-                                 it->getWeight(q) *
+    for(unsigned i = 0; i < Vh_.getDof(); i++)
+      for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
+        for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
+          b_(i + indexOffset) += exprDerived(*it, i, t, p) *
+                                 it->getWeight(p) *
                                  it->getAbsDetJac(t);
   }
 
 }
 
 template <typename T>
-void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCtype bcLabel)
+void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel)
 {
   const T& exprDerived(expr);
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
     if(it->getBClabel() == bcLabel)
     {
-      unsigned indexOffset = it->getElem() * Vh_.getDofNo();
-      for(unsigned i = 0; i < Vh_.getDofNo(); i++)
-        for(unsigned q = 0; q < it->getQuadPointsNo(); q++)
+      unsigned indexOffset = it->getElem() * Vh_.getDof();
+      for(unsigned i = 0; i < Vh_.getDof(); i++)
+        for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
         {
-          b_(i + indexOffset) += exprDerived(*it, i, q) *
-                                 it->getWeight(q) *
+          b_(i + indexOffset) += exprDerived(*it, i, p) *
+                                 it->getWeight(p) *
                                  it->getAreaDoubled();
         }
     }
