@@ -10,6 +10,7 @@
 #include <cmath>
 #include <fstream>
 #include <iterator>
+#include <random>
 #include <unordered_set>
 
 namespace PolyDG
@@ -155,6 +156,15 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 {
   std::ofstream fout{fileName};
 
+  // Create a vector with random integers in order to distinguish elements.
+  std::vector<unsigned> elemValues;
+  elemValues.reserve(Vh_.getFeElementsNo());
+  for(unsigned i = 0; i < Vh_.getFeElementsNo(); i++)
+    elemValues.emplace_back(i);
+
+  std::default_random_engine dre;
+  std::shuffle(elemValues.begin(), elemValues.end(), dre);
+
   // Print the header
   fout << "<?xml version=\"1.0\"?>\n";
   fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
@@ -175,7 +185,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     const std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
 
     // Compute the solution at the nodes.
-    std::vector<Real> uNodes(nodes.size());
+    std::vector<Real> uNodes;
     uNodes.reserve(nodes.size());
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
       uNodes.emplace_back(evalSolution(itNod->get().getX(), itNod->get().getY(), itNod->get().getZ(), *it));
@@ -212,7 +222,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     // Print the values of the solution.
     fout << "      <PointData Scalars=\"Solution\">\n";
-    fout << "        <DataArray type=\"Float64\" Name=\"solution\" format=\"ascii\">\n         ";
+    fout << "        <DataArray type=\"Float64\" Name=\"Solution\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < uNodes.size(); i++)
       fout << ' ' << uNodes[i];
     fout << "\n        </DataArray>\n";
@@ -222,7 +232,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "      <CellData Scalars=\"Mesh\">\n";
     fout << "        <DataArray type=\"Int32\" Name=\"Mesh\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
-      fout << ' ' << elem.getId();
+      fout << ' ' << elemValues[elem.getId()];
     fout << "\n        </DataArray>\n";
     fout << "      </CellData>\n";
 
