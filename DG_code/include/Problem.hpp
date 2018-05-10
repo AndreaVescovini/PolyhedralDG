@@ -27,6 +27,12 @@ public:
   // and for the test functions.
   explicit Problem(const FeSpace& Vh);
 
+  // Default copy-constructor.
+  Problem(const Problem&) = default;
+
+  // Default move-constructor.
+  Problem(Problem&&) = default;
+
   // Function that integrates a blinear form over the volume of the
   // elements of the mesh. If sym == true only the upper triangular part is
   // computed.
@@ -109,6 +115,7 @@ public:
   // after the integrations.
   void finalizeMatrix();
 
+  // Default virtual destructor.
   virtual ~Problem() = default;
 
 private:
@@ -118,7 +125,7 @@ private:
   const FeSpace& Vh_;
 
   // Dimension of the linear system.
-  unsigned dim_;
+  const unsigned dim_;
 
   // Matrix, rhs and solution of the linear system.
   Eigen::SparseMatrix<Real> A_;
@@ -158,7 +165,7 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
+    const unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
     for(unsigned j = 0; j < Vh_.getDof(); j++)
       for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
@@ -186,12 +193,12 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
   else
     triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
 
-  std::array<SideType, 2> sides = {Out, In};
+  const std::array<SideType, 2> sides = {Out, In};
 
   for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
   {
-    std::array<unsigned, 2> indexOffset = { it->getElem(Out) * Vh_.getDof(),
-                                            it->getElem(In) * Vh_.getDof() };
+    const std::array<unsigned, 2> indexOffset = { it->getElemIn() * Vh_.getDof(),
+                                                  it->getElemOut() * Vh_.getDof() };
 
     for(unsigned sj = 0; sj < 2; sj++)
       for(unsigned si = 0; si < (sym == true ? sj + 1 : 2); si++)
@@ -226,7 +233,7 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
     if(it->getBClabel() == bcLabel)
     {
-      unsigned indexOffset = it->getElem() * Vh_.getDof();
+      const unsigned indexOffset = it->getElemIn() * Vh_.getDof();
 
       for(unsigned j = 0; j < Vh_.getDof(); j++)
         for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
@@ -252,7 +259,7 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
+    const unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
     for(unsigned i = 0; i < Vh_.getDof(); i++)
       for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
@@ -272,7 +279,7 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel)
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
     if(it->getBClabel() == bcLabel)
     {
-      unsigned indexOffset = it->getElem() * Vh_.getDof();
+      unsigned indexOffset = it->getElemIn() * Vh_.getDof();
       for(unsigned i = 0; i < Vh_.getDof(); i++)
         for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
         {

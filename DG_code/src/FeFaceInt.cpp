@@ -9,7 +9,7 @@ namespace PolyDG
 
 FeFaceInt::FeFaceInt(const FaceInt& face, unsigned order, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
-                     const QuadRule<Eigen::Vector2d>& triaRule)
+                     const QuadRule2D& triaRule)
   : FeFace(face, dof, basisComposition, triaRule)
 {
   penaltyParam_ = order * order / std::min(face.getTetIn().getPoly().getDiameter(),
@@ -40,7 +40,7 @@ void FeFaceInt::compute_basis()
     // I map the quadrature point from the refrence triangle to the face of the
     // reference tetrahedron and then to the physical one, finally I rescale it
     // in order to compute the scaled legendre polynomial.
-    const Eigen::Vector3d physicPt = face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) * triaRule_.getPoint(p).homogeneous());
+    const Eigen::Vector3d physicPt = this->getQuadPoint(p);
     const Eigen::Vector3d physicPtIn  = (physicPt - mbIn).array() / hbIn.array();
     const Eigen::Vector3d physicPtOut = (physicPt - mbOut).array() / hbOut.array();
 

@@ -21,8 +21,7 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 
 void Mesh::printAll(std::ostream& out) const
 {
-  SizeType lineNo = std::max(vertices_.size(), tetrahedra_.size());
-  this->print(lineNo, out);
+  this->print(std::max(vertices_.size(), tetrahedra_.size()), out);
 }
 
 void Mesh::printHead(std::ostream& out) const
@@ -66,8 +65,8 @@ void Mesh::computeFaces()
       {
         // If I find a face of a tetrahedron of a different polyhedron I insert it in
         // facesInt_, then in any case I erase the face from temp
-        unsigned elem1 = t.getPoly().getId();
-        unsigned elem2 = (*res.first)->getTetIn().getPoly().getId();
+        const unsigned elem1 = t.getPoly().getId();
+        const unsigned elem2 = (*res.first)->getTetIn().getPoly().getId();
 
         if(elem1 != elem2)
         {

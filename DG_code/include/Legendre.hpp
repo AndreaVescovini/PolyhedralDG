@@ -16,16 +16,16 @@ Real legendreDer(unsigned n, PolyDG::Real x);
 
 // Recursive implementation through templates of the integer power of a real number.
 template<typename T>
-constexpr T pow(const T& x, unsigned n);
+constexpr T pow(const T& x, unsigned exponent);
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
 template<typename T>
-constexpr T pow(const T& x, unsigned n)
+constexpr T pow(const T& x, unsigned exponent)
 {
-  return (n == 0) ? T(1.0) : x * pow(x, n - 1);
+  return (exponent == 0) ? T(1.0) : x * pow(x, exponent - 1);
 }
 
 }

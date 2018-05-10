@@ -15,16 +15,31 @@ class ExprWrapper
 public:
   ExprWrapper() = default;
 
-  void operator=(const ExprWrapper<E>&) = delete;
+  // Default copy-constructor.
+  ExprWrapper(const ExprWrapper&) = default;
 
-// Cast operators
+  // Deleted copy-assignment operator.
+  ExprWrapper& operator=(const ExprWrapper&) = delete;
+
+  // Default move-constructor.
+  ExprWrapper(ExprWrapper&&) = default;
+
+  // Deleted move-assignament operator.
+  ExprWrapper& operator=(ExprWrapper&&) = delete;
+
+  // Const cast operators to derived.
   operator const E&() const;
+
+  // Cast operator to derived.
   operator E&();
 
-// Explicit methods for the casting
+  // Explicit method for the const cast to derived.
   const E& asDerived() const;
+
+  // Explicit method fot the cast to derived.
   E& asDerived();
 
+  // Default virtual destructor.
   virtual ~ExprWrapper() = default;
 };
 

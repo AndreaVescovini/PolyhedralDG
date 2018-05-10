@@ -132,7 +132,7 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
+    const unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
     for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
       for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
@@ -162,9 +162,9 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    auto elem = it->getElem();
+    const auto& elem = it->getElem();
 
-  // Compute the nodes in the Polyhedron
+    // Compute the nodes in the Polyhedron.
     std::unordered_set<std::reference_wrapper<const Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> nodesSet;
     nodesSet.reserve(elem.getTetrahedraNo() + 3);
 
@@ -172,9 +172,9 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
       for(SizeType j = 0; j < 4; j++)
         nodesSet.emplace(elem.getTetra(i).getVertex(j));
 
-    std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
+    const std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
 
-  // Compute the solution at the nodes
+    // Compute the solution at the nodes.
     std::vector<Real> uNodes(nodes.size());
     uNodes.reserve(nodes.size());
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
@@ -182,7 +182,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     fout << "    <Piece NumberOfPoints=\"" << nodes.size() << "\" NumberOfCells=\"" << elem.getTetrahedraNo() << "\">\n";
 
-  // Print the nodes coordinates
+    // Print the nodes coordinates.
     fout << "      <Points>\n";
     fout << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n         ";
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
@@ -190,13 +190,13 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </Points>\n";
 
-  // Print the cells (tetrahedra) connectivity and type
+    // Print the cells (tetrahedra) connectivity and type.
     fout << "      <Cells>\n";
     fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
       for(SizeType j = 0; j < 4; j++)
       {
-        unsigned vertexIndex = std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin();
+        const unsigned vertexIndex = std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin();
         fout << ' ' << vertexIndex;
       }
     fout << "\n        </DataArray>\n";
@@ -210,7 +210,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </Cells>\n";
 
-  // Print the values of the solution
+    // Print the values of the solution.
     fout << "      <PointData Scalars=\"Solution\">\n";
     fout << "        <DataArray type=\"Float64\" Name=\"solution\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < uNodes.size(); i++)
@@ -218,7 +218,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "\n        </DataArray>\n";
     fout << "      </PointData>\n";
 
-  // Print a value for the Polyhedron
+    // Print a value for the Polyhedron.
     fout << "      <CellData Scalars=\"Mesh\">\n";
     fout << "        <DataArray type=\"Int32\" Name=\"Mesh\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
@@ -238,17 +238,17 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
 {
   Real result = 0.0;
-  unsigned indexOffset = el.getElem().getId() * Vh_.getDof();
-  Eigen::Vector3d hb = el.getElem().getBoundingBox().sizes() / 2;
-  Eigen::Vector3d mb = el.getElem().getBoundingBox().center();
+  const unsigned indexOffset = el.getElem().getId() * Vh_.getDof();
+  const Eigen::Vector3d hb = el.getElem().getBoundingBox().sizes() / 2;
+  const Eigen::Vector3d mb = el.getElem().getBoundingBox().center();
 
-  auto basisComposition = Vh_.getBasisComposition();
+  const auto& basisComposition = Vh_.getBasisComposition();
 
   for(unsigned i = 0; i < Vh_.getDof(); i++)
   {
-    Real valx = legendre(basisComposition[i][0], (x - mb(0)) / hb(0)) / std::sqrt(hb(0));
-    Real valy = legendre(basisComposition[i][1], (y - mb(1)) / hb(1)) / std::sqrt(hb(1));
-    Real valz = legendre(basisComposition[i][2], (z - mb(2)) / hb(2)) / std::sqrt(hb(2));
+    const Real valx = legendre(basisComposition[i][0], (x - mb(0)) / hb(0)) / std::sqrt(hb(0));
+    const Real valy = legendre(basisComposition[i][1], (y - mb(1)) / hb(1)) / std::sqrt(hb(1));
+    const Real valz = legendre(basisComposition[i][2], (z - mb(2)) / hb(2)) / std::sqrt(hb(2));
 
     result += u_(indexOffset + i) * valx  * valy * valz;
   }

@@ -29,9 +29,8 @@ public:
 
   inline const Vertex& getVertex(unsigned i) const;
   inline Vertex& getVertex(unsigned i);
-  inline const Polyhedron& getPoly() const;// forse questo metodo è da togliere
-  inline Polyhedron& getPoly(); // forse questo const è da togliere
-  inline void setPoly(Polyhedron* poly);
+  inline const Polyhedron& getPoly() const;
+  inline Polyhedron& getPoly();
   inline void setPoly(Polyhedron& poly);
   inline unsigned getId() const;
 
@@ -79,14 +78,9 @@ inline Polyhedron& Tetrahedron::getPoly()
   return *poly_;
 }
 
-inline void Tetrahedron::setPoly(Polyhedron* poly)
-{
-  poly_ = poly;
-}
-
 inline void Tetrahedron::setPoly(Polyhedron& poly)
 {
-  this->setPoly(&poly);
+  poly_ = &poly;
 }
 
 inline unsigned Tetrahedron::getId() const

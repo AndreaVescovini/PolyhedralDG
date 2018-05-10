@@ -3,7 +3,7 @@
 
 #include "PolyDG.hpp"
 #include "Polyhedron.hpp"
-#include "QuadRuleManager.hpp"
+#include "QuadRule.hpp"
 
 #include <Eigen/Core>
 
@@ -25,7 +25,7 @@ public:
   // a quadrature rule tetraRule.
   FeElement(const Element& elem, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
-            const QuadRuleManager::Rule3D& tetraRule);
+            const QuadRule3D& tetraRule);
 
   // Default copy-constructor.
   FeElement(const FeElement&) = default;
@@ -84,7 +84,7 @@ private:
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
 
   // Reference to the tetrahedral rule used for the computation of the basis functions
-  const QuadRuleManager::Rule3D& tetraRule_;
+  const QuadRule3D& tetraRule_;
 
   // Vector containing all the values of the basis functions over this element
   std::vector<Real> phi_;

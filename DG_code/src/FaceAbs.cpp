@@ -23,8 +23,8 @@ FaceAbs::FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn, unsigne
 
 void FaceAbs::computeNormalandArea()
 {
-  Eigen::Vector3d tmp1(vertices_[0].get().getCoords() - vertices_[1].get().getCoords());
-  Eigen::Vector3d tmp2(vertices_[2].get().getCoords() - vertices_[1].get().getCoords());
+  const Eigen::Vector3d tmp1(vertices_[0].get().getCoords() - vertices_[1].get().getCoords());
+  const Eigen::Vector3d tmp2(vertices_[2].get().getCoords() - vertices_[1].get().getCoords());
 
   normal_ = tmp1.cross(tmp2);
   areaDoubled_ = normal_.norm(); // this is the area doubled

@@ -4,7 +4,7 @@
 #include "FaceInt.hpp"
 #include "FeFace.hpp"
 #include "PolyDG.hpp"
-#include "QuadRuleManager.hpp"
+#include "QuadRule.hpp"
 
 #include <Eigen/Core>
 
@@ -19,7 +19,7 @@ class FeFaceInt : public FeFace
 public:
   FeFaceInt(const FaceInt& face, unsigned order, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
-            const QuadRuleManager::Rule2D& triaRule);
+            const QuadRule2D& triaRule);
 
   // Default copy-constructor.
   FeFaceInt(const FeFaceInt&) = default;
@@ -36,8 +36,8 @@ public:
   inline const Eigen::Vector3d& getPhiDer(SideType s, SizeType p, SizeType f) const;
 
   // Function that returns the id-number of the elements to which the face belongs
-  // on the side s.
-  inline unsigned getElem(SideType s) const;
+  // from outside.
+  inline unsigned getElemOut() const;
 
   // Function that prints the values of the basis functions over the face.
   void printBasis(std::ostream& out) const override;
@@ -75,9 +75,9 @@ inline const Eigen::Vector3d& FeFaceInt::getPhiDer(SideType s, SizeType p, SizeT
   return phiDer_[sub2ind(s, p, f)];
 }
 
-inline unsigned FeFaceInt::getElem(SideType s) const
+inline unsigned FeFaceInt::getElemOut() const
 {
-  return (s == Out ? face_.getTetIn().getPoly().getId() : static_cast<const FaceInt&>(face_).getTetOut().getPoly().getId());
+  return static_cast<const FaceInt&>(face_).getTetOut().getPoly().getId();
 }
 
 inline SizeType FeFaceInt::sub2ind(SideType s, SizeType p, SizeType f) const

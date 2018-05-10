@@ -30,7 +30,7 @@ double Watch::getTime() const
 
 double Watch::getTimeNow() const
 {
-  Nanosec timeSpan = measuredTime_ + std::chrono::duration_cast<Nanosec>(MyClock::now() - startTime_);
+  const Nanosec timeSpan = measuredTime_ + std::chrono::duration_cast<Nanosec>(MyClock::now() - startTime_);
   return timeSpan.count() / 1000.0;
 }
 

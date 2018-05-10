@@ -6,7 +6,7 @@
 #include "FeFaceInt.hpp"
 #include "Mesh.hpp"
 #include "PolyDG.hpp"
-#include "QuadRuleManager.hpp"
+#include "QuadRule.hpp"
 
 #include <Eigen/Core>
 
@@ -30,6 +30,12 @@ public:
   // Constructor that takes a mesh Th and the order of polynomials order,
   // the quadrature formulas are chosen to fit with order.
   FeSpace(Mesh& Th, unsigned order);
+
+  // Default copy-constructor.
+  FeSpace(const FeSpace&) = default;
+
+  // Default move-constructor.
+  FeSpace(FeSpace&&) = default;
 
   inline unsigned getOrder() const;
   inline unsigned getDof() const;
@@ -73,8 +79,8 @@ private:
   std::vector<FeElement> feElements_;
   std::vector<FeFaceExt> feFacesExt_;
   std::vector<FeFaceInt> feFacesInt_;
-  const QuadRuleManager::Rule3D& tetraRule_;
-  const QuadRuleManager::Rule2D& triaRule_;
+  const QuadRule3D& tetraRule_;
+  const QuadRule2D& triaRule_;
 
   // Auxiliary function that computes basisComposition_.
   void integerComposition();

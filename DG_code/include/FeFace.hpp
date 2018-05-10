@@ -3,6 +3,7 @@
 
 #include "FaceAbs.hpp"
 #include "PolyDG.hpp"
+#include "QuadRule.hpp"
 #include "QuadRuleManager.hpp"
 
 #include <Eigen/Core>
@@ -18,7 +19,7 @@ class FeFace
 {
 public:
   FeFace(const FaceAbs& face, unsigned dof, const std::vector<std::array<unsigned, 3>>& basisComposition,
-         const QuadRuleManager::Rule2D& triaRule);
+         const QuadRule2D& triaRule);
 
   // Default copy-constructor.
   FeFace(const FeFace&) = default;
@@ -28,6 +29,10 @@ public:
 
   // Function that returns the number of degrees of freedom.
   inline unsigned getDof() const;
+
+  // Function that returns the id-number of the elements to which the face belongs
+  // from inside.
+  inline unsigned getElemIn() const;
 
   // Function that returns the number of quadrature points currently used over
   // the face.
@@ -62,7 +67,7 @@ protected:
   const FaceAbs& face_;
   unsigned dof_;
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
-  const QuadRuleManager::Rule2D& triaRule_;
+  const QuadRule2D& triaRule_;
 
   std::vector<Real> phi_;
   std::vector<Eigen::Vector3d> phiDer_;
@@ -87,6 +92,11 @@ inline unsigned FeFace::getDof() const
   return dof_;
 }
 
+inline unsigned FeFace::getElemIn() const
+{
+  return face_.getTetIn().getPoly().getId();
+}
+
 inline SizeType FeFace::getQuadPointsNo() const
 {
   return triaRule_.getPointsNo();
@@ -99,7 +109,7 @@ inline Real FeFace::getWeight(SizeType p) const
 
 inline Eigen::Vector3d FeFace::getQuadPoint(SizeType p) const
 {
-  return face_.getTetIn().getMap() * (QuadRuleManager::getFaceMap(face_.getFaceNoTetIn()) *
+  return face_.getTetIn().getMap() * (QuadRuleManager::instance().getFaceMap(face_.getFaceNoTetIn()) *
                                      triaRule_.getPoint(p).homogeneous());
 }
 

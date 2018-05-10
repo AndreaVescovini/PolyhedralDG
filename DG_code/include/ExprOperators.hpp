@@ -11,15 +11,6 @@
 namespace PolyDG
 {
 
-// I exploit the functors of the standard library
-using Add = std::plus<Real>;
-using Subtract = std::minus<Real>;
-using Multiply = std::multiplies<Real>;
-using Divide = std::divides<Real>;
-using Negate = std::negate<Real>;
-
-// using fun3 = std::function<Real (Eigen::Vector3d)>;
-
 // Defining the scalar product
 struct DotProduct
 {
@@ -41,11 +32,14 @@ class BinaryOperator : public ExprWrapper<BinaryOperator<LO, RO, OP>>
 public:
   BinaryOperator(const LO& lo, const RO& ro);
 
-  Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  BinaryOperator(const BinaryOperator&) = default;
+  BinaryOperator(BinaryOperator&&) = default;
+
+  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -54,18 +48,21 @@ private:
   const RO& ro_;
 };
 
-// // Specialization for a left operation by a scalar
+// Specialization for a left operation by a scalar
 template <typename RO, typename OP>
 class BinaryOperator<Real, RO, OP> : public ExprWrapper<BinaryOperator<Real, RO, OP>>
 {
 public:
   BinaryOperator(Real lo, const RO& ro);
 
-  Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  BinaryOperator(const BinaryOperator&) = default;
+  BinaryOperator(BinaryOperator&&) = default;
+
+  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -81,11 +78,14 @@ class BinaryOperator<LO, Real, OP> : public ExprWrapper<BinaryOperator<LO, Real,
 public:
   BinaryOperator(const LO& lo, Real ro);
 
-  Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  BinaryOperator(const BinaryOperator&) = default;
+  BinaryOperator(BinaryOperator&&) = default;
+
+  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -94,46 +94,6 @@ public:
     Real ro_;
 };
 
-// // Specialization for a left operation by a function
-// template <typename RO, typename OP>
-// class BinaryOperator<fun3, RO, OP> : public ExprWrapper<BinaryOperator<fun3, RO, OP>>
-// {
-// public:
-//   BinaryOperator(const fun3& lo, const RO& ro);
-//
-//   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-//   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-//   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-//   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
-//
-//   virtual ~BinaryOperator() = default;
-//
-//   private:
-//     const fun3& lo_;
-//     const RO& ro_;
-// };
-//
-// // Specialization for a rigth operation by a function
-// template <typename LO, typename OP>
-// class BinaryOperator<LO, fun3, OP> : public ExprWrapper<BinaryOperator<LO, fun3, OP>>
-// {
-// public:
-//   BinaryOperator(const LO& lo, const fun3& ro);
-//
-//   Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-//   Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-//   Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-//   Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-//   Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
-//
-//   virtual ~BinaryOperator() = default;
-//
-//   private:
-//     const LO& lo_;
-//     const fun3& ro_;
-// };
-
 // Specialization for the scalar product
 template <typename LO, typename RO>
 class BinaryOperator<LO, RO, DotProduct> : public ExprWrapper<BinaryOperator<LO, RO, DotProduct>>
@@ -141,10 +101,13 @@ class BinaryOperator<LO, RO, DotProduct> : public ExprWrapper<BinaryOperator<LO,
 public:
   BinaryOperator(const LO& lo, const RO& ro);
 
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  BinaryOperator(const BinaryOperator&) = default;
+  BinaryOperator(BinaryOperator&&) = default;
+
+  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   virtual ~BinaryOperator() = default;
 
@@ -160,17 +123,27 @@ class UnaryOperator : public ExprWrapper<UnaryOperator<RO, OP>>
 public:
   explicit UnaryOperator(const RO& ro);
 
-  Real operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const;
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const;
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned q) const;
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const;
+  UnaryOperator(const UnaryOperator&) = default;
+  UnaryOperator(UnaryOperator&&) = default;
+
+  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   virtual ~UnaryOperator() = default;
 
 private:
   const RO& ro_;
 };
+
+// I exploit the functors of the standard library
+using Add = std::plus<Real>;
+using Subtract = std::minus<Real>;
+using Multiply = std::multiplies<Real>;
+using Divide = std::divides<Real>;
+using Negate = std::negate<Real>;
 
 // Overloading of the operator + for the sum
 template <typename LO, typename RO>
@@ -179,36 +152,12 @@ BinaryOperator<LO, RO, Add> operator+(const ExprWrapper<LO>& lo, const ExprWrapp
   return BinaryOperator<LO, RO, Add>(lo, ro);
 }
 
-// template <typename LO>
-// BinaryOperator<LO, Real, Add> operator+(const ExprWrapper<LO>& lo, Real ro)
-// {
-//   return BinaryOperator<LO, Real, Add>(lo, ro);
-// }
-//
-// template <typename RO>
-// BinaryOperator<Real, RO, Add> operator+(Real lo, const ExprWrapper<RO>& ro)
-// {
-//   return BinaryOperator<Real, RO, Add>(lo, ro);
-// }
-
 // Overloading of the operator - for the subtraction
 template <typename LO, typename RO>
 BinaryOperator<LO, RO, Subtract> operator-(const ExprWrapper<LO>& lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<LO, RO, Subtract>(lo, ro);
 }
-
-// template <typename LO>
-// BinaryOperator<LO, Real, Subtract> operator-(const ExprWrapper<LO>& lo, Real ro)
-// {
-//   return BinaryOperator<LO, Real, Subtract>(lo, ro);
-// }
-//
-// template <typename RO>
-// BinaryOperator<Real, RO, Subtract> operator-(Real lo, const ExprWrapper<RO>& ro)
-// {
-//   return BinaryOperator<Real, RO, Subtract>(lo, ro);
-// }
 
 // Overloading of the operator * for the multiplication
 template <typename LO, typename RO>
@@ -228,18 +177,6 @@ BinaryOperator<Real, RO, Multiply> operator*(Real lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<Real, RO, Multiply>(lo, ro);
 }
-//
-// template <typename LO>
-// BinaryOperator<LO, fun3, Multiply> operator*(const ExprWrapper<LO>& lo, const fun3& ro)
-// {
-//   return BinaryOperator<LO, fun3, Multiply>(lo, ro);
-// }
-//
-// template <typename RO>
-// BinaryOperator<fun3, RO, Multiply> operator*(const fun3& lo, const ExprWrapper<RO>& ro)
-// {
-//   return BinaryOperator<fun3, RO, Multiply>(lo, ro);
-// }
 
 // Overloading of the operator / for the division
 template <typename LO, typename RO>
@@ -259,18 +196,6 @@ BinaryOperator<Real, RO, Divide> operator/(Real lo, const ExprWrapper<RO>& ro)
 {
   return BinaryOperator<Real, RO, Divide>(lo, ro);
 }
-//
-// template <typename LO>
-// BinaryOperator<LO, fun3, Divide> operator/(const ExprWrapper<LO>& lo, const fun3& ro)
-// {
-//   return BinaryOperator<LO, fun3, Divide>(lo, ro);
-// }
-//
-// template <typename RO>
-// BinaryOperator<fun3, RO, Divide> operator/(const fun3& lo, const ExprWrapper<RO>& ro)
-// {
-//   return BinaryOperator<fun3, RO, Divide>(lo, ro);
-// }
 
 // Overloading of the unary operator - for the negation
 template <typename RO>
@@ -286,43 +211,42 @@ BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo, const ExprWrap
   return BinaryOperator<LO, RO, DotProduct>(lo, ro);
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 
 template <typename LO, typename RO, typename OP>
 BinaryOperator<LO, RO, OP>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
-  return OP()(lo_(fe, i, t, q), ro_(fe, i, t, q));
+  return OP()(lo_(fe, i, t, p), ro_(fe, i, t, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, t, q), ro_(fe, i, j, t, q));
+  return OP()(lo_(fe, i, j, t, p), ro_(fe, i, j, t, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, si, sj, q), ro_(fe, i, j, si, sj, q));
+  return OP()(lo_(fe, i, j, si, sj, p), ro_(fe, i, j, si, sj, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
-  return OP()(lo_(fe, i, q), ro_(fe, i, q));
+  return OP()(lo_(fe, i, p), ro_(fe, i, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, q), ro_(fe, i, j, q));
+  return OP()(lo_(fe, i, j, p), ro_(fe, i, j, p));
 }
 
 template <typename RO, typename OP>
@@ -330,33 +254,33 @@ BinaryOperator<Real, RO, OP>::BinaryOperator(Real lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
-  return OP()(lo_, ro_(fe, i, t, q));
+  return OP()(lo_, ro_(fe, i, t, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
-  return OP()(lo_, ro_(fe, i, j, t, q));
+  return OP()(lo_, ro_(fe, i, j, t, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
-  return OP()(lo_, ro_(fe, i, j, si, sj, q));
+  return OP()(lo_, ro_(fe, i, j, si, sj, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
-  return OP()(lo_, ro_(fe, i, q));
+  return OP()(lo_, ro_(fe, i, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
-  return OP()(lo_, ro_(fe, i, j, q));
+  return OP()(lo_, ro_(fe, i, j, p));
 }
 
 template <typename LO, typename OP>
@@ -364,129 +288,61 @@ BinaryOperator<LO, Real, OP>::BinaryOperator(const LO& lo, Real ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
-  return OP()(lo_(fe, i, t, q), ro_);
+  return OP()(lo_(fe, i, t, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, t, q), ro_);
+  return OP()(lo_(fe, i, j, t, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, si, sj, q), ro_);
+  return OP()(lo_(fe, i, j, si, sj, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
-  return OP()(lo_(fe, i, j, q), ro_);
+  return OP()(lo_(fe, i, j, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
-  return OP()(lo_(fe, i, q), ro_);
+  return OP()(lo_(fe, i, p), ro_);
 }
-//
-// template <typename RO, typename OP>
-// BinaryOperator<fun3, RO, OP>::BinaryOperator(const fun3& lo, const RO& ro)
-//   : lo_{lo}, ro_{ro} {}
-//
-// template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
-// {
-//   return OP()(lo_(fe.getQuadPoint(t, q)), ro_(fe, i, t, q));
-// }
-//
-// template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
-// {
-//   return OP()(lo_(fe.getQuadPoint(t, q)), ro_(fe, i, j, t, q));
-// }
-//
-// template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
-// {
-//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, si, sj, q));
-// }
-//
-// template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
-// {
-//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, q));
-// }
-//
-// template <typename RO, typename OP>
-// Real BinaryOperator<fun3, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
-// {
-//   return OP()(lo_(fe.getQuadPoint(q)), ro_(fe, i, j, q));
-// }
-//
-// template <typename LO, typename OP>
-// BinaryOperator<LO, fun3, OP>::BinaryOperator(const LO& lo, const fun3& ro)
-//   : lo_{lo}, ro_{ro} {}
-//
-// template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeElement& fe, unsigned i, unsigned t, unsigned q) const
-// {
-//   return OP()(lo_(fe, i, t, q), ro_(fe.getQuadPoint(t, q)));
-// }
-//
-// template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
-// {
-//   return OP()(lo_(fe, i, j, t, q), ro_(fe.getQuadPoint(t, q)));
-// }
-//
-// template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
-// {
-//   return OP()(lo_(fe, i, j, si, sj, q), ro_(fe.getQuadPoint(q)));
-// }
-//
-// template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
-// {
-//   return OP()(lo_(fe, i, q), ro_(fe.getQuadPoint(q)));
-// }
-//
-// template <typename LO, typename OP>
-// Real BinaryOperator<LO, fun3, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
-// {
-//   return OP()(lo_(fe, i, j, q), ro_(fe.getQuadPoint(q)));
-// }
 
 template <typename LO, typename RO>
 BinaryOperator<LO, RO, DotProduct>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename RO>
-Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
-  return DotProduct()(lo_(fe, i, j, t, q), ro_(fe, i, j, t, q));
+  return DotProduct()(lo_(fe, i, j, t, p), ro_(fe, i, j, t, p));
 }
 
 template <typename LO, typename RO>
-Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
+Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
-  return DotProduct()(lo_(fe, i, j, si, sj, q), ro_(fe, i, j, si, sj, q));
+  return DotProduct()(lo_(fe, i, j, si, sj, p), ro_(fe, i, j, si, sj, p));
 }
 
 template <typename LO, typename RO>
-Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
-  return DotProduct()(lo_(fe, i, q), ro_(fe, i, q));
+  return DotProduct()(lo_(fe, i, p), ro_(fe, i, p));
 }
 
 template <typename LO, typename RO>
-Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+Real BinaryOperator<LO, RO, DotProduct>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
-  return DotProduct()(lo_(fe, i, j, q), ro_(fe, i, j, q));
+  return DotProduct()(lo_(fe, i, j, p), ro_(fe, i, j, p));
 }
 
 template <typename RO, typename OP>
@@ -494,27 +350,27 @@ UnaryOperator<RO, OP>::UnaryOperator(const RO& ro)
   : ro_{ro} {}
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, unsigned t, unsigned q) const
+Real UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
-  return OP()(ro_(fe, i, j, t, q));
+  return OP()(ro_(fe, i, j, t, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, unsigned q) const
+Real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
-  return OP()(ro_(fe, i, j, si, sj, q));
+  return OP()(ro_(fe, i, j, si, sj, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned q) const
+Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
-  return OP()(ro_(fe, i, q));
+  return OP()(ro_(fe, i, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, unsigned q) const
+Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
-  return OP()(ro_(fe, i, j, q));
+  return OP()(ro_(fe, i, j, p));
 }
 
 } // namespace PolyDG

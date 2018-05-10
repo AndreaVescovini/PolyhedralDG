@@ -4,7 +4,7 @@
 #include "FaceExt.hpp"
 #include "FeFace.hpp"
 #include "PolyDG.hpp"
-#include "QuadRuleManager.hpp"
+#include "QuadRule.hpp"
 
 #include <Eigen/Core>
 
@@ -19,7 +19,7 @@ class FeFaceExt : public FeFace
 public:
   FeFaceExt(const FaceExt& face, unsigned order, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
-            const QuadRuleManager::Rule2D& triaRule);
+            const QuadRule2D& triaRule);
 
   // Default copy-constructor.
   FeFaceExt(const FeFaceExt&) = default;
@@ -34,9 +34,6 @@ public:
   // Function that returns the gradient of the basis function f computed at the
   // quadrature point p.
   inline const Eigen::Vector3d& getPhiDer(SizeType p, SizeType f) const;
-
-  // Function that returns the id-number of the elements to which the face belongs.
-  inline unsigned getElem() const;
 
   // Function that returns the type of boundary condition of the face.
   inline BCType getBClabel() const;
@@ -74,11 +71,6 @@ inline Real FeFaceExt::getPhi(SizeType p, SizeType f) const
 inline const Eigen::Vector3d& FeFaceExt::getPhiDer(SizeType p, SizeType f) const
 {
   return phiDer_[sub2ind(p, f)];
-}
-
-inline unsigned FeFaceExt::getElem() const
-{
-  return face_.getTetIn().getPoly().getId();
 }
 
 inline BCType FeFaceExt::getBClabel() const

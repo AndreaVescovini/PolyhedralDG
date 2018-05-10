@@ -1,12 +1,13 @@
 #include "FeSpace.hpp"
+#include "QuadRuleManager.hpp"
 
 namespace PolyDG
 {
 
 FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
   : Th_{Th}, order_{order}, dof_{(order + 1) * (order + 2) * (order + 3) / 6},
-    tetraRule_{QuadRuleManager::getTetraRule(quad3DDegree)},
-    triaRule_ {QuadRuleManager::getTriaRule(quad2DDegree)}
+    tetraRule_{QuadRuleManager::instance().getTetraRule(quad3DDegree)},
+    triaRule_ {QuadRuleManager::instance().getTriaRule(quad2DDegree)}
   {
     integerComposition();
     initialize();

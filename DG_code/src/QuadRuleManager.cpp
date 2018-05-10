@@ -3,7 +3,13 @@
 namespace PolyDG
 {
 
-const QuadRuleManager::Rule3D& QuadRuleManager::getTetraRule(unsigned doe)
+QuadRuleManager& QuadRuleManager::instance()
+{
+  static QuadRuleManager qrm;
+  return qrm;
+}
+
+const QuadRule3D& QuadRuleManager::getTetraRule(unsigned doe) const
 {
   if(doe == 0)
     return tetraRules_[0];
@@ -13,7 +19,7 @@ const QuadRuleManager::Rule3D& QuadRuleManager::getTetraRule(unsigned doe)
   return tetraRules_[doe - 1];
 }
 
-const QuadRuleManager::Rule2D& QuadRuleManager::getTriaRule(unsigned doe)
+const QuadRule2D& QuadRuleManager::getTriaRule(unsigned doe) const
 {
   if(doe == 0)
     return triaRules_[0];
@@ -23,9 +29,25 @@ const QuadRuleManager::Rule2D& QuadRuleManager::getTriaRule(unsigned doe)
   return triaRules_[doe - 1];
 }
 
-// Here the quadrature rules over the standard 3d-simplex are defined.
-// There are 8 rules with degree of exactness up to 8.
-std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
+// static void QuadRuleManager::addTetraRule(const QuadRule3D& rule) const
+// {
+//   tetraRules_.emplace_back(rule);
+// }
+
+// static void addTetraRule(QuadRule3D&& rule) const
+// {
+//   tetraRules_.emplace_back(std::move(rule));
+// }
+//
+// static void addTriaRule(const QuadRule2D& rule);
+// static void addTriaRule(QuadRule2D&& rule);
+
+QuadRuleManager::QuadRuleManager()
+  : tetraRules_
+{
+  // Here the quadrature rules over the standard 3d-simplex are initalized.
+  // There are 8 rules with degree of exactness up to 8.
+
   // 1 point, degree of exactness = 1, [Quarteroni]
   {1,
   {{0.25, 0.25, 0.25}},
@@ -234,11 +256,13 @@ std::vector<QuadRuleManager::Rule3D> QuadRuleManager::tetraRules_{
     0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164,
     0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164,
     0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164,
-    0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164}}};
+    0.00223873973961420164, 0.00223873973961420164, 0.00223873973961420164}}},
 
-// Here the quadrature rules over the standard 2d-simplex are defined.
-// There are 10 rules with degree of exactness up to 10.
-std::vector<QuadRuleManager::Rule2D> QuadRuleManager::triaRules_{
+triaRules_
+{
+  // Here the quadrature rules over the standard 2d-simplex are defined.
+  // There are 10 rules with degree of exactness up to 10.
+
   // 1 points, degree of exactness = 1, [Dunavant]
   {1,
   {{1./3., 1./3.}},
@@ -405,11 +429,12 @@ std::vector<QuadRuleManager::Rule2D> QuadRuleManager::triaRules_{
    0.036378958422710, 0.0141636212655285, 0.0141636212655285, 0.0141636212655285,
    0.0141636212655285, 0.0141636212655285,0.0141636212655285, 0.0047108334818665,
    0.0047108334818665, 0.0047108334818665, 0.0047108334818665, 0.0047108334818665,
-   0.0047108334818665}}};
+   0.0047108334818665}}},
 
-// Here the maps from the standard 2d-simplex to the four faces of the standard
-// 3d-simplex are defined.
-std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
+faceMaps_
+{
+  // Here the maps from the standard 2d-simplex to the four faces of the standard
+  // 3d-simplex are defined.
 
   // Face z = 0
   (Eigen::Matrix3d() << 0.0, 1.0, 0.0,
@@ -428,6 +453,6 @@ std::array<Eigen::Matrix3d, 4> QuadRuleManager::faceMaps_{
   (Eigen::Matrix3d() << 1.0, 0.0, 0.0,
                         0.0, 1.0, 0.0,
                        -1.0, -1.0, 1.0).finished()
-};
+} {}
 
 } // namespace PolyDG

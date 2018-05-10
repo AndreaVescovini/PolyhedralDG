@@ -1,6 +1,7 @@
 #ifndef _QUAD_RULE_MANAGER_HPP_
 #define _QUAD_RULE_MANAGER_HPP_
 
+#include "PolyDG.hpp"
 #include "QuadRule.hpp"
 
 #include <Eigen/Core>
@@ -13,107 +14,116 @@ namespace PolyDG
 class QuadRuleManager
 {
 public:
-  using Rule3D = QuadRule<Eigen::Vector3d>;
-  using Rule2D = QuadRule<Eigen::Vector2d>;
-
-  // template <typename T>
-  // using RuleContainer = std::vector<T>;
-
-// Const iterator over the vector of quadrature rules
+  // Const iterator over the vector of quadrature rules.
   template <typename T>
-  using CIter = typename std::vector<T>::const_iterator;
+  using ConstIter = typename std::vector<T>::const_iterator;
 
-// Returns a quadrature rule over the standard tetrahedron of exactness doe.
-// If it does not exist it returns the the quadrature rule with the maximum doe
-// that is available.
-  static const Rule3D& getTetraRule(unsigned doe);
+  // Function that returns a reference to the singleton object.
+  static QuadRuleManager& instance();
 
-// Returns a quadrature rule over the standard triangle of exactness doe.
-// If it does not exist it returns the the quadrature rule with the maximum doe
-// that is available.
-  static const Rule2D& getTriaRule(unsigned doe);
+  // Deleted copy-constructor.
+  QuadRuleManager(const QuadRule3D&) = delete;
 
-// Returns the number of available quadrature rules over tetrahedra
-  inline static unsigned getTetraRuleNo();
+  // Deleted copy-assigment operator.
+  QuadRuleManager& operator=(const QuadRuleManager&) = delete;
 
-// Returns the number of available quadrature rules over triangles
-  inline static unsigned getTriaRuleNo();
+  // Deleted move-constructor.
+  QuadRuleManager(QuadRuleManager&&) = delete;
 
-// Returns a const interator to the first quadrature rule over tetrahedra
-  inline static CIter<Rule3D> tetraCbegin();
+  // Deleted move-assigment operator.
+  QuadRuleManager& operator=(QuadRuleManager&) = delete;
 
-// Returns a const iterator to the rule after the end over tetrhedra
-  inline static CIter<Rule3D> tetraCend();
+  // Returns a quadrature rule over the standard tetrahedron of exactness doe.
+  // If it does not exist it returns the the quadrature rule with the maximum doe
+  // that is available.
+  const QuadRule3D& getTetraRule(unsigned doe) const;
 
-// Returns a const interator to the first quadrature rule over triangles
-  inline static CIter<Rule2D> triaCbegin();
+  // Returns a quadrature rule over the standard triangle of exactness doe.
+  // If it does not exist it returns the the quadrature rule with the maximum doe
+  // that is available.
+  const QuadRule2D& getTriaRule(unsigned doe) const;
 
-// Returns a const iterator to the rule after the end over triangles
-  inline static CIter<Rule2D> triaCend();
+  // Returns the number of available quadrature rules over tetrahedra.
+  inline SizeType getTetraRuleNo() const;
 
-// Returns the matrix corresponding to the map from the standard 2d-simplex to the
-// face faceNo of the standard 3d-simplex. The matrix is 3x3 so it must be applied
-// to a 2d vector with homogeneous coordinates (i.e. a 3x1 vector with a 1 as
-// last element)
-  inline static const Eigen::Matrix3d& getFaceMap(unsigned faceNo);
+  // Returns the number of available quadrature rules over triangles.
+  inline SizeType getTriaRuleNo() const;
 
-  // static void addTetraRule(const QuadRule<Eigen::Vector3d>& rule);
-  // static void addTriaRule(const QuadRule<Eigen::Vector2d>& rule);
+  // Returns a const interator to the first quadrature rule over tetrahedra.
+  inline ConstIter<QuadRule3D> tetraCbegin() const;
 
-private:
-// Virtual constructor, copy-constructor and destructor, because this class
-// contains only static methods and should be a singleton
+  // Returns a const iterator to the rule after the end over tetrhedra.
+  inline ConstIter<QuadRule3D> tetraCend() const;
 
-// è meglio usare delete (ho letto sul libro)
-  QuadRuleManager() = default;
-  QuadRuleManager(const QuadRuleManager& man) = default;
+  // Returns a const interator to the first quadrature rule over triangles.
+  inline ConstIter<QuadRule2D> triaCbegin() const;
+
+  // Returns a const iterator to the rule after the end over triangles.
+  inline ConstIter<QuadRule2D> triaCend() const;
+
+  // Returns the matrix corresponding to the map from the standard 2d-simplex to
+  // the face faceNo of the standard 3d-simplex. The matrix is 3x3 so it must be
+  // applied to a 2d vector with homogeneous coordinates (i.e. a 3x1 vector with
+  // a 1 as last element).
+  inline const Eigen::Matrix3d& getFaceMap(unsigned faceNo) const;
+
+  // void addTetraRule(const QuadRule3D& rule);
+  // void addTetraRule(QuadRule3D&& rule);
+  // void addTriaRule(const QuadRule2D& rule);
+  // void addTriaRule(QuadRule2D&& rule);
+
+  // Default virtual destructor.
   virtual ~QuadRuleManager() = default;
 
-// Vector containing the rules over the standard 3d-simplex
-  static std::vector<Rule3D> tetraRules_;
+private:
+  // Constructor.
+  QuadRuleManager();
 
-// Vector containing the rules over the standard 2d-simplex
-  static std::vector<Rule2D> triaRules_;
+  // Vector containing the rules over the standard 3d-simplex.
+  std::vector<QuadRule3D> tetraRules_;
 
-// Maps from the standard 2d-simplex to the four faces of the standard 3d-simplex
-  static std::array<Eigen::Matrix3d, 4> faceMaps_;
+  // Vector containing the rules over the standard 2d-simplex.
+  std::vector<QuadRule2D> triaRules_;
+
+  // Maps from the standard 2d-simplex to the four faces of the standard 3d-simplex.
+  std::array<Eigen::Matrix3d, 4> faceMaps_;
 };
 
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline unsigned QuadRuleManager::getTetraRuleNo()
+inline SizeType QuadRuleManager::getTetraRuleNo() const
 {
   return tetraRules_.size();
 }
 
-inline unsigned QuadRuleManager::getTriaRuleNo()
+inline SizeType QuadRuleManager::getTriaRuleNo() const
 {
   return triaRules_.size();
 }
 
-inline QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCbegin()
+inline QuadRuleManager::ConstIter<QuadRule3D> QuadRuleManager::tetraCbegin() const
 {
   return tetraRules_.cbegin();
 }
 
-inline QuadRuleManager::CIter<QuadRuleManager::Rule3D> QuadRuleManager::tetraCend()
+inline QuadRuleManager::ConstIter<QuadRule3D> QuadRuleManager::tetraCend() const
 {
   return tetraRules_.cend();
 }
 
-inline QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCbegin()
+inline QuadRuleManager::ConstIter<QuadRule2D>  QuadRuleManager::triaCbegin() const
 {
   return triaRules_.cbegin();
 }
 
-inline QuadRuleManager::CIter<QuadRuleManager::Rule2D>  QuadRuleManager::triaCend()
+inline QuadRuleManager::ConstIter<QuadRule2D>  QuadRuleManager::triaCend() const
 {
   return triaRules_.cend();
 }
 
-inline const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo)
+inline const Eigen::Matrix3d& QuadRuleManager::getFaceMap(unsigned faceNo) const
 {
   return faceMaps_[faceNo];
 }

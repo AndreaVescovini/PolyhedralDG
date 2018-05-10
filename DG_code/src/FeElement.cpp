@@ -8,7 +8,7 @@ namespace PolyDG
 
 FeElement::FeElement(const Element& elem, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
-                     const QuadRuleManager::Rule3D& tetraRule)
+                     const QuadRule3D& tetraRule)
   : elem_{elem}, dof_{dof}, basisComposition_{basisComposition}, tetraRule_{tetraRule}
 {
   compute_basis();
@@ -36,7 +36,7 @@ void FeElement::compute_basis()
     {
       // I map the quadrature point from the reference tetrahedron to the physical one,
       // then I rescale it in order to compute the scaled legendre polynomial.
-      const Eigen::Vector3d physicPt = ((elem_.getTetra(t).getMap() * tetraRule_.getPoint(p)) - mb).array() / hb.array();
+      const Eigen::Vector3d physicPt = (this->getQuadPoint(t, p) - mb).array() / hb.array();
 
       // loop over basis functions.
       for(unsigned f = 0; f < dof_; f++)
