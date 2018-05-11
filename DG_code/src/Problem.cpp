@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <random>
 #include <unordered_set>
@@ -152,7 +154,7 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
   return std::sqrt(errSquared);
 }
 
-void Problem::exportSolutionVTK(const std::string& fileName) const
+void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision) const
 {
   std::ofstream fout{fileName};
 
@@ -192,6 +194,8 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     fout << "    <Piece NumberOfPoints=\"" << nodes.size() << "\" NumberOfCells=\"" << elem.getTetrahedraNo() << "\">\n";
 
+    fout << std::setprecision(precision) << std::scientific;
+
     // Print the nodes coordinates.
     fout << "      <Points>\n";
     fout << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n         ";
@@ -205,15 +209,14 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
     fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
       for(SizeType j = 0; j < 4; j++)
-      {
-        const unsigned vertexIndex = std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin();
-        fout << ' ' << vertexIndex;
-      }
+        fout << ' ' << (std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin());
     fout << "\n        </DataArray>\n";
+
     fout << "         <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n         ";
     for(unsigned offset = 4; offset <= elem.getTetrahedraNo() * 4; offset += 4)
       fout << ' ' << offset;
     fout << "\n        </DataArray>\n";
+
     fout << "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n         ";
     for(unsigned i = 0; i < elem.getTetrahedraNo(); i++)
       fout << " 10";
@@ -230,7 +233,7 @@ void Problem::exportSolutionVTK(const std::string& fileName) const
 
     // Print a value for the Polyhedron.
     fout << "      <CellData Scalars=\"Mesh\">\n";
-    fout << "        <DataArray type=\"Int32\" Name=\"Mesh\" format=\"ascii\">\n         ";
+    fout << "        <DataArray type=\"UInt32\" Name=\"Mesh\" format=\"ascii\">\n         ";
     for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
       fout << ' ' << elemValues[elem.getId()];
     fout << "\n        </DataArray>\n";

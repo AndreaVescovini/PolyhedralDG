@@ -9,8 +9,6 @@
 #include <Eigen/Sparse>
 
 #include <vector>
-#include <iostream>
-#include <iterator>
 #include <algorithm>
 #include <functional>
 #include <string>
@@ -85,7 +83,7 @@ public:
 
   // Function that exports the solution in a xml file fileName.vtu that can be
   // read with a visualization software (e.g. Paraview).
-  void exportSolutionVTK(const std::string& fileName) const;
+  void exportSolutionVTK(const std::string& fileName, unsigned precision = 8) const;
 
   // Function that returns true if the inserted form is symmetric or false
   // if it is not.
