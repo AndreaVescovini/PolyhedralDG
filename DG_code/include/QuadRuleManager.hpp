@@ -6,7 +6,9 @@
 
 #include <Eigen/Core>
 
-#include <vector>
+#include <array>
+#include <set>
+// #include <vector>
 
 namespace PolyDG
 {
@@ -16,7 +18,7 @@ class QuadRuleManager
 public:
   // Const iterator over the vector of quadrature rules.
   template <typename T>
-  using ConstIter = typename std::vector<T>::const_iterator;
+  using ConstIter = typename std::set<T, std::less<T>>::const_iterator;
 
   // Function that returns a reference to the singleton object.
   static QuadRuleManager& instance();
@@ -33,12 +35,12 @@ public:
   // Deleted move-assigment operator.
   QuadRuleManager& operator=(QuadRuleManager&) = delete;
 
-  // Returns a quadrature rule over the standard tetrahedron of exactness doe.
-  // If it does not exist it returns the the quadrature rule with the maximum doe
+  // Returns a quadrature rule over the standard tetrahedron of exactness at least
+  // doe. If it does not exist it returns the the quadrature rule with the maximum doe
   // that is available.
   const QuadRule3D& getTetraRule(unsigned doe) const;
 
-  // Returns a quadrature rule over the standard triangle of exactness doe.
+  // Returns a quadrature rule over the standard triangle of exactness at least doe.
   // If it does not exist it returns the the quadrature rule with the maximum doe
   // that is available.
   const QuadRule2D& getTriaRule(unsigned doe) const;
@@ -67,10 +69,25 @@ public:
   // a 1 as last element).
   inline const Eigen::Matrix3d& getFaceMap(unsigned faceNo) const;
 
-  // void addTetraRule(const QuadRule3D& rule);
-  // void addTetraRule(QuadRule3D&& rule);
-  // void addTriaRule(const QuadRule2D& rule);
-  // void addTriaRule(QuadRule2D&& rule);
+  // Function that takes a const reference to a QuadRule3D and stores it in the
+  // class. If there is already a rule with the same degree of exactness, that
+  // rule is substituted.
+  void setTetraRule(const QuadRule3D& rule);
+
+  // Function that takes a rvalue reference to a QuadRule3D and stores it in the
+  // class. If there is already a rule with the same degree of exactness, that
+  // rule is substituted.
+  void setTetraRule(QuadRule3D&& rule);
+
+  // Function that takes a const reference to a QuadRule2D and stores it in the
+  // class. If there is already a rule with the same degree of exactness, that
+  // rule is substituted.
+  void setTriaRule(const QuadRule2D& rule);
+
+  // Function that takes a rvalue reference to a QuadRule2D and stores it in the
+  // class. If there is already a rule with the same degree of exactness, that
+  // rule is substituted.
+  void setTriaRule(QuadRule2D&& rule);
 
   // Default virtual destructor.
   virtual ~QuadRuleManager() = default;
@@ -79,11 +96,11 @@ private:
   // Constructor.
   QuadRuleManager();
 
-  // Vector containing the rules over the standard 3d-simplex.
-  std::vector<QuadRule3D> tetraRules_;
+  // Set containing the rules over the standard 3d-simplex.
+  std::set<QuadRule3D, std::less<QuadRule3D>> tetraRules_;
 
-  // Vector containing the rules over the standard 2d-simplex.
-  std::vector<QuadRule2D> triaRules_;
+  // Set containing the rules over the standard 2d-simplex.
+  std::set<QuadRule2D, std::less<QuadRule2D>> triaRules_;
 
   // Maps from the standard 2d-simplex to the four faces of the standard 3d-simplex.
   std::array<Eigen::Matrix3d, 4> faceMaps_;

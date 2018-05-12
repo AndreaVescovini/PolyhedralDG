@@ -18,7 +18,7 @@ class QuadRule
 {
 public:
   QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<Real>& weights);
-  QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<Real> weights);
+  QuadRule(unsigned doe, const std::initializer_list<T>& points, const std::initializer_list<Real>& weights);
 
   // Default copy-constructor.
   QuadRule(const QuadRule&) = default;
@@ -44,6 +44,9 @@ public:
   // Default virtual destructor.
   virtual ~QuadRule() = default;
 
+  template <typename Q>
+  friend bool compDoe(const Q& rule, unsigned doe);
+
 private:
   // Degree of exactness od the quadrature formula
   unsigned doe_;
@@ -58,16 +61,33 @@ private:
 using QuadRule3D = QuadRule<Eigen::Vector3d>;
 using QuadRule2D = QuadRule<Eigen::Vector2d>;
 
+} // namespace PolyDG
+
+namespace std
+{
+  template<typename T>
+  struct less<PolyDG::QuadRule<T>>
+  {
+    bool operator()(const PolyDG::QuadRule<T>& lhs, const PolyDG::QuadRule<T>& rhs)
+    {
+      return lhs.getDoe() < rhs.getDoe();
+    }
+  };
+} // namespace std
+
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
+
+namespace PolyDG
+{
 
 template <typename T>
 QuadRule<T>::QuadRule(unsigned doe, const std::vector<T>& points, const std::vector<Real>& weights)
   : doe_{doe}, points_{points}, weights_{weights} {}
 
 template <typename T>
-QuadRule<T>::QuadRule(unsigned doe, std::initializer_list<T> points, std::initializer_list<Real> weights)
+QuadRule<T>::QuadRule(unsigned doe, const std::initializer_list<T>& points, const std::initializer_list<Real>& weights)
   : doe_{doe}, points_{points}, weights_{weights} {}
 
 template <typename T>
@@ -103,6 +123,12 @@ bool QuadRule<T>::checkRuleWeights(Real tol) const
   const Real volume = 1. / std::tgamma(points_[0].size() + 1);
 
   return (std::abs(sum - volume) < tol) ? true : false;
+}
+
+template <typename Q>
+bool compDoe(const Q& rule, unsigned doe)
+{
+  return rule.doe_ < doe;
 }
 
 } // namespace PolyDG
