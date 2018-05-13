@@ -75,19 +75,25 @@ void FeFaceInt::compute_basis()
 
 void FeFaceInt::printBasis(std::ostream& out = std::cout) const
 {
-  out << "Face " << face_.getId() << '\n';
-  out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
+  out << "Face " << face_.getId() << ": [ ";
+  out << face_.getVertex(0).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
   std::array<SideType, 2> sides = { Out, In };
 
   // Loop over sides.
   for(SizeType i = 0; i < 2; i++)
   {
-    // Loop over basis functions.
-    for(unsigned f = 0; f < dof_; f++)
+    out << "Side " << (i == 0 ? "Out" : "In") << '\n';
+    out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
+    // Loop over quadrature points.
+    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
     {
-      // Loop over quadrature points.
-      for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
+      out << "Quad. Point " << p + 1 << ": ";
+
+      // Loop over basis functions.
+      for(unsigned f = 0; f < dof_; f++)
         out << getPhi(sides[i], p, f) << ' ';
 
       out << '\n';
@@ -99,20 +105,26 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
 
 void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
 {
-  out << "Face " << face_.getId() << '\n';
-  out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
+  out << "Face " << face_.getId() << ": [ ";
+  out << face_.getVertex(0).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
   std::array<SideType, 2> sides = { Out, In };
 
   // Loop over sides.
   for(SizeType i = 0; i < 2; i++)
   {
-    // Loop over basis functions.
-    for(unsigned f = 0; f < dof_; f++)
+    out << "Side " << (i == 0 ? "Out" : "In") << '\n';
+    out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
+    // Loop over quadrature points.
+    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
     {
-      // Loop over quadrature points.
-      for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
-        out << getPhiDer(sides[i], p, f).transpose() << '\n';
+      out << "Quad. Point " << p + 1 << ": ";
+
+      // Loop over basis functions.
+      for(unsigned f = 0; f < dof_; f++)
+        out << "[ " << getPhiDer(sides[i], p, f).transpose() << " ] ";
 
       out << '\n';
     }

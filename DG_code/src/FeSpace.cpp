@@ -16,7 +16,7 @@ FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2
 // ho solo il termine di stiffness con le derivate e non il termine di massa,
 // quindi posso abbassare l'ordine della quadratura nei tetraedri
 FeSpace::FeSpace(Mesh& Th, unsigned order)
-  : FeSpace(Th, order, 2*(order-1), 2*order) {}
+  : FeSpace(Th, order, 2 * (order - 1), 2 * order) {}
 
 void FeSpace::integerComposition()
 {
@@ -57,51 +57,63 @@ void FeSpace::initialize()
     feFacesInt_.emplace_back(Th_.getFaceInt(i), order_, dof_, basisComposition_, triaRule_);
 }
 
+void FeSpace::printInfo(std::ostream& out) const
+{
+  out << "-------------------- FESPACE INFO --------------------" << '\n';
+  out << "Order = " << order_ << '\n';
+  out << "Degrees of freedom per element: " << dof_ << '\n';
+  out << "Elements: " << feElements_.size() << '\n';
+  out << "Total degrees of freedom: " << dof_ * feElements_.size() <<'\n';
+  out << "Quadrature Rule 3D: degree of exactness = " << tetraRule_.getDoe() << ", points: " << tetraRule_.getPointsNo() << '\n';
+  out << "Quadrature Rule 2D: degree of exactness = " << triaRule_.getDoe() << ", points: " << triaRule_.getPointsNo() << '\n';
+  out << "------------------------------------------------------" << std::endl;
+}
+
 void FeSpace::printElemBasis(std::ostream& out) const
 {
-  out << "-------- BASIS OVER ELEMENTS --------" << '\n';
+  out << "---------------- BASIS OVER ELEMENTS -----------------" << '\n';
 
   for(const FeElement& el : feElements_)
     el.printBasis(out);
 
-  out << "-------------------------------------" << std::endl;
+  out << "------------------------------------------------------" << std::endl;
 }
 
 void FeSpace::printElemBasisDer(std::ostream& out) const
 {
-  out << "-------- BASIS DERIVATIVE OVER ELEMENTS --------" << '\n';
+  out << "----------- BASIS DERIVATIVE OVER ELEMENTS -----------" << '\n';
 
   for(const FeElement& el : feElements_)
     el.printBasisDer(out);
 
-  out << "------------------------------------------------" << std::endl;
+  out << "------------------------------------------------------" << std::endl;
 }
 
 void FeSpace::printFaceBasis(std::ostream& out) const
 {
-  out << "-------- BASIS OVER INTERNAL FACES --------" << '\n';
-
-  for(const FeFaceInt& face : feFacesInt_)
-    face.printBasis(out);
-
-  out << "-------- BASIS OVER EXTERNAL FACES --------" << '\n';
+  out << "------------- BASIS OVER EXTERNAL FACES --------------" << '\n';
 
   for(const FeFaceExt& face : feFacesExt_)
     face.printBasis(out);
 
-  out << "-------------------------------------------" << std::endl;
+  out << "------------- BASIS OVER INTERNAL FACES --------------" << '\n';
+
+  for(const FeFaceInt& face : feFacesInt_)
+    face.printBasis(out);
+
+  out << "------------------------------------------------------" << std::endl;
 }
 
 void FeSpace::printFaceBasisDer(std::ostream& out) const
 {
-  out << "-------- BASIS DERIVATIVE OVER INTERNAL FACES --------" << '\n';
-
-  for(const FeFaceInt& face : feFacesInt_)
-    face.printBasisDer(out);
-
   out << "-------- BASIS DERIVATIVE OVER EXTERNAL FACES --------" << '\n';
 
   for(const FeFaceExt& face : feFacesExt_)
+    face.printBasisDer(out);
+
+  out << "-------- BASIS DERIVATIVE OVER INTERNAL FACES --------" << '\n';
+
+  for(const FeFaceInt& face : feFacesInt_)
     face.printBasisDer(out);
 
   out << "------------------------------------------------------" << std::endl;

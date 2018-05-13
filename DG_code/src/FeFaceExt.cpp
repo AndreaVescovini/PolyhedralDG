@@ -58,14 +58,20 @@ void FeFaceExt::compute_basis()
 
 void FeFaceExt::printBasis(std::ostream& out = std::cout) const
 {
-  out << "Face " << face_.getId() << '\n';
-  out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
+  out << "Face " << face_.getId() << ": [ ";
+  out << face_.getVertex(0).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
-  // Loop over the basis functions.
-  for(unsigned f = 0; f < dof_; f++)
+  out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
+
+  // Loop over the quadrature points.
+  for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
   {
-    // Loop over quadrature points.
-    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
+    out << "Quad. Point " << p + 1 << ": ";
+
+    // Loop over the basis functions.
+    for(unsigned f = 0; f < dof_; f++)
       out << getPhi(p, f) << ' ';
 
     out << '\n';
@@ -75,15 +81,21 @@ void FeFaceExt::printBasis(std::ostream& out = std::cout) const
 
 void FeFaceExt::printBasisDer(std::ostream& out = std::cout) const
 {
-  out << "Face " << face_.getId() << '\n';
-  out << face_.getVertex(0).getCoords().transpose() << " - " << face_.getVertex(1).getCoords().transpose() << " - " << face_.getVertex(2).getCoords().transpose() << '\n';
+  out << "Face " << face_.getId() << ": [ ";
+  out << face_.getVertex(0).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
+  out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
-  // Loop over the basis functions.
-  for(unsigned f = 0; f < dof_; f++)
+  out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
+
+  // Loop over the quadrature points.
+  for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
   {
-    // Loop over the quadrature points.
-    for(SizeType p = 0; p < triaRule_.getPointsNo(); p++)
-      out << getPhiDer(p, f).transpose() << '\n';
+    out << "Quad. Point " << p + 1 << ": ";
+
+    // Loop over the basis functions.
+    for(unsigned f = 0; f < dof_; f++)
+      out << "[ " << getPhiDer(p, f).transpose() << " ] ";
 
     out << '\n';
   }

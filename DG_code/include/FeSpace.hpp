@@ -58,6 +58,7 @@ public:
   inline ConstIter<FeFaceInt> feFacesIntCbegin() const;
   inline ConstIter<FeFaceInt> feFacesIntCend() const;
 
+  void printInfo(std::ostream& out = std::cout) const;
   void printElemBasis(std::ostream& out = std::cout) const;
   void printElemBasisDer(std::ostream& out = std::cout) const;
   void printFaceBasis(std::ostream& out = std::cout) const;

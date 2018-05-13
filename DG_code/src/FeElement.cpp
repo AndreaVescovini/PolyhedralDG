@@ -67,11 +67,19 @@ void FeElement::printBasis(std::ostream& out) const
   // Loop over tetrahedra.
   for(SizeType t = 0; t < elem_.getTetrahedraNo(); t++)
   {
-    out << "Tetrahedron " << elem_.getTetra(t).getId() << '\n';
+    out << "Tetrahedron " << elem_.getTetra(t).getId() << ": [ ";
+    out << elem_.getTetra(t).getVertex(0).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(1).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(2).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(3).getCoords().transpose() << "]\n";
+
+    out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
 
     // Loop over quadrature points.
     for(SizeType p = 0; p < tetraRule_.getPointsNo(); p++)
     {
+      out << "Quad. Point " << p + 1 << ": ";
+
       // Loop over basis functions.
       for(SizeType f = 0; f < dof_; f++)
         out << getPhi(t, p, f) << ' ';
@@ -87,15 +95,22 @@ void FeElement::printBasisDer(std::ostream& out) const
   // Loop over tetrahedra.
   for(SizeType t = 0; t < elem_.getTetrahedraNo(); t++)
   {
-    out << "Tetrahedron " << elem_.getTetra(t).getId() << '\n';
+    out << "Tetrahedron " << elem_.getTetra(t).getId() << ": [ ";
+    out << elem_.getTetra(t).getVertex(0).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(1).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(2).getCoords().transpose() << " ] [ ";
+    out << elem_.getTetra(t).getVertex(3).getCoords().transpose() << "]\n";
+
+    out << "Basis Functions = 1, 2, ..., dof per element" << '\n';
 
     // Loop over quadrature points.
     for(SizeType p = 0; p < tetraRule_.getPointsNo(); p++)
     {
+      out << "Quad. Point " << p + 1 << ": ";
 
       // Loop over basis functions.
       for(SizeType f = 0; f < dof_; f++)
-        out << getPhiDer(t, p, f).transpose() << '\n';
+        out << "[ " << getPhiDer(t, p, f).transpose() << " ] ";
 
       out << '\n';
     }

@@ -1,16 +1,24 @@
-#include "Mesh.hpp"
 #include "FeSpace.hpp"
+#include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
+
+#include <string>
+
+using PolyDG::FeSpace;
+using PolyDG::Mesh;
+using PolyDG::MeshReaderPoly;
 
 int main()
 {
-  std::string fileName = "../meshes/cube_str6t.mesh";
+  std::string fileName = "../meshes/cube_str48h.mesh";
 
-  PolyDG::MeshReaderPoly reader;
-  PolyDG::Mesh Th(fileName, reader);
+  MeshReaderPoly reader;
+  Mesh Th(fileName, reader);
 
   unsigned r = 1;
-  PolyDG::FeSpace Vh(Th, r, 2, 2);
+  FeSpace Vh(Th, r, 2, 2);
+
+  Vh.printInfo();
 
   Vh.printElemBasis();
   Vh.printElemBasisDer();
