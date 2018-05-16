@@ -10,6 +10,7 @@
 
 #include <array>
 #include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -109,14 +110,17 @@ public:
   inline unsigned getDim() const;
 
   // Function that sets to zero the matrix of the linear system.
-  inline void clearMatrix();
+  void clearMatrix();
 
   // Function that sets to zero the vector of the rhs of the linear system.
-  inline void clearRhs();
+  void clearRhs();
 
   // Function that assembles the matrix of the linear system. This must be called
   // after the integrations.
   void finalizeMatrix();
+
+  // Prints info about the problem.
+  void printInfo(std::ostream& out = std::cout) const;
 
   // Default virtual destructor.
   virtual ~Problem() = default;
@@ -215,7 +219,7 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool
         }
     }
 
-  // I made and overestimate so now I shrink the vector on order to optimize
+  // I made and overestimate so now I shrink the vector in order to optimize
   // the memory consnmption.
   triplets_[1].shrink_to_fit();
 }
@@ -295,7 +299,7 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel)
 
 inline bool Problem::isSymmetric() const
 {
-  return sym_[0] || sym_[1] || sym_[2];
+  return sym_[0] && sym_[1] && sym_[2];
 }
 
 inline const Eigen::SparseMatrix<Real>& Problem::getMatrix() const
@@ -316,16 +320,6 @@ inline const Eigen::VectorXd& Problem::getSolution() const
 inline unsigned Problem::getDim() const
 {
   return dim_;
-}
-
-inline void Problem::clearMatrix()
-{
-  A_.setZero();
-}
-
-inline void Problem::clearRhs()
-{
-  b_ = Eigen::VectorXd::Zero(dim_);
 }
 
 } // namespace PolyDG

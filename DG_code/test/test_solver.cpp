@@ -7,74 +7,171 @@
 #include "Watch.hpp"
 
 #include <cmath>
-
-using namespace PolyDG;
+#include <exception>
 
 int main()
 {
-  std::string fileName = "/vagrant/pacs/progetto_codici/meshes/cube_str48p.mesh";
+  // Exact solution and source term
+  auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0) * x(1) * x(2)); };
+  auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0) * x(0) * x(1) * x(1) +
+                                                                     x(1) * x(1) * x(2) * x(2) +
+                                                                     x(0) * x(0) * x(2) * x(2));};
+  auto uexGrad = [&uex](const Eigen::Vector3d& x) -> Eigen::Vector3d { return uex(x)*Eigen::Vector3d(x(1) * x(2),
+                                                                                                     x(0) * x(2),
+                                                                                                     x(0) * x(1)); };
+
+  // Mesh reading
+  std::string fileName = "../meshes/cube_str1296p.mesh";
 
   PolyDG::MeshReaderPoly reader;
   PolyDG::Mesh Th(fileName, reader);
+  Th.printInfo();
 
-  unsigned r = 1;
-  FeSpace Vh(Th, r);
+  // FeSpace Creation
+  unsigned r = 2;
+  PolyDG::FeSpace Vh(Th, r);
 
-  PhiI v;
-  GradPhiJ uGrad;
-  GradPhiI vGrad;
-  JumpPhiJ uJump;
-  JumpPhiI vJump;
-  AverGradPhiJ uGradAver;
-  AverGradPhiI vGradAver;
-  PenaltyScaling gamma(10.0);
-  Normal n;
+  // Operators
+  PolyDG::PhiI            v;
+  PolyDG::GradPhiJ        uGrad;
+  PolyDG::GradPhiI        vGrad;
+  PolyDG::JumpPhiJ        uJump;
+  PolyDG::JumpPhiI        vJump;
+  PolyDG::AverGradPhiJ    uGradAver;
+  PolyDG::AverGradPhiI    vGradAver;
+  PolyDG::PenaltyScaling  gamma(10.0);
+  PolyDG::Normal          n;
+  PolyDG::Function        f(source), gd(uex);
 
-  Function f([](Eigen::Vector3d /* x */) { return 0.0; });
-  Function gd([](Eigen::Vector3d x) { return x(0); });
+  // Problem instantation and integration
+  std::cout << "-------------------- Symmetric Problem --------------------" << std::endl;
+  PolyDG::Problem poisson(Vh);
 
-  Problem prob(Vh);
+  poisson.integrateVol(dot(uGrad, vGrad), true);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), 1, true);
+  poisson.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), true);
+  poisson.integrateVolRhs(f * v);
+  poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
 
-  bool symform = true;
-
-  prob.integrateVol(dot(uGrad, vGrad), symform);
-  prob.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), symform);
-  prob.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, symform);
-
-  prob.integrateVolRhs(f * v);
-  prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
-
-  prob.finalizeMatrix();
+  poisson.finalizeMatrix();
 
   Timings::Watch ch;
+
+  // LU
+  std::cout << "\nSolving with SparseLU..." << std::endl;
   ch.start();
-
-  std::cout << "\nSolving with SparseLU" << std::endl;
-  prob.solveLU();
-  // std::cout << prob.getSolution() << '\n' << std::endl;
-
+  poisson.solveLU();
   ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
+
   ch.reset();
+
+  // Chlolesky
+  std::cout << "\nSolving with SparseCholesky..." << std::endl;
   ch.start();
-
-  std::cout << "\nSolving with SparseCholesky" << std::endl;
-  prob.solveChol();
-  // std::cout << prob.getSolution() << '\n' <<  std::endl;
-
+  poisson.solveChol();
   ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
+
   ch.reset();
+
+  // Conjugate Gradient
+  std::cout << "\nSolving with ConjugateGradient..." << std::endl;
   ch.start();
-
-  std::cout << "\nSolving with ConjugateGradient" << std::endl;
-  prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 2 * prob.getDim());
-  // std::cout << prob.getSolution() << std::endl;
-
+  poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
   ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
-  // prob.exportSolutionVTK("output.vtu");
+  ch.reset();
+
+  // BiCGSTAB
+  std::cout << "\nSolving with BiCGSTAB..." << std::endl;
+  ch.start();
+  poisson.solveBiCGSTAB(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
+  ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
+  std::cout << ch << std::endl;
+
+  // Another problem
+  std::cout << "------------------ Non Symmetric Problem ------------------" << std::endl;
+  poisson.clearMatrix();
+  poisson.clearRhs();
+
+  PolyDG::Stiff stiff;
+  PolyDG::Mass  mass;
+
+  poisson.integrateVol(stiff + mass, true);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), 1,  false);
+  poisson.integrateFacesInt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), false);
+
+  poisson.integrateVolRhs(f * v);
+  poisson.integrateFacesExtRhs(gd * dot(n, vGrad) + gamma * gd * v, 1);
+
+  poisson.finalizeMatrix();
+
+  // LU
+  std::cout << "\nSolving with SparseLU..." << std::endl;
+  ch.start();
+  poisson.solveLU();
+  ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
+  std::cout << ch << std::endl;
+
+  ch.reset();
+
+  // Chlolesky
+  std::cout << "\nSolving with SparseCholesky..." << std::endl;
+  ch.start();
+  try
+  {
+    poisson.solveChol();
+    ch.stop();
+    std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+    std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
+    std::cout << ch << std::endl;
+
+  } catch(const std::exception&e)
+  {
+    std::cout << e.what() << std::endl;
+  }
+
+  ch.reset();
+
+  // Conjugate Gradient
+  std::cout << "\nSolving with ConjugateGradient..." << std::endl;
+  ch.start();
+  try
+  {
+    poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
+    ch.stop();
+    std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+    std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
+    std::cout << ch << std::endl;
+  } catch(const std::exception& e)
+  {
+    std::cout << e.what() << std::endl;
+  }
+
+  ch.reset();
+
+  // BiCGSTAB
+  std::cout << "\nSolving with BiCGSTAB..." << std::endl;
+  ch.start();
+  poisson.solveBiCGSTAB(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
+  ch.stop();
+  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
+  std::cout << ch << std::endl;
+
+  std::cout << "-----------------------------------------------------------" << std::endl;
 
   return 0;
 }

@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 
+using PolyDG::Mesh;
+using PolyDG::MeshReaderPoly;
+
 int main()
 {
-  using PolyDG::MeshReaderPoly;
-  using PolyDG::Mesh;
-
   std::vector<std::string> fileNames;
   fileNames.emplace_back("../meshes/cube_str6t.mesh");
   fileNames.emplace_back("../meshes/cube_str48t.mesh");

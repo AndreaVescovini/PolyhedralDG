@@ -9,7 +9,6 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <iterator>
 #include <random>
 #include <stdexcept>
@@ -259,6 +258,16 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
   fout.close();
 }
 
+void Problem::printInfo(std::ostream& out) const
+{
+  out << "-------------------- PROBLEM INFO --------------------" << '\n';
+  out << "Total degrees of freedom: " << dim_ <<'\n';
+  if(A_.nonZeros() != 0)
+    out << "Non-zeros in the matrix: " << A_.nonZeros() << '\n';
+  out << "Symmetric:  " << (this->isSymmetric() == true ? "Yes" : "No") << '\n';
+  out << "------------------------------------------------------" << std::endl;
+}
+
 Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
 {
   Real result = 0.0;
@@ -284,11 +293,13 @@ void Problem::finalizeMatrix()
 {
   std::vector<triplet> concatVec;
 
-  concatVec.reserve((sym_[0] == true ? 2 : 1) * triplets_[0].size() +
-                    (sym_[1] == true ? 2 : 1) * triplets_[1].size() +
-                    (sym_[2] == true ? 2 : 1) * triplets_[2].size());
+  SizeType dimTot = 0;
+  for(SizeType i = 0; i < triplets_.size(); i++)
+    dimTot += (sym_[i] == true ? 2 : 1) * triplets_[i].size();
 
-  for(unsigned i = 0; i < 3; i++)
+  concatVec.reserve(dimTot);
+
+  for(SizeType i = 0; i < triplets_.size(); i++)
   {
     if(this->isSymmetric() == false && sym_[i] == true)
       for(const auto& t : triplets_[i])
@@ -303,6 +314,18 @@ void Problem::finalizeMatrix()
 
   A_.setFromTriplets(concatVec.cbegin(), concatVec.cend());
   A_.prune(A_.coeff(0,0));
+}
+
+void Problem::clearMatrix()
+{
+  A_.setZero();
+  for(SizeType i = 0; i < triplets_.size(); i++)
+    triplets_[i].clear();
+}
+
+void Problem::clearRhs()
+{
+  b_ = Eigen::VectorXd::Zero(dim_);
 }
 
 } // namespace PolyDG
