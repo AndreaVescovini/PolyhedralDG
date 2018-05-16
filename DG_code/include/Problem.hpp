@@ -1,18 +1,17 @@
 #ifndef _PROBLEM_HPP_
 #define _PROBLEM_HPP_
 
-#include "PolyDG.hpp"
-#include "FeSpace.hpp"
 #include "ExprWrapper.hpp"
+#include "FeSpace.hpp"
+#include "PolyDG.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 
-#include <vector>
-#include <algorithm>
+#include <array>
 #include <functional>
 #include <string>
-#include <array>
+#include <vector>
 
 namespace PolyDG
 {
@@ -37,17 +36,17 @@ public:
   template <typename T>
   void integrateVol(const ExprWrapper<T>& expr, bool sym = false);
 
-  // Function that integrates a bilinear form over the internal faces
-  // of the elements of the mesh. If sym == true only the upper triangular part
-  // is computed.
-  template <typename T>
-  void integrateFacesInt(const ExprWrapper<T>& expr, bool sym = false);
-
   // Function that integrates a bilinear over the external faces
   // of the elements of the mesh. If sym == true only the upper triangular part
   // is computed.
   template <typename T>
   void integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool sym = false);
+
+  // Function that integrates a bilinear form over the internal faces
+  // of the elements of the mesh. If sym == true only the upper triangular part
+  // is computed.
+  template <typename T>
+  void integrateFacesInt(const ExprWrapper<T>& expr, bool sym = false);
 
   // Function that integrates a linear form over the volume of the elements of
   // the mesh.
@@ -72,6 +71,12 @@ public:
   // specified.
   void solveCG(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
                Real tol = Eigen::NumTraits<Real>::epsilon());
+
+  // Function that solves the linear system iteratively using the bi conjugate
+  // gradient stabilized method.It requires an initial guess and maximum number
+  // of iterations and the tolerance can be specified.
+  void solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
+                            Real tol = Eigen::NumTraits<Real>::epsilon());
 
   // Function that, given the exact solution uex, computes the L2-norm of the
   // error.
@@ -179,17 +184,54 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
 }
 
 template <typename T>
-void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
+void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool sym)
 {
   const T& exprDerived(expr);
 
   sym_[1] = sym;
 
+  // If the variational form is symmetric I store only half elements,
+  // I overestimate considering all the external faces with the same type of
+  // boundary conditions
+  if(sym == true)
+    triplets_[1].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * (Vh_.getDof() + 1) / 2);
+  else
+    triplets_[1].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * Vh_.getDof());
+
+  for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
+    if(it->getBClabel() == bcLabel)
+    {
+      const unsigned indexOffset = it->getElemIn() * Vh_.getDof();
+
+      for(unsigned j = 0; j < Vh_.getDof(); j++)
+        for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
+        {
+          Real sum = 0.0;
+
+          for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
+            sum += exprDerived(*it, i, j, p) * it->getWeight(p) * it->getAreaDoubled();
+
+          triplets_[1].emplace_back(i + indexOffset, j + indexOffset, sum);
+        }
+    }
+
+  // I made and overestimate so now I shrink the vector on order to optimize
+  // the memory consnmption.
+  triplets_[1].shrink_to_fit();
+}
+
+template <typename T>
+void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
+{
+  const T& exprDerived(expr);
+
+  sym_[2] = sym;
+
   // If the variational form is symmetric I store only half elements
   if(sym == true)
-    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * (2 * Vh_.getDof() + 1));
+    triplets_[2].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * (2 * Vh_.getDof() + 1));
   else
-    triplets_[1].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
+    triplets_[2].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
 
   const std::array<SideType, 2> sides = {Out, In};
 
@@ -208,46 +250,9 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
             for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
               sum += exprDerived(*it, i, j, sides[si], sides[sj], p) * it->getWeight(p) * it->getAreaDoubled();
 
-            triplets_[1].emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
+            triplets_[2].emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
           }
   }
-}
-
-template <typename T>
-void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool sym)
-{
-  const T& exprDerived(expr);
-
-  sym_[2] = sym;
-
-  // If the variational form is symmetric I store only half elements,
-  // I overestimate considering all the external faces with the same type of
-  // boundary conditions
-  if(sym == true)
-    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * (Vh_.getDof() + 1) / 2);
-  else
-    triplets_[2].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * Vh_.getDof());
-
-  for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
-    if(it->getBClabel() == bcLabel)
-    {
-      const unsigned indexOffset = it->getElemIn() * Vh_.getDof();
-
-      for(unsigned j = 0; j < Vh_.getDof(); j++)
-        for(unsigned i = 0; i < (sym == true ? j + 1 : Vh_.getDof()); i++)
-        {
-          Real sum = 0.0;
-
-          for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
-            sum += exprDerived(*it, i, j, p) * it->getWeight(p) * it->getAreaDoubled();
-
-          triplets_[2].emplace_back(i + indexOffset, j + indexOffset, sum);
-        }
-    }
-
-  // I made and overestimate so now I shrink the vector on order to optimize
-  // the memory consnmption.
-  triplets_[2].shrink_to_fit();
 }
 
 template <typename T>
@@ -290,7 +295,7 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel)
 
 inline bool Problem::isSymmetric() const
 {
-  return (sym_[0] || sym_[1] || sym_[2]);
+  return sym_[0] || sym_[1] || sym_[2];
 }
 
 inline const Eigen::SparseMatrix<Real>& Problem::getMatrix() const

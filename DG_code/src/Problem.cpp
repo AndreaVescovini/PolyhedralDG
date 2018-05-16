@@ -6,13 +6,13 @@
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseLU>
 
-#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <random>
+#include <stdexcept>
 #include <unordered_set>
 
 namespace PolyDG
@@ -26,6 +26,7 @@ Problem::Problem(const FeSpace& Vh)
 void Problem::solveLU()
 {
   Eigen::SparseLU<Eigen::SparseMatrix<Real>> solver;
+  A_.makeCompressed();
 
   if(this->isSymmetric() == true)
   {
@@ -36,72 +37,82 @@ void Problem::solveLU()
     solver.compute(A_);
 
   if(solver.info() != Eigen::Success)
-  {
-    std::cerr << "Numerical Issue\n" << solver.lastErrorMessage() << std::endl;
-    return;
-  }
+    throw std::runtime_error("Numerical issue in the matrix factorization.\n" + solver.lastErrorMessage());
 
   u_ = solver.solve(b_);
   if(solver.info() != Eigen::Success)
-  {
-    std::cerr << "Numerical Issue\n" << solver.lastErrorMessage() << std::endl;
-    return;
-  }
+    std::cerr << "Numerical issue in the solver.\n" << solver.lastErrorMessage() << std::endl;
 }
 
 void Problem::solveChol()
 {
   if(this->isSymmetric() == false)
-  {
-    std::cerr << "solveChol() requires a symmetric matrix" << std::endl;
-    return;
-  }
+    throw std::domain_error("solveChol() requires a symmetric matrix.");
 
-  // Eigen::SimplicialLLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
-  Eigen::SimplicialLDLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
+  Eigen::SimplicialLLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
 
   A_.makeCompressed();
   solver.compute(A_);
   if(solver.info() != Eigen::Success)
-  {
-    std::cerr << "Numerical Issue " << solver.info() << std::endl;
-    return;
-  }
+    throw std::runtime_error("Numerical issue in the matrix factorization.");
 
   u_ = solver.solve(b_);
   if(solver.info() != Eigen::Success)
-  {
-    std::cerr << "Numerical Issue" << std::endl;
-    return;
-  }
+    std::cerr << "Numerical issue in the solver." << std::endl;
 }
 
 void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
   if(this->isSymmetric() == false)
-  {
-    std::cerr << "solveCG() requires a symmetric matrix" << std::endl;
-    return;
-  }
+    throw std::domain_error("solveCG() requires a symmetric matrix.");
 
   Eigen::ConjugateGradient<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
-  // Eigen::ConjugateGradient<Eigen::SparseMatrix<Real>, Eigen::Lower|Upper> solver;
-
   solver.setMaxIterations(iterMax);
   solver.setTolerance(tol);
 
+  A_.makeCompressed();
   solver.compute(A_);
 
   u_ = solver.solveWithGuess(b_, x0);
-  if(solver.info() != Eigen::Success)
-  {
-    std::cerr << "Not converged" << std::endl;
-    return;
-  }
 
-  // if(verbosity)
-  std::cout << "Converged with " << solver.iterations() << " iterations.\n";
-  std::cout << "Estimated error "<< solver.error() << std::endl;
+  if(solver.info() != Eigen::Success)
+    std::cerr << "Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
+  else
+  {
+    // if(verbosity)
+    std::cout << "Conjugate gradient converged with " << solver.iterations() << " iterations.\n";
+    std::cout << "Estimated error = "<< solver.error() << std::endl;
+  }
+}
+
+void Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
+{
+  Eigen::BiCGSTAB<Eigen::SparseMatrix<Real>> solver;
+  solver.setMaxIterations(iterMax);
+  solver.setTolerance(tol);
+
+  A_.makeCompressed();
+
+  Eigen::SparseMatrix<Real>  Aselfadj;
+  if(this->isSymmetric() == true)
+  {
+    std::cerr << "The matrix is symmetric. Consider using the conjugate gradient instead." << std::endl;
+    Aselfadj = A_.selfadjointView<Eigen::Upper>();
+    solver.compute(Aselfadj);
+  }
+  else
+    solver.compute(A_);
+
+  u_ = solver.solveWithGuess(b_, x0);
+
+  if(solver.info() != Eigen::Success)
+    std::cerr << "BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
+  else
+  {
+    // if(verbosity)
+    std::cout << "BiCGSTAB converged with " << solver.iterations() << " iterations.\n";
+    std::cout << "Estimated error = "<< solver.error() << std::endl;
+  }
 }
 
 Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>& uex) const
@@ -110,18 +121,18 @@ Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>&
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
-    unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
+    const unsigned indexOffset = it->getElem().getId() * Vh_.getDof();
 
     for(SizeType t = 0; t < it->getTetrahedraNo(); t++)
       for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
       {
         Real uh = 0.0;
 
-        // Evaluation of the fem function at the quadrature node
+        // Evaluation of the fem function at the quadrature node.
         for(unsigned f = 0; f < Vh_.getDof(); f++)
           uh += u_(f + indexOffset) * it->getPhi(t, p, f);
 
-        Real difference = uh - uex(it->getQuadPoint(t, p));
+        const Real difference = uh - uex(it->getQuadPoint(t, p));
         errSquared += difference * difference * it->getWeight(p) * it->getAbsDetJac(t);
       }
   }
@@ -142,11 +153,11 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
       {
         Eigen::Vector3d uhGrad = Eigen::Vector3d::Zero();
 
-        // Evaluation of the fem function at the quadrature node
+        // Evaluation of the fem function at the quadrature node.
         for(unsigned f = 0; f < Vh_.getDof(); f++)
           uhGrad += u_(f + indexOffset) * it->getPhiDer(t, p, f);
 
-        Eigen::Vector3d difference = uhGrad - uexGrad(it->getQuadPoint(t, p));
+        const Eigen::Vector3d difference = uhGrad - uexGrad(it->getQuadPoint(t, p));
         errSquared += difference.squaredNorm() * it->getWeight(p) * it->getAbsDetJac(t);
       }
   }
@@ -285,13 +296,12 @@ void Problem::finalizeMatrix()
           concatVec.emplace_back(t.col(), t.row(), t.value());
 
     concatVec.insert(concatVec.cend(),
-                   std::make_move_iterator(triplets_[i].cbegin()),
-                   std::make_move_iterator(triplets_[i].cend()));
+                     std::make_move_iterator(triplets_[i].cbegin()),
+                     std::make_move_iterator(triplets_[i].cend()));
     triplets_[i].clear();
   }
 
   A_.setFromTriplets(concatVec.cbegin(), concatVec.cend());
-
   A_.prune(A_.coeff(0,0));
 }
 

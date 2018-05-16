@@ -158,4 +158,10 @@ void Mesh::print(SizeType lineNo, std::ostream& out) const
   out << "----------------------" << std::endl;
 }
 
+MeshFormatError::MeshFormatError(const std::string& what_arg)
+  : std::runtime_error(what_arg) {}
+
+MeshFormatError::MeshFormatError(const char* what_arg)
+  : std::runtime_error(what_arg) {}
+
 } // namespace PolyDG

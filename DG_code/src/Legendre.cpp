@@ -1,6 +1,6 @@
 #include "Legendre.hpp"
 
-#include <iostream>
+#include <stdexcept>
 
 namespace PolyDG
 {
@@ -31,8 +31,7 @@ Real legendre(unsigned n, Real x)
       return (231.0 * pow(x, 6) - 315.0 * pow(x, 4) + 105.0 * pow(x, 2) - 5.0) / 16.0;
 
     default:
-      std::cerr << "The required degree is not implemented." << std::endl;
-      exit(1);
+      throw std::domain_error("The required degree for the FeSpace is not implemented.");
   }
 }
 
@@ -62,8 +61,7 @@ Real legendreDer(unsigned n, Real x)
       return (1386.0 * pow(x, 5) - 1260.0 * pow(x, 3) + 210.0 * x) / 16.0;
 
     default:
-      std::cerr << "The required degree is not implemented." << std::endl;
-      exit(1);
+      throw std::domain_error("The required degree for the FeSpace is not implemented.");
   }
 }
 

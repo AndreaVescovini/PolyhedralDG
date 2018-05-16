@@ -5,6 +5,7 @@
 #include "Tetrahedron.hpp"
 #include "Vertex.hpp"
 
+#include <stdexcept>
 #include <vector>
 
 namespace PolyDG
@@ -21,10 +22,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   std::ifstream meshFile{fileName};
   if(meshFile.is_open() == false)
-  {
-    std::cerr << "Can't open mesh file. Mesh file does not exist or is corrupted" << std::endl;
-    exit(1);
-  }
+    throw std::runtime_error("Can't open mesh file. Mesh file does not exist or is corrupted.");
 
   // I use the proxy to access the Mesh class.
   MeshProxy mp(mesh);
@@ -35,10 +33,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   bool found = goToSection(meshFile, 0);
   if(found == false)
-  {
-    std::cerr << "Error in mesh format, " << sections_[0] << " not found." << std::endl;
-    exit(2);
-  }
+    throw MeshFormatError("Error in mesh format, " + sections_[0] + " not found.");
 
   // Read vertices.
   SizeType verticesNo = 0;
@@ -56,10 +51,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   found = goToSection(meshFile, 1);
   if(found == false)
-  {
-    std::cerr << "Error in mesh format, " << sections_[1] << " not found." << std::endl;
-    exit(2);
-  }
+    throw MeshFormatError("Error in mesh format, " + sections_[0] + " not found.");
 
   // Read tetrahedra.
   SizeType tetrahedraNo = 0;
@@ -77,10 +69,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   found = goToSection(meshFile, 2);
   if(found == false)
-  {
-    std::cerr << "Error in mesh format, " << sections_[2] << " not found." << std::endl;
-    exit(2);
-  }
+    throw MeshFormatError("Error in mesh format, " + sections_[0] + " not found.");
 
   // Read external faces.
   SizeType facesExtNo = 0;

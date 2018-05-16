@@ -11,6 +11,7 @@
 #include "Vertex.hpp"
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -79,6 +80,15 @@ private:
   void computePolyInfo();
 
   void print(SizeType lineNo, std::ostream& out = std::cout) const;
+};
+
+class MeshFormatError : public std::runtime_error
+{
+public:
+  explicit MeshFormatError(const std::string& what_arg);
+  explicit MeshFormatError(const char* what_arg);
+
+  virtual ~MeshFormatError() = default;
 };
 
 //----------------------------------------------------------------------------//
