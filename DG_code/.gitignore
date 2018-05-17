@@ -2,6 +2,7 @@
 obj/
 bin/
 lib/
+doc/
 .d
 
 # I ignore output files

@@ -1,3 +1,9 @@
+/*!
+    @file   Face.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class Face
+*/
+
 #include "Face.hpp"
 
 #include <Eigen/Geometry>
@@ -8,10 +14,10 @@ namespace PolyDG
 {
 
 Face::Face(Vertex& v1, Vertex& v2, Vertex& v3)
-  : vertices_{{v1, v2, v3}}, tetIn_{nullptr}, faceNoTetIn_{0}
+  : vertices_{{v1, v2, v3}}, tetIn_{nullptr}, faceNoTetIn_{4}
 {
   // I sort vertices comparing the id.
-  std::sort(vertices_.begin(), vertices_.end(), compId);
+  std::sort(vertices_.begin(), vertices_.end(), compareId);
 }
 
 Face::Face(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn, unsigned faceNoTetIn)

@@ -1,3 +1,9 @@
+/*!
+    @file   Watch.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class Watch
+*/
+
 #include "Watch.hpp"
 
 namespace Timings
