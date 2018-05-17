@@ -14,6 +14,7 @@ public:
   using MyTimePoint = std::chrono::time_point<MyClock>;
   using Nanosec = std::chrono::nanoseconds;
 
+  // Constructor. Initializes start time to now.
   Watch();
 
   // Default copy-constructor.
@@ -28,23 +29,26 @@ public:
   // Default move-assignment operator.
   Watch& operator=(Watch&&) = default;
 
-  // Default virtual destructor.
-  virtual ~Watch() = default;
-
   //! Outputs time from last start and stop
   friend std::ostream& operator <<(std::ostream & out, const Watch& w);
 
-  //! Starts/reset  counting time
+  //! Initializes start time to now.
   void start();
 
   //! Stops counting time
   void stop();
 
+  // Reset to zero the measured time.
   void reset();
 
+  // Get the measured time [microseconds]
   double getTime() const;
 
+  // Makes a measure now and get [microseconds]
   double getTimeNow() const;
+
+  // Default virtual destructor.
+  virtual ~Watch() = default;
 
 private:
   MyTimePoint startTime_;

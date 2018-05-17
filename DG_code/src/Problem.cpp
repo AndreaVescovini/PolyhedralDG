@@ -19,8 +19,16 @@ namespace PolyDG
 
 Problem::Problem(const FeSpace& Vh)
   : Vh_{Vh}, dim_{static_cast<unsigned>(Vh.getDof() * Vh.getFeElementsNo())},
-    A_{dim_, dim_}, b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)},
-    sym_{true, true, true} {}
+    A_{dim_, dim_}, b_{Eigen::VectorXd::Zero(dim_)}, u_{Eigen::VectorXd::Zero(dim_)} {}
+
+bool Problem::isSymmetric() const
+{
+  for(SizeType i = 0; i < sym_.size(); i++)
+    if(sym_[i] == false)
+      return false;
+
+  return true;
+}
 
 void Problem::solveLU()
 {
@@ -46,24 +54,24 @@ void Problem::solveLU()
 void Problem::solveChol()
 {
   if(this->isSymmetric() == false)
-    throw std::domain_error("solveChol() requires a symmetric matrix.");
+    throw std::domain_error("Error: solveChol() requires a symmetric matrix.");
 
   Eigen::SimplicialLLT<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
 
   A_.makeCompressed();
   solver.compute(A_);
   if(solver.info() != Eigen::Success)
-    throw std::runtime_error("Numerical issue in the matrix factorization.");
+    throw std::runtime_error("Error: Numerical issue in the matrix factorization.");
 
   u_ = solver.solve(b_);
   if(solver.info() != Eigen::Success)
-    std::cerr << "Numerical issue in the solver." << std::endl;
+    std::cerr << "Warning: Numerical issue in the solver." << std::endl;
 }
 
 void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
   if(this->isSymmetric() == false)
-    throw std::domain_error("solveCG() requires a symmetric matrix.");
+    throw std::domain_error("Error: solveCG() requires a symmetric matrix.");
 
   Eigen::ConjugateGradient<Eigen::SparseMatrix<Real>, Eigen::Upper> solver;
   solver.setMaxIterations(iterMax);
@@ -75,7 +83,7 @@ void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
   u_ = solver.solveWithGuess(b_, x0);
 
   if(solver.info() != Eigen::Success)
-    std::cerr << "Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    std::cerr << "Warning: Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
   else
   {
     // if(verbosity)
@@ -95,7 +103,7 @@ void Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
   Eigen::SparseMatrix<Real>  Aselfadj;
   if(this->isSymmetric() == true)
   {
-    std::cerr << "The matrix is symmetric. Consider using the conjugate gradient instead." << std::endl;
+    std::cerr << "Warning: The matrix is symmetric. Consider using the conjugate gradient instead." << std::endl;
     Aselfadj = A_.selfadjointView<Eigen::Upper>();
     solver.compute(Aselfadj);
   }
@@ -105,7 +113,7 @@ void Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
   u_ = solver.solveWithGuess(b_, x0);
 
   if(solver.info() != Eigen::Success)
-    std::cerr << "BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    std::cerr << "Warning: BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
   else
   {
     // if(verbosity)
@@ -261,10 +269,10 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
 void Problem::printInfo(std::ostream& out) const
 {
   out << "-------------------- PROBLEM INFO --------------------" << '\n';
+  out << "Symmetric:  " << (this->isSymmetric() == true ? "Yes" : "No") << '\n';
   out << "Total degrees of freedom: " << dim_ <<'\n';
   if(A_.nonZeros() != 0)
-    out << "Non-zeros in the matrix: " << A_.nonZeros() << '\n';
-  out << "Symmetric:  " << (this->isSymmetric() == true ? "Yes" : "No") << '\n';
+    out << "Actual non-zeros in the matrix: " << A_.nonZeros() << '\n';
   out << "------------------------------------------------------" << std::endl;
 }
 
@@ -314,13 +322,14 @@ void Problem::finalizeMatrix()
 
   A_.setFromTriplets(concatVec.cbegin(), concatVec.cend());
   A_.prune(A_.coeff(0,0));
+
+  triplets_.clear();
 }
 
 void Problem::clearMatrix()
 {
   A_.setZero();
-  for(SizeType i = 0; i < triplets_.size(); i++)
-    triplets_[i].clear();
+  sym_.clear();
 }
 
 void Problem::clearRhs()

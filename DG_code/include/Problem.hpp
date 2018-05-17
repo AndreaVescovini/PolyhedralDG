@@ -93,7 +93,7 @@ public:
 
   // Function that returns true if the inserted form is symmetric or false
   // if it is not.
-  inline bool isSymmetric() const;
+  bool isSymmetric() const;
 
   // Function that returns a const reference to the matrix of the linear system.
   inline const Eigen::SparseMatrix<Real>& getMatrix() const;
@@ -139,13 +139,12 @@ private:
   Eigen::VectorXd b_;
   Eigen::VectorXd u_;
 
-  // Array of vectors of triplet used to store the values computed in the
+  // Vector of vectors of triplet used to store the values computed in the
   // integration.
-  std::array<std::vector<triplet>, 3> triplets_;
+  std::vector<std::vector<triplet>> triplets_;
 
-  // Array of bools referring to the symmetriy of the bilinear forms respectively
-  // over volumes, internal faces and external faces.
-  std::array<bool, 3> sym_;
+  // Vector of bools referring to the symmetry of the integrated forms.
+  std::vector<bool> sym_;
 
   // Function that evalues the solution of the problem at the point x, y, z
   // belonging to the FeElement el.
@@ -162,13 +161,14 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
   // I exploit the conversion to derived
   const T& exprDerived(expr);
 
-  sym_[0] = sym;
+  triplets_.emplace_back();
+  sym_.emplace_back(sym);
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
-    triplets_[0].reserve(dim_ * (Vh_.getDof() + 1) / 2);
+    triplets_.back().reserve(dim_ * (Vh_.getDof() + 1) / 2);
   else
-    triplets_[0].reserve(dim_ * Vh_.getDof());
+    triplets_.back().reserve(dim_ * Vh_.getDof());
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
@@ -182,7 +182,7 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
           for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
             sum += exprDerived(*it, i, j, t, p) * it->getWeight(p) * it->getAbsDetJac(t);
 
-        triplets_[0].emplace_back(i + indexOffset, j + indexOffset, sum);
+        triplets_.back().emplace_back(i + indexOffset, j + indexOffset, sum);
       }
   }
 }
@@ -192,15 +192,16 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool
 {
   const T& exprDerived(expr);
 
-  sym_[1] = sym;
+  triplets_.emplace_back();
+  sym_.emplace_back(sym);
 
   // If the variational form is symmetric I store only half elements,
   // I overestimate considering all the external faces with the same type of
   // boundary conditions
   if(sym == true)
-    triplets_[1].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * (Vh_.getDof() + 1) / 2);
+    triplets_.back().reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * (Vh_.getDof() + 1) / 2);
   else
-    triplets_[1].reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * Vh_.getDof());
+    triplets_.back().reserve(Vh_.getFeFacesExtNo() * Vh_.getDof() * Vh_.getDof());
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
     if(it->getBClabel() == bcLabel)
@@ -215,13 +216,13 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, BCType bcLabel, bool
           for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
             sum += exprDerived(*it, i, j, p) * it->getWeight(p) * it->getAreaDoubled();
 
-          triplets_[1].emplace_back(i + indexOffset, j + indexOffset, sum);
+          triplets_.back().emplace_back(i + indexOffset, j + indexOffset, sum);
         }
     }
 
   // I made and overestimate so now I shrink the vector in order to optimize
   // the memory consnmption.
-  triplets_[1].shrink_to_fit();
+  triplets_.back().shrink_to_fit();
 }
 
 template <typename T>
@@ -229,13 +230,14 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
 {
   const T& exprDerived(expr);
 
-  sym_[2] = sym;
+  triplets_.emplace_back();
+  sym_.emplace_back(sym);
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
-    triplets_[2].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * (2 * Vh_.getDof() + 1));
+    triplets_.back().reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * (2 * Vh_.getDof() + 1));
   else
-    triplets_[2].reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
+    triplets_.back().reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
 
   const std::array<SideType, 2> sides = {Out, In};
 
@@ -254,7 +256,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
             for(SizeType p = 0; p < it->getQuadPointsNo(); p++)
               sum += exprDerived(*it, i, j, sides[si], sides[sj], p) * it->getWeight(p) * it->getAreaDoubled();
 
-            triplets_[2].emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
+            triplets_.back().emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
           }
   }
 }
@@ -295,11 +297,6 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel)
                                  it->getAreaDoubled();
         }
     }
-}
-
-inline bool Problem::isSymmetric() const
-{
-  return sym_[0] && sym_[1] && sym_[2];
 }
 
 inline const Eigen::SparseMatrix<Real>& Problem::getMatrix() const
