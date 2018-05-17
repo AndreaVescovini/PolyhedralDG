@@ -19,9 +19,9 @@ class FeElement
 public:
   using Element = Polyhedron;
 
-  // Constructor that takes a geometrical polyhedron elem, the order of polynomials
-  // order, the consequent number of degrees of freedom dof, the possible composition
-  // of polynomilas of degree less or equal to order into monomials basisComposition,
+  // Constructor that takes a geometrical polyhedron elem, the degree of polynomials,
+  // the consequent number of degrees of freedom dof, the possible composition
+  // of polynomilas of degree less or equal to degree into monomials basisComposition,
   // a quadrature rule tetraRule.
   FeElement(const Element& elem, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
@@ -43,7 +43,7 @@ public:
   inline Real getAbsDetJac(SizeType i) const;
 
   // Function that returns the number of degrees of freedom that in 3D is
-  // dof = (order+1)*(order+2)*(order+3)/(3!)
+  // dof = (degree+1)*(degree+2)*(degree+3)/(3!)
   inline unsigned getDof() const;
 
   // Function that returns the number of quadrature points of tetraRule_.
@@ -76,11 +76,11 @@ private:
   // Reference to the element over which the finite element is computed
   const Element& elem_;
 
-  // Number of degrees of freedom that in 3D is dof = (order+1)*(order+2)*(order+3)/(3!)
+  // Number of degrees of freedom that in 3D is dof = (degree+1)*(degree+2)*(degree+3)/(3!)
   unsigned dof_;
 
   // Vector that contains all the possible degrees of the monomials that give
-  // polynomials of degree less or equal to order_
+  // polynomials of degree less or equal to degree_
   const std::vector<std::array<unsigned, 3>>& basisComposition_;
 
   // Reference to the tetrahedral rule used for the computation of the basis functions

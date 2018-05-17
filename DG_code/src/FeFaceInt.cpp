@@ -7,12 +7,12 @@
 namespace PolyDG
 {
 
-FeFaceInt::FeFaceInt(const FaceInt& face, unsigned order, unsigned dof,
+FeFaceInt::FeFaceInt(const FaceInt& face, unsigned degree, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRule2D& triaRule)
   : FeFace(face, dof, basisComposition, triaRule)
 {
-  penaltyParam_ = order * order / std::min(face.getTetIn().getPoly().getDiameter(),
+  penaltyParam_ = degree * degree / std::min(face.getTetIn().getPoly().getDiameter(),
                                            face.getTetOut().getPoly().getDiameter());
   compute_basis();
 }

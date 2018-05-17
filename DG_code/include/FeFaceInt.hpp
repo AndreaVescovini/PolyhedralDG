@@ -17,7 +17,7 @@ namespace PolyDG
 class FeFaceInt : public FeFace
 {
 public:
-  FeFaceInt(const FaceInt& face, unsigned order, unsigned dof,
+  FeFaceInt(const FaceInt& face, unsigned degree, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRule2D& triaRule);
 

@@ -72,8 +72,8 @@ protected:
   std::vector<Real> phi_;
   std::vector<Eigen::Vector3d> phiDer_;
 
-// Penalty parameter equal to max(order^2 / diameter_k) for k = k1, k2,
-// with order the order of the polynomials k1 and k2 the two polyhedra sharing
+// Penalty parameter equal to max(degree^2 / diameter_k) for k = k1, k2,
+// with degree the degree of the polynomials k1 and k2 the two polyhedra sharing
 // the face, diameter_k their diameter. For external face there is only one
 // polyhedron and so no need for the maximum.
   Real penaltyParam_;

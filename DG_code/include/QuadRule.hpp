@@ -45,7 +45,7 @@ public:
   virtual ~QuadRule() = default;
 
   template <typename Q>
-  friend bool compDoe(const Q& rule, unsigned doe);
+  friend bool compareDoe(const Q& rule, unsigned doe);
 
 private:
   // Degree of exactness od the quadrature formula
@@ -126,7 +126,7 @@ bool QuadRule<T>::checkRuleWeights(Real tol) const
 }
 
 template <typename Q>
-bool compDoe(const Q& rule, unsigned doe)
+bool compareDoe(const Q& rule, unsigned doe)
 {
   return rule.doe_ < doe;
 }

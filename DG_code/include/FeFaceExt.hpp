@@ -17,7 +17,7 @@ namespace PolyDG
 class FeFaceExt : public FeFace
 {
 public:
-  FeFaceExt(const FaceExt& face, unsigned order, unsigned dof,
+  FeFaceExt(const FaceExt& face, unsigned degree, unsigned dof,
             const std::vector<std::array<unsigned, 3>>& basisComposition,
             const QuadRule2D& triaRule);
 

@@ -13,13 +13,13 @@ QuadRuleManager& QuadRuleManager::instance()
 
 const QuadRule3D& QuadRuleManager::getTetraRule(unsigned doe) const
 {
-  ConstIter<QuadRule3D> iter = std::lower_bound(tetraRules_.cbegin(), tetraRules_.cend(), doe, compDoe<QuadRule3D>);
+  ConstIter<QuadRule3D> iter = std::lower_bound(tetraRules_.cbegin(), tetraRules_.cend(), doe, compareDoe<QuadRule3D>);
   return iter != tetraRules_.cend() ? *iter : *(--iter);
 }
 
 const QuadRule2D& QuadRuleManager::getTriaRule(unsigned doe) const
 {
-  ConstIter<QuadRule2D> iter = std::lower_bound(triaRules_.cbegin(), triaRules_.cend(), doe, compDoe<QuadRule2D>);
+  ConstIter<QuadRule2D> iter = std::lower_bound(triaRules_.cbegin(), triaRules_.cend(), doe, compareDoe<QuadRule2D>);
   return iter != triaRules_.cend() ? *iter : *(--iter);
 }
 

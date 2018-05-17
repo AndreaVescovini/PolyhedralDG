@@ -23,13 +23,13 @@ public:
   template <typename T>
   using ConstIter = typename std::vector<T>::const_iterator;
 
-  // Constructor that takes a mesh Th, the order of polynomials order and
+  // Constructor that takes a mesh Th, the degree of polynomials for the space and
   // the required degrees of exactness for quadrature formulas.
-  FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree);
+  FeSpace(Mesh& Th, unsigned degree, unsigned quad3DDegree, unsigned quad2DDegree);
 
-  // Constructor that takes a mesh Th and the order of polynomials order,
-  // the quadrature formulas are chosen to fit with order.
-  FeSpace(Mesh& Th, unsigned order);
+  // Constructor that takes a mesh Th and the degree of polynomials for the space,
+  // the quadrature formulas are chosen to fit with degree.
+  FeSpace(Mesh& Th, unsigned degree);
 
   // Default copy-constructor.
   FeSpace(const FeSpace&) = default;
@@ -37,7 +37,7 @@ public:
   // Default move-constructor.
   FeSpace(FeSpace&&) = default;
 
-  inline unsigned getOrder() const;
+  inline unsigned getdegree() const;
   inline unsigned getDof() const;
 
   inline const FeElement& getFeElement(SizeType i) const;
@@ -70,10 +70,10 @@ private:
   // Reference to the mesh over which the FeSpace is built.
   const Mesh& Th_;
 
-  // Order of polynomials.
-  const unsigned order_;
+  // degree of polynomials.
+  const unsigned degree_;
 
-  // Number of degrees of freedom that in 3D is dof = (order+1)*(order+2)*(order+3)/6
+  // Number of degrees of freedom that in 3D is dof = (degree+1)*(degree+2)*(degree+3)/6
   const unsigned dof_;
 
   std::vector<std::array<unsigned, 3>> basisComposition_;
@@ -95,9 +95,9 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline unsigned FeSpace::getOrder() const
+inline unsigned FeSpace::getdegree() const
 {
-  return order_;
+  return degree_;
 }
 
 inline unsigned FeSpace::getDof() const

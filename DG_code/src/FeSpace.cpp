@@ -4,8 +4,8 @@
 namespace PolyDG
 {
 
-FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2DDegree)
-  : Th_{Th}, order_{order}, dof_{(order + 1) * (order + 2) * (order + 3) / 6},
+FeSpace::FeSpace(Mesh& Th, unsigned degree, unsigned quad3DDegree, unsigned quad2DDegree)
+  : Th_{Th}, degree_{degree}, dof_{(degree + 1) * (degree + 2) * (degree + 3) / 6},
     tetraRule_{QuadRuleManager::instance().getTetraRule(quad3DDegree)},
     triaRule_ {QuadRuleManager::instance().getTriaRule(quad2DDegree)}
   {
@@ -15,20 +15,20 @@ FeSpace::FeSpace(Mesh& Th, unsigned order, unsigned quad3DDegree, unsigned quad2
 
 // ho solo il termine di stiffness con le derivate e non il termine di massa,
 // quindi posso abbassare l'ordine della quadratura nei tetraedri
-FeSpace::FeSpace(Mesh& Th, unsigned order)
-  : FeSpace(Th, order, 2 * (order - 1), 2 * order) {}
+FeSpace::FeSpace(Mesh& Th, unsigned degree)
+  : FeSpace(Th, degree, 2 * (degree - 1), 2 * degree) {}
 
 void FeSpace::integerComposition()
 {
   basisComposition_.reserve(dof_);
 
-  int nx = order_;
+  int nx = degree_;
   while(nx >= 0)
   {
-    int ny = order_ - nx;
+    int ny = degree_ - nx;
     while(ny >= 0)
     {
-      int nz = order_ - nx - ny;
+      int nz = degree_ - nx - ny;
       while(nz >= 0)
       {
         basisComposition_.emplace_back(std::array<unsigned, 3>{static_cast<unsigned>(nx),
@@ -50,17 +50,17 @@ void FeSpace::initialize()
 
   feFacesExt_.reserve(Th_.getFacesExtNo());
   for(SizeType i = 0; i < Th_.getFacesExtNo(); i++)
-    feFacesExt_.emplace_back(Th_.getFaceExt(i), order_, dof_, basisComposition_, triaRule_);
+    feFacesExt_.emplace_back(Th_.getFaceExt(i), degree_, dof_, basisComposition_, triaRule_);
 
   feFacesInt_.reserve(Th_.getFacesIntNo());
   for(SizeType i = 0; i < Th_.getFacesIntNo(); i++)
-    feFacesInt_.emplace_back(Th_.getFaceInt(i), order_, dof_, basisComposition_, triaRule_);
+    feFacesInt_.emplace_back(Th_.getFaceInt(i), degree_, dof_, basisComposition_, triaRule_);
 }
 
 void FeSpace::printInfo(std::ostream& out) const
 {
   out << "-------------------- FESPACE INFO --------------------" << '\n';
-  out << "Order = " << order_ << '\n';
+  out << "Degree = " << degree_ << '\n';
   out << "Degrees of freedom per element: " << dof_ << '\n';
   out << "Elements: " << feElements_.size() << '\n';
   out << "Total degrees of freedom: " << dof_ * feElements_.size() <<'\n';
