@@ -1,3 +1,9 @@
+/*!
+    @file   FaceInt.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FaceInt
+*/
+
 #include "FaceInt.hpp"
 
 namespace PolyDG

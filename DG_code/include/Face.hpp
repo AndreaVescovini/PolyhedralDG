@@ -21,13 +21,13 @@
 namespace PolyDG
 {
 
-/*
+/*!
     @brief Class that defines a generic face of a polyhedral mesh
 
-    This base class defines a generic face of a polyhedral mesh i.e. a face of a
-    triangle belonging to the triangulation of an interface between two
-    polyhedral elements. An interface is the intersection of the two-dimensional
-    facets of neighbouring elements.
+    This base class defines a generic face of a polyhedral mesh.
+    A face is defined as one of the co-planar triangles belonging to the
+    triangulation of an interface between two polyhedral elements. An interface
+    is the intersection of the two-dimensional facets of neighbouring elements.
     It stores the three vertices of the triangle, a pointer to a Tetrahedron
     to which the face belongs and the number of this face in it. Conventionally
     the i-th face is that one without the (3-i)-th vertex.
@@ -46,15 +46,15 @@ public:
   Face(Vertex& v1, Vertex& v2, Vertex& v3);
 
   /*!
-      @brief Constructor that takes three vertices
+      @brief Constructor that takes three vertices and a Tetrahedron "In"
 
       The three vertices are setted sorted by their id number.
 
       @param v1 Vertex.
       @param v2 Vertex.
       @param v3 Vertex.
-      @param tetIn Tetrahedron to which the face belongs.
-      @param faceNoTetIn Number of the face in the tetrahedron tetIn
+      @param tetIn Tetrahedron "In" to which the face belongs.
+      @param faceNoTetIn Number of the face in the Tetrhedron tetIn.
   */
   Face(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn , unsigned faceNoTetIn);
 
@@ -89,43 +89,43 @@ public:
   inline Vertex& getVertex(SizeType i);
 
   /*!
-      @brief  Check if a Tetrahedron is set
-      @return @b true if a Tetrahedron is set, @b false if it is not.
+      @brief  Check if a Tetrahedron "In" is set
+      @return @b true if a Tetrahedron "In" is set, @b false if it is not.
   */
   inline bool isTetInSet() const;
 
   /*!
-      @brief   Get the Tetrahedron to which the Face belongs
-      @warning This function must be called only if isTetInSet() returns @b true.
+      @brief   Get the Tetrahedron "In" to which the face belongs
+      @warning This function can be called only if isTetInSet() returns @b true.
   */
   inline const Tetrahedron& getTetIn() const;
 
   /*!
-      @brief   Get the Tetrahedron to which the Face belongs
-      @warning This function must be called only if isTetInSet() returns @b true.
+      @brief   Get the Tetrahedron "In" to which the face belongs
+      @warning This function can be called only if isTetInSet() returns @b true.
   */
   inline Tetrahedron& getTetIn();
 
   /*!
-      @brief Set a Tetrahedron
-      @param tetIn The Tetrahedron to which this face belongs.
+      @brief Set a Tetrahedron "In"
+      @param tetIn The Tetrahedron "In" to which this face belongs.
   */
   inline void setTetIn(Tetrahedron& tetIn);
 
   /*!
-      @brief   Get the number of the face in the Tetrahedron to which it belongs
+      @brief   Get the number of the face in the Tetrahedron "In" to which it belongs
 
-      This functions returns the number of the face in the Tetrahedron to which
+      This functions returns the number of the face in the Tetrahedron "In" to which
       it belongs. Conventionally the i-th face is that one without the (3-i)-th
       vertex.
 
-      @warning This function must be called only if isTetInSet() returns @b true,
+      @return This function should be called only if isTetInSet() returns @b true,
                otherwise it returns a meaningless value like 4.
   */
   inline unsigned getFaceNoTetIn() const;
 
   /*!
-      @brief Set the number of the face in the Tetrahedron to which it belongs
+      @brief Set the number of the face in the Tetrahedron "In" to which it belongs
       @param facenoTetIn The number you want to set.
   */
   inline void setFaceNoTetIn(unsigned faceNoTetIn);
@@ -143,10 +143,10 @@ protected:
   //! Vertices of the face, sorted on the id number
   std::array<std::reference_wrapper<Vertex>, 3> vertices_;
 
-  //! Pointer to the tetrahedron owning the face
+  //! Pointer to the Tetrahedron "In" owning the face
   Tetrahedron* tetIn_;
 
-  //! Local number of the face in the tetrhedron pointed by tetIn_
+  //! Local number of the face in the Tetrhedron "In" pointed by tetIn_
   // Locally the i-th face is the face made all the vartices of the tetrahedron
   // but the i-th, i = 0,...,3.
   unsigned faceNoTetIn_;
@@ -200,7 +200,7 @@ inline Vertex& Face::getVertex(SizeType i)
   return vertices_[i];
 }
 
-inline bool Tetrahedron::isTetInSet() const
+inline bool Face::isTetInSet() const
 {
   return tetIn_ == nullptr ? false : true;
 }

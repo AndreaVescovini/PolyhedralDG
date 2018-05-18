@@ -1,3 +1,9 @@
+/*!
+    @file   Polyhedron.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class Polyhedron
+*/
+
 #include "Polyhedron.hpp"
 
 #include <algorithm>

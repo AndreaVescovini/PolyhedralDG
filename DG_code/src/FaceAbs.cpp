@@ -1,3 +1,9 @@
+/*!
+    @file   FaceAbs.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FaceAbs
+*/
+
 #include "FaceAbs.hpp"
 
 #include <Eigen/Geometry>

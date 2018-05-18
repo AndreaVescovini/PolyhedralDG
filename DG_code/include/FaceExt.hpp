@@ -1,3 +1,9 @@
+/*!
+    @file   FaceExt.hpp
+    @author Andrea Vescovini
+    @brief  Class for external faces of a polyhedral mesh
+*/
+
 #ifndef _FACE_EXT_HPP_
 #define _FACE_EXT_HPP_
 
@@ -10,29 +16,64 @@
 namespace PolyDG
 {
 
+/*!
+    @brief Class for external faces of a polyhedral mesh
+
+    This class defines an external face of a polyhedral mesh.
+    An external face is defined as one of the co-planar triangles belonging to
+    the triangulation of the intersection between a facet of a polyhedral element
+    and the external boundary of the domain.
+    This class inherits from FaceAbs and extends it with a label useful to
+    define the boundary condition.
+*/
+
 class FaceExt : public FaceAbs
 {
 public:
+  /*!
+      @brief Constructor that takes three vertices and a label
+
+      This constructor calls the constructor of FaceAbs and sets the label.
+
+      @param bcLabel The label to be set.
+  */
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCType bcLabel);
 
+  /*!
+      @brief Constructor that takes three vertices, a Tetrahedron and a label
+
+      This constructor calls the constructor of FaceAbs and sets the label.
+
+      @param v1 Vertex.
+      @param v2 Vertex.
+      @param v3 Vertex.
+      @param tetIn Tetrahedron "In" to which the face belongs.
+      @param faceNoTetIn Number of the face in the Tetrahedron tetIn.
+      @param bcLabel The label to be set.
+  */
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
           unsigned faceNoTetIn, BCType bcLabel);
 
-  // Default copy constructor.
+  //! Copy constructor
   FaceExt(const FaceExt&) = default;
 
-  // Default move constructor.
+  //! Move constructor
   FaceExt(FaceExt&&) = default;
 
+  //! Get the label
   inline BCType getBClabel() const;
+
+  //! Set the label
   inline void setBClabel(BCType bcLabel);
 
+  //! Destructor
   virtual ~FaceExt() = default;
 
 private:
-  // Label for a specific boundary condition.
+  //! Label for a specific boundary condition
   BCType bcLabel_;
 
+  //! Print information about the face
   void print(std::ostream& out) const override;
 };
 

@@ -1,7 +1,7 @@
 /*!
     @file   Tetrahedron.hpp
     @author Andrea Vescovini
-    @brief  Class that defines a tetrahedron of a tridimensional mesh
+    @brief  Class that defines a tetrahedron of a polyhedral mesh
 */
 
 #ifndef _TETRAHEDRON_HPP_
@@ -22,7 +22,7 @@ namespace PolyDG
 class Polyhedron;
 
 /*!
-    @brief Class that defines a tetrahedron of a tridimensional mesh
+    @brief Class that defines a tetrahedron of a polyhedral mesh
 
     This class defines a tetrahedron of a tridimensional mesh. It stores the
     four vertices, a id number univocal inside the mesh, the affine map from the
@@ -82,13 +82,13 @@ public:
 
   /*!
       @brief   Get the Polyhedron to which the Tetrahedron belongs
-      @warning This function must be called only if isPolySet() returns @b true.
+      @warning This function can be called only if isPolySet() returns @b true.
   */
   inline const Polyhedron& getPoly() const;
 
   /*!
       @brief   Get the Polyhedron to which the Tetrahedron belongs
-      @warning This function must be called only if isPolySet() returns @b true.
+      @warning This function can be called only if isPolySet() returns @b true.
   */
   inline Polyhedron& getPoly();
 
@@ -140,7 +140,7 @@ public:
   friend std::ostream& operator<<(std::ostream& out, const Tetrahedron& tetra);
 
 private:
-  //! id number
+  //! Id number
   const unsigned id_;
 
   //! The four vertices of the tetrahedron
@@ -155,7 +155,7 @@ private:
   //! The absolute value of the determinant of the jacobian of the map
   Real absDetJacobian_;
 
-  //! Counter used to assign a different id to each vertex when it is created.
+  //! Counter used to assign a different id to each Tetrahedron when it is created.
   static unsigned counter_;
 };
 

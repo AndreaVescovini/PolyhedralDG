@@ -101,13 +101,13 @@ public:
   inline friend bool operator==(const Vertex& lhs, const Vertex& rhs);
 
 private:
-  //! id number
+  //! Id number
   const unsigned id_;
 
   //! Coordinates
   Eigen::Vector3d coords_;
 
-  //! Counter used to assign a different id to each vertex when it is created.
+  //! Counter used to assign a different id to each vertex when it is created
   static unsigned counter_;
 };
 

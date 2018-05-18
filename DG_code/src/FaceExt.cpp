@@ -1,3 +1,9 @@
+/*!
+    @file   FaceExt.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FaceExt
+*/
+
 #include "FaceExt.hpp"
 
 namespace PolyDG
