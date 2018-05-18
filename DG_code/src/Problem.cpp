@@ -193,16 +193,7 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
   {
     const auto& elem = it->getElem();
-
-    // Compute the nodes in the Polyhedron.
-    std::unordered_set<std::reference_wrapper<const Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> nodesSet;
-    nodesSet.reserve(elem.getTetrahedraNo() + 3);
-
-    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
-      for(SizeType j = 0; j < 4; j++)
-        nodesSet.emplace(elem.getTetra(i).getVertex(j));
-
-    const std::vector<std::reference_wrapper<const Vertex>> nodes(nodesSet.cbegin(), nodesSet.cend());
+    const std::vector<std::reference_wrapper<const Vertex>> nodes(elem.verticesCbegin(), elem.verticesCend());
 
     // Compute the solution at the nodes.
     std::vector<Real> uNodes;
@@ -225,8 +216,8 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
     // Print the cells (tetrahedra) connectivity and type.
     fout << "      <Cells>\n";
     fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
-    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++)
-      for(SizeType j = 0; j < 4; j++)
+    for(SizeType i = 0; i < elem.getTetrahedraNo(); i++) // Loop over tetrahedra
+      for(SizeType j = 0; j < 4; j++) // Loop over vertices
         fout << ' ' << (std::find(nodes.cbegin(), nodes.cend(), elem.getTetra(i).getVertex(j)) - nodes.cbegin());
     fout << "\n        </DataArray>\n";
 

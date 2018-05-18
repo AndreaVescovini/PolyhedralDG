@@ -18,20 +18,20 @@ Polyhedron::Polyhedron()
   counter_++;
 }
 
-void Polyhedron::computeBB()
+void Polyhedron::addTetra(Tetrahedron& tet)
 {
-  // I store in boundingBox_ the min and max vertices coordinates.
-  for(auto it = verticesExt_.cbegin(); it != verticesExt_.cend(); it++)
-    boundingBox_.extend(it->get().getCoords());
-}
+  tetrahedra_.emplace_back(tet);
 
-void Polyhedron::computeDiameter()
-{
-  diameter_ = 0.0;
-
-  for(auto i = verticesExt_.cbegin(); i != verticesExt_.cend(); i++)
-    for(auto j = std::next(i); j != verticesExt_.cend(); j++)
-      diameter_ = std::max(diameter_, i->get().distance(*j));
+  for(SizeType i = 0; i < 4; i++)
+  {
+    auto insertion = vertices_.emplace(tet.getVertex(i));
+    if(insertion.second == true)
+    {
+      boundingBox_.extend(tet.getVertex(i).getCoords());
+      for(auto iter = vertices_.cbegin(); iter != vertices_.cend(); iter++)
+        diameter_ = std::max(diameter_, iter->get().distance(tet.getVertex(i)));
+    }
+  }
 }
 
 std::ostream& operator<<(std::ostream& out, const Polyhedron& poly)

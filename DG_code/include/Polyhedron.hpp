@@ -31,16 +31,16 @@ class Tetrahedron;
     A polyhedron is defined as the union of disjoint neighbouring tetrahedra.
     Each Polyhedron has a id number univocal inside the mesh.
     The default constructor creates an empty Polyhedron, then through the
-    function addTetra() you can add the tetrahedra. In order to compute the
-    cartesian bounding box of the polyhedron and the diameter, you must also
-    insert the vertices of the Polyhedron with the function addVertex(). Vertices
-    are stored in an associative container so that if you add the same vertex
-    twice it is stored only once.
+    function addTetra() you can add the tetrahedra.
 */
 
 class Polyhedron
 {
 public:
+  //! Alias for a forward const iterator over the vertices of the Polyhedron
+  using ConstIterVertex = std::unordered_set<std::reference_wrapper<Vertex>,
+                                             std::hash<Vertex>,
+                                             std::equal_to<Vertex>>::const_iterator;
   /*!
       @brief Constructor
 
@@ -55,10 +55,7 @@ public:
   Polyhedron(Polyhedron&&) = default;
 
   //! Extend the Polyhedron adding a Tetrahedron
-  inline void addTetra(Tetrahedron& tet);
-
-  //! Specify a Vertex of the Polyhedron
-  inline void addVertexExt(Vertex& v);
+  void addTetra(Tetrahedron& tet);
 
   //! Get the id number
   inline unsigned getId() const;
@@ -84,8 +81,19 @@ public:
   //! Get the number of tetrahedra of which the polyhedron is made
   inline SizeType getTetrahedraNo() const;
 
+  /*!
+      @brief     Get a ConstIterVertex poining to the first Vertex
+      @attention When you dereference the iterator to access the Vertex, you may
+                 have to call the method get(), because vertices as stored
+                 through std::reference_wrapper.
+  */
+  inline ConstIterVertex verticesCbegin() const;
+
+  //! Get a ConstIterVertex poining to the @a past-the-end Vertex
+  inline ConstIterVertex verticesCend() const;
+
   //! Get the number of vertices of the tetrahedron
-  inline SizeType getVerticesExtNo() const;
+  inline SizeType getVerticesNo() const;
 
   /*!
       @brief Get the cartesian bounding box
@@ -96,23 +104,6 @@ public:
 
   //! Get the diameter of the Polyhedron
   inline Real getDiameter() const;
-
-  /*!
-      @brief Compute the cartesian bounding box
-
-      This function, starting from the vertices inserted, computes the cartesian
-      bounding box of the polyhedron.
-  */
-  void computeBB();
-
-  /*!
-      @brief Compute the diameter of the Polyhedron
-
-      This function, starting from the vertices inserted, computes the diameter
-      of the Polyhderon i.e. the maximum distance between two points inside the
-      Polyhderon.
-  */
-  void computeDiameter();
 
   /*!
       @brief Reset the counter for id numbers
@@ -143,8 +134,8 @@ private:
   //! Vector containing the tetrahedra of which the polyhedron is made
   std::vector<std::reference_wrapper<Tetrahedron>> tetrahedra_;
 
-  //! Unordered set containing the vertices coming from faces of the polyhedron
-  std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> verticesExt_;
+  //! Unordered set containing the vertices coming from the tetrahedra
+  std::unordered_set<std::reference_wrapper<Vertex>, std::hash<Vertex>, std::equal_to<Vertex>> vertices_;
 
   //! Cartesian bounding box containing the polyhedron
   Eigen::AlignedBox3d boundingBox_;
@@ -162,16 +153,6 @@ std::ostream& operator<<(std::ostream& out, const Polyhedron& poly);
 //----------------------------------------------------------------------------//
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
-
-inline void Polyhedron::addTetra(Tetrahedron& tet)
-{
-  tetrahedra_.emplace_back(tet);
-}
-
-inline void Polyhedron::addVertexExt(Vertex& v)
-{
-  verticesExt_.emplace(v);
-}
 
 inline Real Polyhedron::getDiameter() const
 {
@@ -203,9 +184,19 @@ inline const Eigen::AlignedBox3d& Polyhedron::getBoundingBox() const
   return boundingBox_;
 }
 
-inline SizeType Polyhedron::getVerticesExtNo() const
+inline Polyhedron::ConstIterVertex Polyhedron::verticesCbegin() const
 {
-  return verticesExt_.size();
+  return vertices_.cbegin();
+}
+
+inline Polyhedron::ConstIterVertex Polyhedron::verticesCend() const
+{
+  return vertices_.cend();
+}
+
+inline SizeType Polyhedron::getVerticesNo() const
+{
+  return vertices_.size();
 }
 
 inline void Polyhedron::resetCounter(unsigned counter)

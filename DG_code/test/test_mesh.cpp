@@ -1,5 +1,6 @@
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
+#include "Watch.hpp"
 
 #include <string>
 #include <vector>
@@ -9,6 +10,9 @@ using PolyDG::MeshReaderPoly;
 
 int main()
 {
+  Timings::Watch ch;
+  ch.start();
+
   std::vector<std::string> fileNames;
   fileNames.emplace_back("../meshes/cube_str6t.mesh");
   fileNames.emplace_back("../meshes/cube_str48t.mesh");
@@ -41,6 +45,9 @@ int main()
     Mesh Th3(f, reader);
     Th3.printInfo();
   }
+
+  ch.stop();
+  std::cout << ch << std::endl;
 
   return 0;
 }

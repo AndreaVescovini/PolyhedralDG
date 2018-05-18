@@ -15,7 +15,7 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
   std::cout << "The mesh file has been read." << std::endl;
   computeFaces();
   std::cout << "Faces have been computed." << std::endl;
-  computePolyInfo();
+  computeDiameters();
   std::cout << "Informations about polyhedra have been computed." << std::endl;
 }
 
@@ -101,29 +101,16 @@ void Mesh::computeFaces()
 
 }
 
-void Mesh::computePolyInfo()
+void Mesh::computeDiameters()
 {
   // I add in each polyhedron the vertices that are on the faces.
   // I will use them in order to compute the bounding box and the diameter.
-  for(FaceInt& f : facesInt_)
-    for(unsigned i = 0; i < 3; i++)
-    {
-      f.getTetIn().getPoly().addVertexExt(f.getVertex(i));
-      f.getTetOut().getPoly().addVertexExt(f.getVertex(i));
-    }
-
-  for(FaceExt& f : facesExt_)
-    for(unsigned i = 0; i < 3; i++)
-      f.getTetIn().getPoly().addVertexExt(f.getVertex(i));
 
   hmax_ = 0.0;
   hmin_ = std::numeric_limits<Real>::max();
 
   for(Polyhedron& p : polyhedra_)
   {
-    p.computeBB();
-    p.computeDiameter();
-
     if(p.getDiameter() > hmax_)
       hmax_ = p.getDiameter();
     if(p.getDiameter() < hmin_)

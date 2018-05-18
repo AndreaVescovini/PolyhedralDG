@@ -77,7 +77,7 @@ private:
   void computeFaces();
 
   // Function that computes the bounding box and the diameter of each polyhedron.
-  void computePolyInfo();
+  void computeDiameters();
 
   void print(SizeType lineNo, std::ostream& out = std::cout) const;
 };
