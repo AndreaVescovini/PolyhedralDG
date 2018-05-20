@@ -76,19 +76,19 @@ public:
 
   /*!
       @brief  Check if a Polyhedron is set
-      @return @b true if a Polyhedron is set, @b false if it is not.
+      @return @c true if a Polyhedron is set, @c false if it is not.
   */
   inline bool isPolySet() const;
 
   /*!
       @brief   Get the Polyhedron to which the Tetrahedron belongs
-      @warning This function can be called only if isPolySet() returns @b true.
+      @warning This function can be called only if isPolySet() returns @c true.
   */
   inline const Polyhedron& getPoly() const;
 
   /*!
       @brief   Get the Polyhedron to which the Tetrahedron belongs
-      @warning This function can be called only if isPolySet() returns @b true.
+      @warning This function can be called only if isPolySet() returns @c true.
   */
   inline Polyhedron& getPoly();
 

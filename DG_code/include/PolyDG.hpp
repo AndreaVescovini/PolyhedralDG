@@ -9,6 +9,7 @@
 
 #include <cstddef>
 
+//! Library namespace
 namespace PolyDG
 {
 

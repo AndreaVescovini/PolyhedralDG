@@ -1,3 +1,9 @@
+/*!
+    @file   Operators.cpp
+    @author Andrea Vescovini
+    @brief  Implementation of the classes for the operators
+*/
+
 #include "Operators.hpp"
 
 namespace PolyDG

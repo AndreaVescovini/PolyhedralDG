@@ -1,13 +1,19 @@
+/*!
+    @file   FeSpace.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FeSpace
+*/
+
 #include "FeSpace.hpp"
 #include "QuadRuleManager.hpp"
 
 namespace PolyDG
 {
 
-FeSpace::FeSpace(Mesh& Th, unsigned degree, unsigned quad3DDegree, unsigned quad2DDegree)
+FeSpace::FeSpace(Mesh& Th, unsigned degree, unsigned doeQuad3D, unsigned doeQuad2D)
   : Th_{Th}, degree_{degree}, dof_{(degree + 1) * (degree + 2) * (degree + 3) / 6},
-    tetraRule_{QuadRuleManager::instance().getTetraRule(quad3DDegree)},
-    triaRule_ {QuadRuleManager::instance().getTriaRule(quad2DDegree)}
+    tetraRule_{QuadRuleManager::instance().getTetraRule(doeQuad3D)},
+    triaRule_ {QuadRuleManager::instance().getTriaRule(doeQuad2D)}
   {
     integerComposition();
     initialize();

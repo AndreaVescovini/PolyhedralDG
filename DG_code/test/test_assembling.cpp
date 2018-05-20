@@ -58,8 +58,9 @@ int main()
 
   PolyDG::Stiff stiff;
   PolyDG::Mass  mass;
+  PolyDG::PhiJ  u;
 
-  poisson.integrateVol(stiff + mass, true);
+  poisson.integrateVol(stiff + u*v, true);
   poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), 1,  false);
   poisson.integrateFacesInt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), false);
 

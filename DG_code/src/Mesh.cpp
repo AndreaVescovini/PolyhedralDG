@@ -1,5 +1,11 @@
-#include "Mesh.hpp"
+/*!
+    @file   Mesh.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class Mesh
+*/
+
 #include "Face.hpp"
+#include "Mesh.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -13,8 +19,11 @@ Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 {
   reader.read(*this, fileName);
   std::cout << "The mesh file has been read." << std::endl;
-  computeFaces();
-  std::cout << "Faces have been computed." << std::endl;
+  if(facesInt_.size() == 0)
+  {
+    computeFaces();
+    std::cout << "Faces have been computed." << std::endl;
+  }
   computeDiameters();
   std::cout << "Informations about polyhedra have been computed." << std::endl;
 }

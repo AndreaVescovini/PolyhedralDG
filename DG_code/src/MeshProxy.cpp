@@ -1,3 +1,9 @@
+/*!
+    @file   MeshProxy.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class MeshProxy
+*/
+
 #include "MeshProxy.hpp"
 
 namespace PolyDG

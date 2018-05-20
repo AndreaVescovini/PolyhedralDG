@@ -29,7 +29,7 @@ class Tetrahedron;
 
     This class defines a polyhedron that is an element of a polyhedral mesh.
     A polyhedron is defined as the union of disjoint neighbouring tetrahedra.
-    Each Polyhedron has a id number univocal inside the mesh.
+    Each Polyhedron has a id number univocal inside the mesh.@n
     The default constructor creates an empty Polyhedron, then through the
     function addTetra() you can add the tetrahedra.
 */
@@ -65,7 +65,7 @@ public:
 
       This functions returns the i-th Tetrahedron.
 
-      @param i The index of the Tetrahedron required, it can be 0,..,getTetrahedraNo() - 1
+      @param i The index of the Tetrahedron required, it can be 0,..,getTetrahedraNo() - 1.
   */
   inline const Tetrahedron& getTetra(SizeType i) const;
 
@@ -74,7 +74,7 @@ public:
 
       This functions returns the i-th Tetrahedron.
 
-      @param i The index of the Tetrahedron required, it can be 0,..,getTetrahedraNo() - 1
+      @param i The index of the Tetrahedron required, it can be 0,..,getTetrahedraNo() - 1.
   */
   inline Tetrahedron& getTetra(SizeType i);
 

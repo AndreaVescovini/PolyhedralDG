@@ -22,8 +22,8 @@ namespace PolyDG
 /*!
     @brief Class that defines a vertex of a tridimensional mesh
 
-    This class defines a vertex of a tridimensional mesh, it stores the
-    coordinates and a id number univocal inside the mesh.
+    This class defines a vertex of a tridimensional mesh. It stores the
+    coordinates and a id number univocal inside the mesh.@n
     A method Vertex::distance is provided for computing the euclidean distance
     between two vertices.
 */
@@ -94,10 +94,10 @@ public:
   */
   friend std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
-  //! Comparison operator< based on the id number.
+  //! Comparison operator< based on the id number
   inline friend bool compareId(const Vertex& lhs, const Vertex& rhs);
 
-  //! Overload for the operatorr== based on the id number.
+  //! Overload for the operator== based on the id number
   inline friend bool operator==(const Vertex& lhs, const Vertex& rhs);
 
 private:
@@ -121,20 +121,22 @@ namespace std
 // I specify the equal_to and hash structs in order to use in the right way
 // unordered sets of vertices, comparing only the index to see weather two
 // elements are equivalent.
-//! Specialization outf the functor std::equal_to for a PolyDG::Vertex
+//! Specialization of the functor @c std::equal_to for a PolyDG::Vertex
 template<>
 struct equal_to<PolyDG::Vertex>
 {
+  //! Call operator
   bool operator()(const PolyDG::Vertex& lhs, const PolyDG::Vertex& rhs) const
   {
     return lhs == rhs;
   }
 };
 
-//! Specialization of the functor std::hash for a PolyDG::Vertex
+//! Specialization of the functor @c std::hash for a PolyDG::Vertex based of the id number of the Vertex
 template<>
 struct hash<PolyDG::Vertex>
 {
+  //! Call operator
   size_t operator()(const PolyDG::Vertex& v) const
   {
     return hash<unsigned>()(v.getId());
@@ -191,11 +193,13 @@ void Vertex::setCoords(const Eigen::MatrixBase<D>& coords)
   coords_ = coords;
 }
 
+//! Comparison operator< based on the id number
 inline bool compareId(const Vertex& lhs, const Vertex& rhs)
 {
   return lhs.id_ < rhs.id_;
 }
 
+//! Overload for the operator== based on the id number
 inline bool operator==(const Vertex& lhs, const Vertex& rhs)
 {
   return lhs.id_ == rhs.id_;

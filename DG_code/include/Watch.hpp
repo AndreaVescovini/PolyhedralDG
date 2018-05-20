@@ -16,10 +16,10 @@ namespace Timings
 /*!
     @brief Class used to measure time
 
-    This class defines a "Watch" useful for measuring time in programs. You can
-    call the method tart() to start the measure, Watch::stop() to stop
-    it and the getTime(). After that you can reset() the Watch to 0
-    or start() a new measure to be added to the preavious one.
+    This class defines a "Watch" useful for measuring time in programs.@n
+    You can call the method start() to start the measure, stop() to stop
+    it and the getTime(). After that you can reset() the Watch to 0 or start()
+    a new measure to be added to the preavious one.
 */
 
 class Watch

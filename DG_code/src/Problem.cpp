@@ -1,3 +1,9 @@
+/*!
+    @file   Problem.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class problem
+*/
+
 #include "Legendre.hpp"
 #include "Problem.hpp"
 #include "Vertex.hpp"
@@ -30,7 +36,7 @@ bool Problem::isSymmetric() const
   return true;
 }
 
-void Problem::solveLU()
+bool Problem::solveLU()
 {
   Eigen::SparseLU<Eigen::SparseMatrix<Real>> solver;
   A_.makeCompressed();
@@ -48,10 +54,15 @@ void Problem::solveLU()
 
   u_ = solver.solve(b_);
   if(solver.info() != Eigen::Success)
+  {
     std::cerr << "Numerical issue in the solver.\n" << solver.lastErrorMessage() << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
-void Problem::solveChol()
+bool Problem::solveCholesky()
 {
   if(this->isSymmetric() == false)
     throw std::domain_error("Error: solveChol() requires a symmetric matrix.");
@@ -65,10 +76,14 @@ void Problem::solveChol()
 
   u_ = solver.solve(b_);
   if(solver.info() != Eigen::Success)
+  {
     std::cerr << "Warning: Numerical issue in the solver." << std::endl;
+    return false;
+  }
+  return true;
 }
 
-void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
+bool Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
   if(this->isSymmetric() == false)
     throw std::domain_error("Error: solveCG() requires a symmetric matrix.");
@@ -83,16 +98,20 @@ void Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
   u_ = solver.solveWithGuess(b_, x0);
 
   if(solver.info() != Eigen::Success)
+  {
     std::cerr << "Warning: Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    return false;
+  }
   else
   {
     // if(verbosity)
     std::cout << "Conjugate gradient converged with " << solver.iterations() << " iterations.\n";
     std::cout << "Estimated error = "<< solver.error() << std::endl;
+    return true;
   }
 }
 
-void Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
+bool Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
   Eigen::BiCGSTAB<Eigen::SparseMatrix<Real>> solver;
   solver.setMaxIterations(iterMax);
@@ -113,12 +132,16 @@ void Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
   u_ = solver.solveWithGuess(b_, x0);
 
   if(solver.info() != Eigen::Success)
+  {
     std::cerr << "Warning: BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    return false;
+  }
   else
   {
     // if(verbosity)
     std::cout << "BiCGSTAB converged with " << solver.iterations() << " iterations.\n";
     std::cout << "Estimated error = "<< solver.error() << std::endl;
+    return true;
   }
 }
 

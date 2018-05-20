@@ -19,10 +19,10 @@ namespace PolyDG
 /*!
     @brief Class for external faces of a polyhedral mesh
 
-    This class defines an external face of a polyhedral mesh.
+    This class defines an external face of a polyhedral mesh.@n
     An external face is defined as one of the co-planar triangles belonging to
     the triangulation of the intersection between a facet of a polyhedral element
-    and the external boundary of the domain.
+    and the external boundary of the domain.@n
     This class inherits from FaceAbs and extends it with a label useful to
     define the boundary condition.
 */
@@ -35,6 +35,9 @@ public:
 
       This constructor calls the constructor of FaceAbs and sets the label.
 
+      @param v1      Vertex.
+      @param v2      Vertex.
+      @param v3      Vertex.
       @param bcLabel The label to be set.
   */
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCType bcLabel);
@@ -44,12 +47,12 @@ public:
 
       This constructor calls the constructor of FaceAbs and sets the label.
 
-      @param v1 Vertex.
-      @param v2 Vertex.
-      @param v3 Vertex.
-      @param tetIn Tetrahedron "In" to which the face belongs.
+      @param v1          Vertex.
+      @param v2          Vertex.
+      @param v3          Vertex.
+      @param tetIn       Tetrahedron @a "In" to which the face belongs.
       @param faceNoTetIn Number of the face in the Tetrahedron tetIn.
-      @param bcLabel The label to be set.
+      @param bcLabel     The label to be set.
   */
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
           unsigned faceNoTetIn, BCType bcLabel);

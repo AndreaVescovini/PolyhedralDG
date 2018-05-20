@@ -1,3 +1,9 @@
+/*!
+    @file   Legendre.hpp
+    @author Andrea Vescovini
+    @brief  Here are defined Legendre polynomials
+*/
+
 #ifndef _LEGENDRE_HPP_
 #define _LEGENDRE_HPP_
 
@@ -6,15 +12,41 @@
 namespace PolyDG
 {
 
-// Function that return the value of the Legendre polynomial of order n at the
-// point x belonging to [-1, 1]. It is implemented only for n<=6.
+/*!
+    @brief Evaulate a Legendre polynomial
+
+    This function evaulates the Legendre polynomial of degree n at the point x
+    belonging to [-1, 1].
+
+    @warning It is implemented only for n <= 8, for n > 8 a @c std::domain_error
+             exception is thrown.
+    @param n Degree of the polynomial.
+    @param x Evaluation point, it must be in [-1, 1].
+*/
 Real legendre(unsigned n, PolyDG::Real x);
 
-// Function that return the value of the derivative of the Legendre polynomial
-// of order n at the point x belonging to [-1, 1]. It is implemented only for n<=6.
+/*!
+    @brief Evaulate a the first derivative of a Legendre polynomial
+
+    This function evaulates the first derivative of the Legendre polynomial of
+    degree n at the point x belonging to [-1, 1].
+
+    @warning It is implemented only for n <= 8, for n > 8 a @c std::domain_error
+             exception is thrown.
+    @param n Degree of the polynomial.
+    @param x Evaluation point, it must be in [-1, 1].
+*/
 Real legendreDer(unsigned n, PolyDG::Real x);
 
-// Recursive implementation through templates of the integer power of a real number.
+/*!
+    @brief Integer power of a real number.
+
+    This function implements recursively through templates the integer power of
+    a real number.
+
+    @param x        A real number.
+    @param exponent The exponent.
+*/
 template<typename T>
 constexpr T pow(const T& x, unsigned exponent);
 

@@ -1,3 +1,9 @@
+/*!
+    @file   ExprWrapper.hpp
+    @author Andrea Vescovini
+    @brief  Template base class that wraps every expression
+*/
+
 #ifndef _EXPR_WRAPPER_HPP_
 #define _EXPR_WRAPPER_HPP_
 
@@ -6,40 +12,46 @@
 namespace PolyDG
 {
 
-// Wrapper class that encapsulates every expression. It defines the cast operator
-// to the template parameter class, i.e. to all those class that will inherit from
-// ExprWrapper.
+/*!
+    @brief Template base class that wraps every expression
+
+    This template class is a wrapper wrapper that encapsulates every expression.
+    It defines the cast operator to the template parameter class, i.e. to all
+    those class that will inherit from ExprWrapper.
+*/
+
 template <typename E>
 class ExprWrapper
 {
 public:
+  //! Constructor
   ExprWrapper() = default;
 
-  // Default copy-constructor.
+  //! Copy constructor
   ExprWrapper(const ExprWrapper&) = default;
 
-  // Deleted copy-assignment operator.
+  //! Deleted copy-assignment operator
   ExprWrapper& operator=(const ExprWrapper&) = delete;
 
-  // Default move-constructor.
+  //! Move constructor
   ExprWrapper(ExprWrapper&&) = default;
 
-  // Deleted move-assignament operator.
+  //! Deleted move-assignament operator
   ExprWrapper& operator=(ExprWrapper&&) = delete;
 
-  // Const cast operators to derived.
+  //! Const cast operators to derived
   operator const E&() const;
 
-  // Cast operator to derived.
+  //! Cast operator to derived
   operator E&();
 
-  // Explicit method for the const cast to derived.
+  //! Explicit method for the const cast to derived
   const E& asDerived() const;
 
-  // Explicit method fot the cast to derived.
+  //! Explicit method fot the cast to derived
   E& asDerived();
 
-  // Default virtual destructor.
+  //! Destructor
   virtual ~ExprWrapper() = default;
 };
 

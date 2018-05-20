@@ -1,3 +1,9 @@
+/*!
+    @file   MeshReaderPoly.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class MeshReaderPoly
+*/
+
 #include "MeshReaderPoly.hpp"
 #include "FaceExt.hpp"
 #include "PolyDG.hpp"
@@ -26,10 +32,10 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   // I use the proxy to access the Mesh class.
   MeshProxy mp(mesh);
-  std::vector<Vertex>& vertList = mp.getVerticesRef();
+  std::vector<Vertex>& vertList       = mp.getVerticesRef();
   std::vector<Tetrahedron>& tetraList = mp.getTetrahedraRef();
-  std::vector<FaceExt>& faceExtList = mp.getFacesExtRef();
-  std::vector<Polyhedron>& polyList = mp.getPolyhedraRef();
+  std::vector<FaceExt>& faceExtList   = mp.getFacesExtRef();
+  std::vector<Polyhedron>& polyList   = mp.getPolyhedraRef();
 
   bool found = goToSection(meshFile, 0);
   if(found == false)

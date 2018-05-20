@@ -1,3 +1,9 @@
+/*!
+    @file   Problem.hpp
+    @author Andrea Vescovini
+    @brief  Class for solving a differential problem
+*/
+
 #ifndef _PROBLEM_HPP_
 #define _PROBLEM_HPP_
 
@@ -17,18 +23,22 @@
 namespace PolyDG
 {
 
+/*
+    @brief  Class for solving a differential problem
+
+    ciaocioaj
+*/
+
 class Problem
 {
 public:
-
-  // Constructor that requires a FeSpace used for the computation of the solution
-  // and for the test functions.
+  //! Constructor
   explicit Problem(const FeSpace& Vh);
 
-  // Default copy-constructor.
+  //! Copy constructor
   Problem(const Problem&) = default;
 
-  // Default move-constructor.
+  //! Move constructor
   Problem(Problem&&) = default;
 
   // Function that integrates a blinear form over the volume of the
@@ -59,95 +69,196 @@ public:
   template <typename T>
   void integrateFacesExtRhs(const ExprWrapper<T>& expr, BCType bcLabel);
 
-  // Function that solves the linear system with a direct LU decomposition.
-  void solveLU();
+  /*!
+      @brief Solve the linear sysyem with a sparse LU decomposition
 
-  // Function that solves the linear system with a direct Chlolesky decomposition.
-  // It works only with a symmetric formulation.
-  void solveChol();
+      Thi function solves the linear system with a direct sparse LU decomposition,
+      using the solver implemented in the library Eigen (https://eigen.tuxfamily.org/dox/classEigen_1_1SparseLU.html).
+      The solver works both for symmetric and non symmetric matrices.
+      If the decomposition fails, a @c std::runtime_error exception is thrown.
+      If the solver does not succeed a warning message is printed.
 
-  // Function that solves the linear system iteratively using the Conjugate
-  // Gradient method. It works only with a symmetric formulation. it requires
-  // an initial guess and maximum number of iterations and the tolerance can be
-  // specified.
-  void solveCG(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
+      @return @c true if the solver succeeds, @c false if it does not.
+  */
+  bool solveLU();
+
+  /*!
+      @brief Solve the linear sysyem with a sparse Chlolesky decomposition
+
+      Thi function solves the linear system with a direct sparse Chlolesky
+      decomposition, using the solver implemented in the library Eigen
+      (https://eigen.tuxfamily.org/dox/classEigen_1_1SimplicialLLT.html). The
+      solver works only for symmetric matrices, it throws a @c std::domain_error
+      exception if called on a non symmetric matrix. If the decomposition fails,
+      a @c std::runtime_error exception is thrown. If the solver does not succeed
+      a warning message is printed.
+
+      @return @c true if the solver succeeds, @c false if it does not.
+  */
+  bool solveCholesky();
+
+  /*!
+      @brief Solve the linear sysyem with the conjugate gradient method
+
+      This function solves the linear system iteratively using the conjugate
+      gradient method, using the solver implemented in the library Eigen
+      (https://eigen.tuxfamily.org/dox/classEigen_1_1ConjugateGradient.html).The
+      solver works only for symmetric matrices, it throws a @c std::domain_error
+      exception if called on a non symmetric matrix. It requires and initial guess
+      and you can specify the maximum number of iteation and the tolerance for
+      the stopping criterion. If it does not converge in the assigned maximum
+      number of iterarions a warning message is printed.
+
+      @param x0      Initial guess.
+      @param iterMax Maximum number if iteration, if not specified it is 10000.
+      @param tol     Tolerance for the stopping criterio, if not specified it is
+                     the machine epsilon.
+      @return @c true if the solver succeeds, @c false if it does not.
+
+  */
+  bool solveCG(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
                Real tol = Eigen::NumTraits<Real>::epsilon());
 
-  // Function that solves the linear system iteratively using the bi conjugate
-  // gradient stabilized method.It requires an initial guess and maximum number
-  // of iterations and the tolerance can be specified.
-  void solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
-                            Real tol = Eigen::NumTraits<Real>::epsilon());
+  /*!
+      @brief Solve the linear sysyem with the bi-conjugate gradient stabilized gradient method
 
-  // Function that, given the exact solution uex, computes the L2-norm of the
-  // error.
+      This function solves the linear system iteratively using the bi-conjugate
+      gradient stabilized method, using the solver implemented in the library Eigen
+      (https://eigen.tuxfamily.org/dox/classEigen_1_1BiCGSTAB.html).The solver
+      works for symmetric and non symmetric matrices, but it convenient only for
+      non symmetric matrices. It requires and initial guess and you can specify
+      the maximum number of iteation and the tolerance for the stopping criterion.
+      If it does not converge in the assigned maximum number of iterarions a
+      warning message is printed.
+
+      @param x0      Initial guess.
+      @param iterMax Maximum number if iteration, if not specified it is 10000.
+      @param tol     Tolerance for the stopping criterio, if not specified it is
+                     the machine epsilon.
+      @return @c true if the solver succeeds, @c false if it does not.
+  */
+  bool solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax = 10000,
+                     Real tol = Eigen::NumTraits<Real>::epsilon());
+
+  /*!
+      @brief Compute the L-2 norm of the error
+
+      This function, given the exact solution uex, computes \f$ || u_h - u_{ex} ||_{L^2(\mathcal{T})} \f$.
+
+      @param uex Exact solution, it is a function that takes a @c Eigen::Vector3d
+                 and gives a PolyDG::Real.
+  */
   Real computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>& uex) const;
 
-  // Function that, given the gradient of the exact solution uexGrad, computes
-  // the H1-seminorm of the error.
+  /*!
+      @brief Compute the H1-seminorm of the error
+
+      This function, given the gradient of the exact solution uexGrad, computes
+      \f$ || \nabla u_h - \nabla u_{ex} ||_{L^2(\mathcal{T})} \f$.
+
+      @param uexGrad Gradient of the exact solution, it is a function that takes a
+                     @c Eigen::Vector3d and gives a @c Eigen::Vector3d.
+  */
   Real computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const;
 
-  // Function that exports the solution in a xml file fileName.vtu that can be
-  // read with a visualization software (e.g. Paraview).
+  /*!
+      @brief Export the solution
+
+      This function exports the solution in a VTK unstructured grid file with XML
+      format. It can be read with a visualization software (e.g. Paraview).
+
+      @param fileName  Name of the file to be saved (the extension should be .vtu).
+      @param precision Precision to be used for floating points numbers.
+  */
   void exportSolutionVTK(const std::string& fileName, unsigned precision = 8) const;
 
-  // Function that returns true if the inserted form is symmetric or false
-  // if it is not.
+  /*!
+      @brief Get the symmetry
+
+      This function tells if globally the variational form and so the matrix is
+      symmetric or not.
+
+      @return @c true if the system is symmetric, @c false if it is not.
+  */
   bool isSymmetric() const;
 
-  // Function that returns a const reference to the matrix of the linear system.
+  //! Get the sparse matrix of the linear system
   inline const Eigen::SparseMatrix<Real>& getMatrix() const;
 
-  // Functions that returns a const reference to the vector of the rhs of the
-  // linear system.
+  //! Get the rhs of the linear system
   inline const Eigen::VectorXd& getRhs() const;
 
-  // Functions that returns a const reference to the vector of the solution of the
-  // linear system.
+  //! Get the solution of the linear system
   inline const Eigen::VectorXd& getSolution() const;
 
-  // Function that return the dimension of the linear system.
+  //! Get the dimension of the linear system
   inline unsigned getDim() const;
 
-  // Function that sets to zero the matrix of the linear system.
+  /*!
+      @brief Clear the matrix of the linear system
+
+      This function sets to zero the matrix of the linear system. It has to be
+      called if you want to integrate a new problem.
+  */
   void clearMatrix();
 
-  // Function that sets to zero the vector of the rhs of the linear system.
+  /*!
+      @brief Clear the rhs of the linear system
+
+      This function sets to zero the rhs of the linear system. It has to be
+      called if you want to integrate a new problem.
+  */
   void clearRhs();
 
-  // Function that assembles the matrix of the linear system. This must be called
-  // after the integrations.
+  /*!
+      @brief Assemble the matrix of the linear sysyem.
+
+      This function assembles the matrix of the linear system. It has to be
+      after the integration methods and before the solve methods.
+  */
   void finalizeMatrix();
 
-  // Prints info about the problem.
+  //! Print information about the problem
   void printInfo(std::ostream& out = std::cout) const;
 
-  // Default virtual destructor.
+  //! Destructor
   virtual ~Problem() = default;
 
 private:
+  //! Alias for a triplet (row, column, value)
   using triplet = Eigen::Triplet<double>;
 
-  // FeSpace used for the solution of the problem and for the test functions.
+  //! FeSpace used for the solution of the problem
   const FeSpace& Vh_;
 
-  // Dimension of the linear system.
+  //! Dimension of the linear system
   const unsigned dim_;
 
-  // Matrix, rhs and solution of the linear system.
+  //! Matrix of the linear system
   Eigen::SparseMatrix<Real> A_;
+
+  //! Rhs of the linear system
   Eigen::VectorXd b_;
+
+  //! Solution of the linear system
   Eigen::VectorXd u_;
 
-  // Vector of vectors of triplet used to store the values computed in the
-  // integration.
+  //! Containers used to store the triplets computed in the integration
   std::vector<std::vector<triplet>> triplets_;
 
-  // Vector of bools referring to the symmetry of the integrated forms.
+  //! Vector of bools referring to the symmetry of the integrated forms
   std::vector<bool> sym_;
 
-  // Function that evalues the solution of the problem at the point x, y, z
-  // belonging to the FeElement el.
+  /*!
+      @brief Evaluate the solution
+      @param x  /f$ x /f$ coordinate in the element el at which the solution has
+                to be evaluated.
+      @param y  /f$ y /f$ coordinate in the element el at which the solution has
+                to be evaluated.
+      @param z  /f$ z /f$ coordinate in the element el at which the solution has
+                to be evaluated.
+      @param el FeElement in which the solution has to be evaluated.
+  */
   Real evalSolution(Real x, Real y, Real z, const FeElement& el) const;
 };
 

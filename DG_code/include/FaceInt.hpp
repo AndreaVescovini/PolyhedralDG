@@ -18,13 +18,13 @@ namespace PolyDG
 /*!
     @brief Class for internal faces of a polyhedral mesh
 
-    This class defines an internal face of a polyhedral mesh.
+    This class defines an internal face of a polyhedral mesh.@n
     A internal face is defined as one of the co-planar triangles belonging to the
     triangulation of an interface between two polyhedral elements. An interface
-    is the intersection of the two-dimensional facets of neighbouring elements.
+    is the intersection of the two-dimensional facets of neighbouring elements.@n
     This class inherits from FaceAbs and extends it adding a second Tetrahedron
     that shares it. Note that the outward normal give by getNormal() is that one
-    pointing from the Tetrahedron "In" to the Tetrhedron "Out".
+    pointing from the Tetrahedron @a "In" to the Tetrhedron @a "Out".
 */
 
 class FaceInt : public FaceAbs
@@ -43,12 +43,12 @@ public:
       This constructor calls the constructor of FaceAbs and sets the Out
       Tetrhedron..
 
-      @param v1 Vertex.
-      @param v2 Vertex.
-      @param v3 Vertex.
-      @param tetIn Tetrahedron In to which the face belongs.
+      @param v1          Vertex.
+      @param v2          Vertex.
+      @param v3          Vertex.
+      @param tetIn       Tetrahedron In to which the face belongs.
       @param faceNoTetIn Number of the face in the tetrahedron tetIn.
-      @apram tetOut Tetrhedron Out to which the face belongs.
+      @param tetOut      Tetrhedron Out to which the face belongs.
   */
   FaceInt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
           unsigned faceNoTetIn, Tetrahedron& tetOut);
@@ -60,26 +60,26 @@ public:
   FaceInt(FaceInt&&) = default;
 
   /*!
-      @brief  Check if a Tetrahedron "Out" is set
-      @return @b true if a Tetrahedron "Out" is set, @b false if it is not.
+      @brief  Check if a Tetrahedron @a "Out" is set
+      @return @c true if a Tetrahedron @a "Out" is set, @c false if it is not.
   */
   inline bool isTetOutSet() const;
 
   /*!
-      @brief   Get the Tetrahedron "Out" to which the face belongs
-      @warning This function can be called only if isTetOutSet() returns @b true.
+      @brief   Get the Tetrahedron @a "Out" to which the face belongs
+      @warning This function can be called only if isTetOutSet() returns @c true.
   */
   inline const Tetrahedron& getTetOut() const;
 
   /*!
-      @brief   Get the Tetrahedron "Out" to which the face belongs
-      @warning This function can be called only if isTetOutSet() returns @b true.
+      @brief   Get the Tetrahedron @a "Out" to which the face belongs
+      @warning This function can be called only if isTetOutSet() returns @c true.
   */
   inline Tetrahedron& getTetOut();
 
   /*!
-      @brief Set a Tetrahedron "Out"
-      @param tetIn The Tetrahedron "Out" to which this face belongs.
+      @brief Set a Tetrahedron @a "Out"
+      @param tetOut The Tetrahedron @a "Out" to which this face belongs.
   */
   inline void setTetOut(Tetrahedron& tetOut);
 
@@ -87,7 +87,7 @@ public:
   virtual ~FaceInt() = default;
 
 private:
-  //! Pointer to the tetrahedron Out owning the face
+  //! Pointer to the Tetrahedron "Out" owning the face
   Tetrahedron* tetOut_;
 
   //! Print information about the face

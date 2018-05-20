@@ -1,3 +1,9 @@
+/*!
+    @file   QuadRuleManager.cpp
+    @author Andrea Vescovini
+    @brief  Implementation of the class QuadRuleManager
+*/
+
 #include "QuadRuleManager.hpp"
 
 #include <algorithm>

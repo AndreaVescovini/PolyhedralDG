@@ -1,3 +1,9 @@
+/*!
+    @file   FeFaceInt.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FeFaceInt
+*/
+
 #include "FeFaceInt.hpp"
 #include "Legendre.hpp"
 
@@ -10,7 +16,7 @@ namespace PolyDG
 FeFaceInt::FeFaceInt(const FaceInt& face, unsigned degree, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRule2D& triaRule)
-  : FeFace(face, dof, basisComposition, triaRule)
+  : FeFaceAbs(face, dof, basisComposition, triaRule)
 {
   penaltyParam_ = degree * degree / std::min(face.getTetIn().getPoly().getDiameter(),
                                            face.getTetOut().getPoly().getDiameter());

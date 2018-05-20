@@ -1,3 +1,9 @@
+/*!
+    @file   FeElement.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FeElement
+*/
+
 #include "FeElement.hpp"
 #include "Legendre.hpp"
 

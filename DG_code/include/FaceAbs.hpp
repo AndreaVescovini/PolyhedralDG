@@ -18,13 +18,13 @@ namespace PolyDG
     @brief Abstract base class for faces of a polyhedral mesh
 
     This abstract class is the base class for external faces FaceExt and internal
-    faces FaceInt of a polyhedral mesh.
+    faces FaceInt of a polyhedral mesh.@n
     A face is defined as one of the co-planar triangles belonging to the
     triangulation of an interface between two polyhedral elements. An interface
-    is the intersection of the two-dimensional facets of neighbouring elements.
+    is the intersection of the two-dimensional facets of neighbouring elements.@n
     This class inherits from Face and extends it adding a id number, the area of
     the face and the unitary normal vector, outward with respect to the
-    Tetrhedron "In" given by getTetIn().
+    Tetrhedron @a "In" given by getTetIn().
 */
 
 class FaceAbs : public Face
@@ -35,7 +35,7 @@ public:
 
       This constructor calls the constructor of Face and sets the id number,
       the normal vector and the area are initialized. The direction of the
-      normal vector is random since a Tetrahedron "In" has not been set.
+      normal vector is random since a Tetrahedron @a "In" has not been set.
   */
   FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3);
 
@@ -45,10 +45,10 @@ public:
       This constructor calls the constructor of Face and sets the id number,
       the normal vector and the area are initialized.
 
-      @param v1 Vertex.
-      @param v2 Vertex.
-      @param v3 Vertex.
-      @param tetIn Tetrahedron "In" to which the face belongs.
+      @param v1          Vertex.
+      @param v2          Vertex.
+      @param v3          Vertex.
+      @param tetIn       Tetrahedron @a "In" to which the face belongs.
       @param faceNoTetIn Number of the face in the Tetrahedron tetIn.
   */
   FaceAbs(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn, unsigned faceNoTetIn);
@@ -64,8 +64,8 @@ public:
 
   /*!
       @brief  Get the normal vector
-      @return Eigen::Vector3d containing the unitary normal vector, outward with
-      respect to the Tetrhedron "In" given by getTetIn().
+      @return @c Eigen::Vector3d containing the unitary normal vector, outward with
+              respect to the Tetrhedron @a "In" given by getTetIn().
   */
   inline const Eigen::Vector3d& getNormal() const;
 
@@ -73,15 +73,16 @@ public:
       @brief Compute the normal and the area
 
       This function computes the unitary normal vector to the face, outward with
-      respect to the Tetrhedron "In" given by getTetIn(), and the doubled area
+      respect to the Tetrhedron @a "In" given by getTetIn(), and the doubled area
       of the face. This function calls checkNormalSign().
   */
   void computeNormalandArea();
 
   /*!
       @brief Check the sign of the normal vector
-      Function that checks weather the normal vector has the right sign (outtward
-      wrt the Tetrahedron "In") and revertes it if needed. If a Tetrahedron "In"
+
+      This function checks weather the normal vector has the right sign (outward
+      wrt the Tetrahedron @a "In") and revertes it if needed. If a Tetrahedron @a "In"
       has not been set this function does nothing.
   */
   void checkNormalSign();

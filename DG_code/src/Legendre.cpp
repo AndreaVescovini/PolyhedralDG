@@ -1,3 +1,9 @@
+/*!
+    @file   Legendre.cpp
+    @author Andrea Vescovini
+    @brief  Implementation of Legendre polynomials
+*/
+
 #include "Legendre.hpp"
 
 #include <stdexcept>

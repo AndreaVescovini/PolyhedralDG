@@ -71,7 +71,7 @@ int main()
   // Chlolesky
   std::cout << "\nSolving with SparseCholesky..." << std::endl;
   ch.start();
-  poisson.solveChol();
+  poisson.solveCholesky();
   ch.stop();
   std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
@@ -132,7 +132,7 @@ int main()
   ch.start();
   try
   {
-    poisson.solveChol();
+    poisson.solveCholesky();
     ch.stop();
     std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
     std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;

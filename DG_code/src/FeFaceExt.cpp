@@ -1,3 +1,9 @@
+/*!
+    @file   FeFaceExt.cpp
+    @author Andrea Vescovini
+    @brief  Implementation for the class FeFaceExt
+*/
+
 #include "FeFaceExt.hpp"
 #include "Legendre.hpp"
 
@@ -9,7 +15,7 @@ namespace PolyDG
 FeFaceExt::FeFaceExt(const FaceExt& face, unsigned degree, unsigned dof,
                      const std::vector<std::array<unsigned, 3>>& basisComposition,
                      const QuadRule2D& triaRule)
-  : FeFace(face, dof, basisComposition, triaRule)
+  : FeFaceAbs(face, dof, basisComposition, triaRule)
 {
   penaltyParam_ = degree * degree / face.getTetIn().getPoly().getDiameter();
   compute_basis();
