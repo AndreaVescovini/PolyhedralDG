@@ -39,6 +39,7 @@ int main()
 
   Mesh Th2(fileNames[2], reader);
   Th2.printHead();
+  Th2.exportMeshVTK("test_mesh.vtu");
 
   for(const std::string& f : fileNames)
   {

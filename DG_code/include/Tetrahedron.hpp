@@ -15,6 +15,7 @@
 
 #include <array>
 #include <iostream>
+#include <functional>
 
 namespace PolyDG
 {

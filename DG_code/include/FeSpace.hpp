@@ -26,8 +26,8 @@ namespace PolyDG
 /*!
     @brief Class that defines finite elements spaces
 
-    This class defines a finite element space and stores FeElements, FeFacesExt
-    and FeFacesInt.@n
+    This class defines a discontinuous finite element space and stores FeElements
+    FeFacesExt and FeFacesInt.@n
     It rapresents the space:
     \f[
       \mathcal{D}_r(\mathcal{T}) = \{ v \in L^2(\Omega) : v|_\kappa \in

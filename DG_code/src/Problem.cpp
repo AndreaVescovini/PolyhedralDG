@@ -197,6 +197,11 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
 
 void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision) const
 {
+  exportSolutionVTK(u_, fileName, precision);
+}
+
+void Problem::exportSolutionVTK(const Eigen::VectorXd& u, const std::string& fileName, unsigned precision) const
+{
   std::ofstream fout{fileName};
 
   // Create a vector with random integers in order to distinguish elements.
@@ -222,7 +227,7 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
     std::vector<Real> uNodes;
     uNodes.reserve(nodes.size());
     for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
-      uNodes.emplace_back(evalSolution(itNod->get().getX(), itNod->get().getY(), itNod->get().getZ(), *it));
+      uNodes.emplace_back(evalSolution(u, itNod->get().getX(), itNod->get().getY(), itNod->get().getZ(), *it));
 
     fout << "    <Piece NumberOfPoints=\"" << nodes.size() << "\" NumberOfCells=\"" << elem.getTetrahedraNo() << "\">\n";
 
@@ -280,6 +285,7 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
   fout.close();
 }
 
+
 void Problem::printInfo(std::ostream& out) const
 {
   out << "-------------------- PROBLEM INFO --------------------" << '\n';
@@ -290,7 +296,7 @@ void Problem::printInfo(std::ostream& out) const
   out << "------------------------------------------------------" << std::endl;
 }
 
-Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
+Real Problem::evalSolution(const Eigen::VectorXd& u, Real x, Real y, Real z, const FeElement& el) const
 {
   Real result = 0.0;
   const unsigned indexOffset = el.getElem().getId() * Vh_.getDof();
@@ -305,7 +311,7 @@ Real Problem::evalSolution(Real x, Real y, Real z, const FeElement& el) const
     const Real valy = legendre(basisComposition[i][1], (y - mb(1)) / hb(1)) / std::sqrt(hb(1));
     const Real valz = legendre(basisComposition[i][2], (z - mb(2)) / hb(2)) / std::sqrt(hb(2));
 
-    result += u_(indexOffset + i) * valx  * valy * valz;
+    result += u(indexOffset + i) * valx  * valy * valz;
   }
 
   return result;

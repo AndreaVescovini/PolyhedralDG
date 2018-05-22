@@ -40,7 +40,7 @@ public:
       @param v3      Vertex.
       @param bcLabel The label to be set.
   */
-  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCType bcLabel);
+  FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, BCLabelType bcLabel);
 
   /*!
       @brief Constructor that takes three vertices, a Tetrahedron and a label
@@ -55,7 +55,7 @@ public:
       @param bcLabel     The label to be set.
   */
   FaceExt(Vertex& v1, Vertex& v2, Vertex& v3, Tetrahedron& tetIn,
-          unsigned faceNoTetIn, BCType bcLabel);
+          unsigned faceNoTetIn, BCLabelType bcLabel);
 
   //! Copy constructor
   FaceExt(const FaceExt&) = default;
@@ -64,17 +64,17 @@ public:
   FaceExt(FaceExt&&) = default;
 
   //! Get the label
-  inline BCType getBClabel() const;
+  inline BCLabelType getBClabel() const;
 
   //! Set the label
-  inline void setBClabel(BCType bcLabel);
+  inline void setBClabel(BCLabelType bcLabel);
 
   //! Destructor
   virtual ~FaceExt() = default;
 
 private:
   //! Label for a specific boundary condition
-  BCType bcLabel_;
+  BCLabelType bcLabel_;
 
   //! Print information about the face
   void print(std::ostream& out) const override;
@@ -84,12 +84,12 @@ private:
 //-------------------------------IMPLEMENTATION-------------------------------//
 //----------------------------------------------------------------------------//
 
-inline BCType FaceExt::getBClabel() const
+inline BCLabelType FaceExt::getBClabel() const
 {
   return bcLabel_;
 }
 
-inline void FaceExt::setBClabel(BCType bcLabel)
+inline void FaceExt::setBClabel(BCLabelType bcLabel)
 {
   bcLabel_ = bcLabel;
 }

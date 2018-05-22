@@ -24,7 +24,7 @@ int main()
   // fileNames.push_back("../meshes/cube_str6t.mesh");
   // fileNames.push_back("../meshes/cube_str48h.mesh");
   // fileNames.push_back("../meshes/cube_str384h.mesh");
-  fileNames.push_back("../meshes/cube_str1296t.mesh");
+  fileNames.push_back("../meshes/cube_str1296h.mesh");
   // fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str1296h.mesh");
 
   auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
@@ -70,10 +70,10 @@ int main()
 
     bool symform = true;
     prob.integrateVol(dot(uGrad, vGrad), symform);
-    prob.integrateFacesInt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), symform);
-    prob.integrateFacesExt(-dot(uGradAver, vJump)-dot(uJump, vGradAver)+gamma*dot(uJump, vJump), 1, symform);
+    prob.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), symform);
+    prob.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1}, symform);
     prob.integrateVolRhs(f * v);
-    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, 1);
+    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, {1});
 
     // ch.start();
     prob.finalizeMatrix();
@@ -81,7 +81,7 @@ int main()
     // ch.stop();
     prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 10000, 1e-6);
     // prob.solveBiCGSTAB(Eigen::VectorXd::Zero(prob.getDim()), 10000, 1e-6);
-    // prob.solveChol();
+    // prob.solveChloesky();
     // prob.solveLU();
     // ch.start();
 
@@ -96,7 +96,7 @@ int main()
     // std::cout << prob.getRhs() << std::endl;
     // std::cout << prob.getSolution() << std::endl;
     // std::cout << prob.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
-    // prob.exportSolutionVTK("speriamo.vtu");
+    prob.exportSolutionVTK("speriamo.vtu");
   }
 
 

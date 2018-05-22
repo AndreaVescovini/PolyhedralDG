@@ -139,6 +139,17 @@ public:
   //! Prints general information about the Mesh
   void printInfo(std::ostream& out = std::cout) const;
 
+  /*!
+      @brief Export the Mesh
+
+      This function exports the mesh into a VTK unstructured grid file with
+      XML format. It can be read with a visualization software (e.g. Paraview).
+
+      @param fileName  Name of the file to be saved (the extension should be .vtu).
+      @param precision Precision to be used for floating points numbers.
+  */
+  void exportMeshVTK(const std::string& fileName, unsigned precision = 8) const;
+
   //! Destructor
   virtual ~Mesh() = default;
 

@@ -8,9 +8,14 @@
 #include "Mesh.hpp"
 
 #include <algorithm>
+#include <fstream>
+#include <functional>
+#include <iomanip>
 #include <limits>
 #include <memory>
+#include <random>
 #include <unordered_set>
+#include <vector>
 
 namespace PolyDG
 {
@@ -152,6 +157,76 @@ void Mesh::print(SizeType lineNo, std::ostream& out) const
     out << polyhedra_[i] << '\n';
 
   out << "----------------------" << std::endl;
+}
+
+void Mesh::exportMeshVTK(const std::string& fileName, unsigned precision) const
+{
+  std::ofstream fout{fileName};
+
+  // Create a vector with random integers in order to distinguish elements.
+  std::vector<unsigned> elemValues;
+  elemValues.reserve(polyhedra_.size());
+  for(unsigned i = 0; i < polyhedra_.size(); i++)
+    elemValues.emplace_back(i);
+
+  std::default_random_engine dre;
+  std::shuffle(elemValues.begin(), elemValues.end(), dre);
+
+  // Print the header
+  fout << "<?xml version=\"1.0\"?>\n";
+  fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+  fout << "  <UnstructuredGrid>\n";
+
+  for(auto it = polyhedra_.cbegin(); it != polyhedra_.cend(); it++)
+  {
+    const std::vector<std::reference_wrapper<const Vertex>> nodes(it->verticesCbegin(), it->verticesCend());
+
+    fout << "    <Piece NumberOfPoints=\"" << nodes.size() << "\" NumberOfCells=\"" << it->getTetrahedraNo() << "\">\n";
+
+    fout << std::setprecision(precision) << std::scientific;
+
+    // Print the nodes coordinates.
+    fout << "      <Points>\n";
+    fout << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n         ";
+    for(auto itNod = nodes.cbegin(); itNod != nodes.cend(); itNod++)
+      fout << ' ' << itNod->get().getX() << ' ' << itNod->get().getY() << ' ' << itNod->get().getZ();
+    fout << "\n        </DataArray>\n";
+    fout << "      </Points>\n";
+
+    // Print the cells (tetrahedra) connectivity and type.
+    fout << "      <Cells>\n";
+    fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n         ";
+    for(SizeType i = 0; i < it->getTetrahedraNo(); i++) // Loop over tetrahedra
+      for(SizeType j = 0; j < 4; j++) // Loop over vertices
+        fout << ' ' << (std::find(nodes.cbegin(), nodes.cend(), it->getTetra(i).getVertex(j)) - nodes.cbegin());
+    fout << "\n        </DataArray>\n";
+
+    fout << "         <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n         ";
+    for(unsigned offset = 4; offset <= it->getTetrahedraNo() * 4; offset += 4)
+      fout << ' ' << offset;
+    fout << "\n        </DataArray>\n";
+
+    fout << "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n         ";
+    for(unsigned i = 0; i < it->getTetrahedraNo(); i++)
+      fout << " 10";
+    fout << "\n        </DataArray>\n";
+    fout << "      </Cells>\n";
+
+    // Print a value for the Polyhedron.
+    fout << "      <CellData Scalars=\"Mesh\">\n";
+    fout << "        <DataArray type=\"UInt32\" Name=\"Mesh\" format=\"ascii\">\n         ";
+    for(SizeType i = 0; i < it->getTetrahedraNo(); i++)
+      fout << ' ' << elemValues[it->getId()];
+    fout << "\n        </DataArray>\n";
+    fout << "      </CellData>\n";
+
+    fout << "    </Piece>\n";
+  }
+
+  fout << "  </UnstructuredGrid>\n";
+  fout << "</VTKFile>" << std::endl;
+
+  fout.close();
 }
 
 MeshFormatError::MeshFormatError(const std::string& what_arg)

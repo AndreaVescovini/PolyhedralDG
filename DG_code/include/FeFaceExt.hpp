@@ -79,7 +79,7 @@ public:
   inline const Eigen::Vector3d& getPhiDer(SizeType p, SizeType f) const;
 
   //! Get the label related to the FaceExt
-  inline BCType getBClabel() const;
+  inline BCLabelType getBClabel() const;
 
   //! Print all the computed values of the basis functions
   void printBasis(std::ostream& out) const override;
@@ -113,7 +113,7 @@ inline const Eigen::Vector3d& FeFaceExt::getPhiDer(SizeType p, SizeType f) const
   return phiDer_[sub2ind(p, f)];
 }
 
-inline BCType FeFaceExt::getBClabel() const
+inline BCLabelType FeFaceExt::getBClabel() const
 {
   return static_cast<const FaceExt&>(face_).getBClabel();
 }

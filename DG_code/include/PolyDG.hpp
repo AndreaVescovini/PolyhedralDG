@@ -19,8 +19,8 @@ using Real = double;
 //! Alias for size type of stl containers
 using SizeType = std::size_t;
 
-//! Alias for the type of boundary condition
-using BCType = int;
+//! Alias for the label used for boundary conditions
+using BCLabelType = int;
 
 //! Enum for the two sides of faces.
 enum SideType { Out, In };
