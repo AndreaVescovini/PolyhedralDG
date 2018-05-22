@@ -4,6 +4,7 @@
 #include "MeshReaderPoly.hpp"
 #include "Operators.hpp"
 #include "Problem.hpp"
+#include "Utilities.hpp"
 
 #include <Eigen/Core>
 
@@ -29,8 +30,8 @@ int main()
   uex.emplace_back([](const Eigen::Vector3d& x) { return x(0) * x(1); });
   uex.emplace_back([](const Eigen::Vector3d& x) { return x(0) * x(1) * x(2); });
   uex.emplace_back([](const Eigen::Vector3d& x) { return x(0) * x(0) * x(1) * x(2); });
-  uex.emplace_back([](const Eigen::Vector3d& x) { return x(0) * x(0) * x(0) * x(1) * x(2); });
-  uex.emplace_back([](const Eigen::Vector3d& x) { return x(0) * x(0) * x(0) * x(1) * x(1) * x(2); });
+  uex.emplace_back([](const Eigen::Vector3d& x) { return pow(x(0), 3) * x(1) * x(2); });
+  uex.emplace_back([](const Eigen::Vector3d& x) { return pow(x(0), 3) * x(1) * x(1) * x(2); });
 
   source.emplace_back([](const Eigen::Vector3d& /* x */) { return 0.0; });
   source.emplace_back([](const Eigen::Vector3d& /* x */) { return 0.0; });
@@ -48,11 +49,11 @@ int main()
                                                                              x(0) * x(0) * x(2),
                                                                              x(0) * x(0) * x(1)); });
   uexGrad.emplace_back([](const Eigen::Vector3d& x) { return Eigen::Vector3d(3.0 * x(0) * x(0) * x(1) * x(2),
-                                                                             x(0) * x(0) * x(0) * x(2),
-                                                                             x(0) * x(0) * x(0) * x(1)); });
-  uexGrad.emplace_back([](const Eigen::Vector3d& x) { return Eigen::Vector3d(3.0 * x(0) * x(0) * x(1) * x(1) * x(2),
-                                                                             2.0 * x(0) * x(0) * x(0) * x(1) * x(2),
-                                                                             x(0) * x(0) * x(0) * x(1) * x(1)); });
+                                                                             pow(x(0), 3) * x(2),
+                                                                             pow(x(0), 3) * x(1)); });
+  uexGrad.emplace_back([](const Eigen::Vector3d& x) { return Eigen::Vector3d(3.0 * pow(x(0) * x(1), 2) * x(2),
+                                                                             2.0 * pow(x(0), 3) * x(1) * x(2),
+                                                                             x(0) * pow(x(0) * x(1), 2)); });
   // Operators
   PolyDG::PhiI            v;
   PolyDG::GradPhiJ        uGrad;

@@ -1,7 +1,7 @@
 /*!
     @file   Legendre.hpp
     @author Andrea Vescovini
-    @brief  Here are defined Legendre polynomials
+    @brief  Here are defined Legendre polynomials and their derivative
 */
 
 #ifndef _LEGENDRE_HPP_
@@ -38,28 +38,6 @@ Real legendre(unsigned n, PolyDG::Real x);
 */
 Real legendreDer(unsigned n, PolyDG::Real x);
 
-/*!
-    @brief Integer power of a real number.
-
-    This function implements recursively through templates the integer power of
-    a real number.
-
-    @param x        A real number.
-    @param exponent The exponent.
-*/
-template<typename T>
-constexpr T pow(const T& x, unsigned exponent);
-
-//----------------------------------------------------------------------------//
-//-------------------------------IMPLEMENTATION-------------------------------//
-//----------------------------------------------------------------------------//
-
-template<typename T>
-constexpr T pow(const T& x, unsigned exponent)
-{
-  return (exponent == 0) ? T(1.0) : x * pow(x, exponent - 1);
-}
-
-}
+} // namespace PolyDG
 
 #endif // _LEGENDRE_HPP_

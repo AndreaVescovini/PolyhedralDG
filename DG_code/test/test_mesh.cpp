@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-using PolyDG::Mesh;
-using PolyDG::MeshReaderPoly;
-
 int main()
 {
-  Timings::Watch ch;
+  using PolyDG::Mesh;
+  using PolyDG::MeshReaderPoly;
+  
+  Utilities::Watch ch;
   ch.start();
 
   std::vector<std::string> fileNames;

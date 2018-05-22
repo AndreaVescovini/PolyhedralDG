@@ -6,6 +6,7 @@
 
 #include "Face.hpp"
 #include "Mesh.hpp"
+#include "Watch.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -22,15 +23,47 @@ namespace PolyDG
 
 Mesh::Mesh(const std::string& fileName, MeshReader& reader)
 {
+  #ifdef VERBOSITY
+    std::cout << "Reading the mesh..................";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   reader.read(*this, fileName);
-  std::cout << "The mesh file has been read." << std::endl;
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+    ch.reset();
+  #endif
+
   if(facesInt_.size() == 0)
   {
+    #ifdef VERBOSITY
+      std::cout << "Finding internal faces............";
+      ch.start();
+    #endif
+
     computeFaces();
-    std::cout << "Faces have been computed." << std::endl;
+
+    #ifdef VERBOSITY
+      ch.stop();
+      std::cout << "Done!   " << ch << std::endl;
+      ch.reset();
+    #endif
   }
+
+  #ifdef VERBOSITY
+    std::cout << "Computing diameters of elements...";
+    ch.start();
+  #endif
+
   computeDiameters();
-  std::cout << "Informations about polyhedra have been computed." << std::endl;
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 void Mesh::printAll(std::ostream& out) const
@@ -161,6 +194,12 @@ void Mesh::print(SizeType lineNo, std::ostream& out) const
 
 void Mesh::exportMeshVTK(const std::string& fileName, unsigned precision) const
 {
+  #ifdef VERBOSITY
+    std::cout << "Exporting the mesh................";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   std::ofstream fout{fileName};
 
   // Create a vector with random integers in order to distinguish elements.
@@ -227,6 +266,11 @@ void Mesh::exportMeshVTK(const std::string& fileName, unsigned precision) const
   fout << "</VTKFile>" << std::endl;
 
   fout.close();
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 MeshFormatError::MeshFormatError(const std::string& what_arg)

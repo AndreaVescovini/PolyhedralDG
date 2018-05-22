@@ -7,6 +7,7 @@
 #include "QuadRuleManager.hpp"
 
 #include <algorithm>
+#include <utility>
 
 namespace PolyDG
 {

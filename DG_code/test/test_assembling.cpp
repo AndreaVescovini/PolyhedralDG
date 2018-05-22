@@ -4,11 +4,14 @@
 #include "MeshReaderPoly.hpp"
 #include "Operators.hpp"
 #include "Problem.hpp"
+#include "Utilities.hpp"
 
 #include <cmath>
 
 int main()
 {
+  using Utilities::pow;
+
   // Mesh reading
   std::string fileName = "../meshes/cube_str48h.mesh";
 
@@ -31,9 +34,7 @@ int main()
   PolyDG::Normal          n;
 
   PolyDG::Function f([](Eigen::Vector3d x) {
-    return -std::exp(x(0) * x(1) * x(2)) * (x(0) * x(0) * x(1) * x(1) +
-                                            x(1) * x(1) * x(2) * x(2) +
-                                            x(0) * x(0) * x(2) * x(2)); });
+    return -std::exp(x(0) * x(1) * x(2)) * (pow(x(0) * x(1), 2) + pow(x(1) * x(2), 2) + pow(x(0) * x(2), 2)); });
   PolyDG::Function gd([](Eigen::Vector3d x) { return std::exp(x(0) * x(1) * x(2)); });
 
   // Problem instantation and integration

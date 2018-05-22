@@ -10,6 +10,7 @@
 #include "ExprWrapper.hpp"
 #include "FeSpace.hpp"
 #include "PolyDG.hpp"
+#include "Watch.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
@@ -358,6 +359,12 @@ private:
 template <typename T>
 void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
 {
+  #ifdef VERBOSITY
+    std::cout << "Integrating the bilinear form over volumes..............";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   // I exploit the conversion to derived
   const T& exprDerived(expr);
 
@@ -385,12 +392,27 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
         triplets_.back().emplace_back(i + indexOffset, j + indexOffset, sum);
       }
   }
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 template <typename T>
 void Problem::integrateFacesExt(const ExprWrapper<T>& expr, const std::vector<BCLabelType>& bcLabels,
                                 bool sym)
 {
+  #ifdef VERBOSITY
+    std::cout << "Integrating the bilinear form over external faces (";
+    for(SizeType i = 0; i < bcLabels.size() - 1; i++)
+      std::cout << bcLabels[i] << ", ";
+
+    std::cout << bcLabels.back() << ")...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   const T& exprDerived(expr);
 
   triplets_.emplace_back();
@@ -424,11 +446,22 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, const std::vector<BC
   // I made and overestimate so now I shrink the vector in order to optimize
   // the memory consnmption.
   triplets_.back().shrink_to_fit();
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 template <typename T>
 void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
 {
+  #ifdef VERBOSITY
+    std::cout << "Integrating the bilinear form over internal faces.......";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   const T& exprDerived(expr);
 
   triplets_.emplace_back();
@@ -460,11 +493,22 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
             triplets_.back().emplace_back(i + indexOffset[si], j + indexOffset[sj], sum);
           }
   }
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 template <typename T>
 void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
 {
+  #ifdef VERBOSITY
+    std::cout << "Integrating the rhs over volumes........................";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   const T& exprDerived(expr);
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
@@ -479,11 +523,25 @@ void Problem::integrateVolRhs(const ExprWrapper<T>& expr)
                                  it->getAbsDetJac(t);
   }
 
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 template <typename T>
 void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, const std::vector<BCLabelType>& bcLabels)
 {
+  #ifdef VERBOSITY
+    std::cout << "Integrating the rhs over external faces (";
+    for(SizeType i = 0; i < bcLabels.size() - 1; i++)
+      std::cout << bcLabels[i] << ", ";
+
+    std::cout << bcLabels.back() << ").............";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   const T& exprDerived(expr);
 
   for(auto it = Vh_.feFacesExtCbegin(); it != Vh_.feFacesExtCend(); it++)
@@ -498,6 +556,11 @@ void Problem::integrateFacesExtRhs(const ExprWrapper<T>& expr, const std::vector
                                  it->getAreaDoubled();
         }
     }
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 inline const Eigen::SparseMatrix<Real>& Problem::getMatrix() const

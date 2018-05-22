@@ -6,6 +6,7 @@
 
 #include "FeSpace.hpp"
 #include "QuadRuleManager.hpp"
+#include "Watch.hpp"
 
 namespace PolyDG
 {
@@ -50,17 +51,42 @@ void FeSpace::integerComposition()
 
 void FeSpace::initialize()
 {
+  #ifdef VERBOSITY
+    std::cout << "Inizializing FeElements...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   feElements_.reserve(Th_.getPolyhedraNo());
   for(SizeType i = 0; i < Th_.getPolyhedraNo(); i++)
     feElements_.emplace_back(Th_.getPolyhedron(i), dof_, basisComposition_, tetraRule_);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << "\nInizializing FeFacesExt...";
+    ch.reset();
+    ch.start();
+  #endif
 
   feFacesExt_.reserve(Th_.getFacesExtNo());
   for(SizeType i = 0; i < Th_.getFacesExtNo(); i++)
     feFacesExt_.emplace_back(Th_.getFaceExt(i), degree_, dof_, basisComposition_, triaRule_);
 
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << "\nInizializing FeFacesInt...";
+    ch.reset();
+    ch.start();
+  #endif
+
   feFacesInt_.reserve(Th_.getFacesIntNo());
   for(SizeType i = 0; i < Th_.getFacesIntNo(); i++)
     feFacesInt_.emplace_back(Th_.getFaceInt(i), degree_, dof_, basisComposition_, triaRule_);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 void FeSpace::printInfo(std::ostream& out) const

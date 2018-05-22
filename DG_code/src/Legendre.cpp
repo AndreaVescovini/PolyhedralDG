@@ -5,6 +5,7 @@
 */
 
 #include "Legendre.hpp"
+#include "Utilities.hpp"
 
 #include <stdexcept>
 
@@ -13,6 +14,8 @@ namespace PolyDG
 
 Real legendre(unsigned n, Real x)
 {
+  using Utilities::pow;
+
   switch(n)
   {
     case 0:
@@ -49,6 +52,8 @@ Real legendre(unsigned n, Real x)
 
 Real legendreDer(unsigned n, Real x)
 {
+  using Utilities::pow;
+
   switch(n)
   {
     case 0:

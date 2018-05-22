@@ -1,9 +1,10 @@
-#include "Mesh.hpp"
-#include "FeSpace.hpp"
-#include "MeshReaderPoly.hpp"
-#include "Problem.hpp"
-#include "Operators.hpp"
 #include "ExprOperators.hpp"
+#include "FeSpace.hpp"
+#include "Mesh.hpp"
+#include "MeshReaderPoly.hpp"
+#include "Operators.hpp"
+#include "Problem.hpp"
+#include "Utilities.hpp"
 #include "Watch.hpp"
 
 #include <cmath>
@@ -11,11 +12,13 @@
 
 int main()
 {
+  using Utilities::pow;
+
   // Exact solution and source term
   auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0) * x(1) * x(2)); };
-  auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0) * x(0) * x(1) * x(1) +
-                                                                     x(1) * x(1) * x(2) * x(2) +
-                                                                     x(0) * x(0) * x(2) * x(2));};
+  auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (pow(x(0) * x(1), 2) +
+                                                                     pow(x(1) * x(2), 2) +
+                                                                     pow(x(0) * x(2), 2));};
   auto uexGrad = [&uex](const Eigen::Vector3d& x) -> Eigen::Vector3d { return uex(x)*Eigen::Vector3d(x(1) * x(2),
                                                                                                      x(0) * x(2),
                                                                                                      x(0) * x(1)); };
@@ -55,7 +58,7 @@ int main()
 
   poisson.finalizeMatrix();
 
-  Timings::Watch ch;
+  Utilities::Watch ch;
 
   // LU
   std::cout << "\nSolving with SparseLU..." << std::endl;

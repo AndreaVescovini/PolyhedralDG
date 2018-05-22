@@ -55,10 +55,10 @@ WFLAGS  += -Wall
 STDFLAG += -std=c++11
 
 ifdef RELEASE
-OPTFLAGS += -O3 -DNDEBUG #-pg #-DINLINE
+ OPTFLAGS += -O3 -DNDEBUG #pg
 else
-OPTFLAGS += -g #-DVERBOSITY
-WFLAGS   += -Wextra -pedantic
+ OPTFLAGS += -g -DVERBOSITY
+ WFLAGS   += -Wextra -pedantic
 endif
 
 CXXFLAGS += $(WFLAGS) $(STDFLAG) $(OPTFLAGS)

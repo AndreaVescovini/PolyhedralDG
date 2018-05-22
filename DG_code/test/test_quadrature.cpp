@@ -1,5 +1,6 @@
 #include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
+#include "Utilities.hpp"
 
 #include <Eigen/Core>
 
@@ -9,12 +10,13 @@
 #include <iostream>
 #include <vector>
 
-using PolyDG::QuadRuleManager;
-using PolyDG::Real;
-using PolyDG::SizeType;
-
 int main()
 {
+  using PolyDG::QuadRuleManager;
+  using PolyDG::Real;
+  using PolyDG::SizeType;
+  using Utilities::pow;
+
   const Real tol = 1e-14;
 
   const auto& qm = QuadRuleManager::instance();
@@ -33,10 +35,10 @@ int main()
   funTetra.emplace_back([](const Eigen::Vector3d& x) { return 120.0 * x(0) * x(1); });
   funTetra.emplace_back([](const Eigen::Vector3d& x) { return 720.0 * x(0) * x(1) * x(2); });
   funTetra.emplace_back([](const Eigen::Vector3d& x) { return 2520.0 * x(0) * x(0) * x(1) * x(2); });
-  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 6720.0 * x(0) * x(0) * x(0) * x(1) * x(2); });
-  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 30240.0 * x(0) * x(0) * x(0) * x(1) * x(1) * x(2); });
-  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 151200.0 * x(0) * x(0) * x(0) * x(1) * x(1) * x(2) * x(2); });
-  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 554400.0 * x(0) * x(0) * x(0) * x(1) * x(1) * x(1) * x(2) * x(2); });
+  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 6720.0 * pow(x(0), 3) * x(1) * x(2); });
+  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 30240.0 * pow(x(0), 3) * x(1) * x(1) * x(2); });
+  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 151200.0 * pow(x(0) * x(1) * x(2), 2) * x(0); });
+  funTetra.emplace_back([](const Eigen::Vector3d& x) { return 554400.0 * pow(x(0) * x(1), 3) * x(2) * x(2); });
 
   std::cout << std::setprecision(-std::log10(tol)) << std::fixed;
 
@@ -55,13 +57,13 @@ int main()
   funTria.emplace_back([](const Eigen::Vector2d& x) { return 6.0 * x(0); });
   funTria.emplace_back([](const Eigen::Vector2d& x) { return 24.0 * x(0) * x(1); });
   funTria.emplace_back([](const Eigen::Vector2d& x) { return 60.0 * x(0) * x(0) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 180.0 * x(0) * x(0) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 420.0 * x(0) * x(0) * x(0) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 840.0 * x(0) * x(0) * x(0) * x(0) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 2520.0 * x(0) * x(0) * x(0) * x(0) * x(1) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 6300.0 * x(0) * x(0) * x(0) * x(0) * x(1) * x(1) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 13860.0 * x(0) * x(0) * x(0) * x(0) * x(0) * x(1) * x(1) * x(1) * x(1); });
-  funTria.emplace_back([](const Eigen::Vector2d& x) { return 33264.0 * x(0) * x(0) * x(0) * x(0) * x(0) * x(1) * x(1) * x(1) * x(1) * x(1); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 180.0 * pow(x(0) * x(1), 2); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 420.0 * pow(x(0) * x(1), 2) * x(0); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 840.0 * pow(x(0), 4) * x(1) * x(1); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 2520.0 * pow(x(0) * x(1), 3) * x(0); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 6300.0 * pow(x(0) * x(1), 4); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 13860.0 * pow(x(0) * x(1), 4) * x(0); });
+  funTria.emplace_back([](const Eigen::Vector2d& x) { return 33264.0 * pow(x(0) * x(1), 5); });
 
   std::cout << "\nTesting exactness of rules over triangles..." << '\n';
   for(auto it = qm.triaCbegin(); it != qm.triaCend(); it++)

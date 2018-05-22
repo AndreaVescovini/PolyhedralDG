@@ -4,6 +4,7 @@
 #include "MeshReaderPoly.hpp"
 #include "Operators.hpp"
 #include "Problem.hpp"
+#include "Utilities.hpp"
 #include "Watch.hpp"
 
 #include <Eigen/Core>
@@ -11,13 +12,13 @@
 #include <cfenv>
 #include <cmath>
 
-using namespace PolyDG;
-
 int main()
 {
+  using namespace PolyDG;
+  using Utilities::pow;
 
   // feenableexcept(FE_INVALID|FE_UNDERFLOW|FE_OVERFLOW|FE_DIVBYZERO);
-  Timings::Watch ch;
+  Utilities::Watch ch;
   ch.start();
 
   std::vector<std::string> fileNames;
@@ -27,13 +28,11 @@ int main()
   fileNames.push_back("../meshes/cube_str1296h.mesh");
   // fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str1296h.mesh");
 
-  auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0)*x(1)*x(2)); };
-  auto source = [&uex](const Eigen::Vector3d& x) { return -uex(x) * (x(0)*x(0)*x(1)*x(1) +
-                                                                     x(1)*x(1)*x(2)*x(2) +
-                                                                     x(0)*x(0)*x(2)*x(2) );};
-  auto uexGrad = [&uex](const Eigen::Vector3d& x) -> Eigen::Vector3d { return uex(x)*Eigen::Vector3d(x(1)*x(2),
-                                                                                                     x(0)*x(2),
-                                                                                                     x(0)*x(1)); };
+  auto uex = [](const Eigen::Vector3d& x) { return std::exp(x(0) * x(1) * x(2)); };
+  auto source = [&uex](const Eigen::Vector3d& x) {
+    return -uex(x) * (pow(x(0) * x(1), 2) + pow(x(1) * x(2), 2) + pow(x(0) * x(2), 2));};
+  auto uexGrad = [&uex](const Eigen::Vector3d& x) -> Eigen::Vector3d {
+    return uex(x) * Eigen::Vector3d(x(1) * x(2),  x(0) * x(2), x(0) * x(1)); };
 
   // auto uex = [](Eigen::Vector3d x) -> double { return x(0); };
   // auto source = [](Eigen::Vector3d /*x*/) -> double { return 0.0;};

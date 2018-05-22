@@ -6,7 +6,7 @@
 
 #include "Watch.hpp"
 
-namespace Timings
+namespace Utilities
 {
 
 Watch::Watch()
@@ -41,14 +41,16 @@ double Watch::getTimeNow() const
 std::ostream& operator<<(std::ostream& out, const Watch& w)
 {
   double finalTime = w.getTime();
+  out << "Elapsed Time = ";
+
   if(finalTime < 1e3)
-    out << "Elapsed Time = " << finalTime << " microsec";
+    out << finalTime << " microsec";
   else if(finalTime < 1e6)
-    out << "Elapsed Time = " << finalTime * 1e-3 << " millisec";
+    out << finalTime * 1e-3 << " millisec";
   else if(finalTime < 1e9)
-    out << "Elapsed Time = " << finalTime * 1e-6 << " sec";
+    out << finalTime * 1e-6 << " sec";
 
   return out;
 }
 
-} // namespace Timings
+} // namespace Utilities

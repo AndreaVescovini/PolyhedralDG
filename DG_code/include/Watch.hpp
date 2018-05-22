@@ -10,7 +10,7 @@
 #include <chrono>
 #include <iostream>
 
-namespace Timings
+namespace Utilities
 {
 
 /*!
@@ -93,6 +93,6 @@ private:
   Nanosec measuredTime_;
 };
 
-} // namespace Timings
+} // namespace Utilities
 
 #endif // _WATCH_HPP_

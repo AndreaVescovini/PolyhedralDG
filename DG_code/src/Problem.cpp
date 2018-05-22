@@ -38,6 +38,12 @@ bool Problem::isSymmetric() const
 
 bool Problem::solveLU()
 {
+  #ifdef VERBOSITY
+    std::cout << "Solving the linear system...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   Eigen::SparseLU<Eigen::SparseMatrix<Real>> solver;
   A_.makeCompressed();
 
@@ -53,6 +59,12 @@ bool Problem::solveLU()
     throw std::runtime_error("Numerical issue in the matrix factorization.\n" + solver.lastErrorMessage());
 
   u_ = solver.solve(b_);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Numerical issue in the solver.\n" << solver.lastErrorMessage() << std::endl;
@@ -64,6 +76,12 @@ bool Problem::solveLU()
 
 bool Problem::solveCholesky()
 {
+  #ifdef VERBOSITY
+    std::cout << "Solving the linear system...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   if(this->isSymmetric() == false)
     throw std::domain_error("Error: solveChol() requires a symmetric matrix.");
 
@@ -75,6 +93,12 @@ bool Problem::solveCholesky()
     throw std::runtime_error("Error: Numerical issue in the matrix factorization.");
 
   u_ = solver.solve(b_);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Warning: Numerical issue in the solver." << std::endl;
@@ -85,6 +109,12 @@ bool Problem::solveCholesky()
 
 bool Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
+  #ifdef VERBOSITY
+    std::cout << "Solving the linear system...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   if(this->isSymmetric() == false)
     throw std::domain_error("Error: solveCG() requires a symmetric matrix.");
 
@@ -97,6 +127,11 @@ bool Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 
   u_ = solver.solveWithGuess(b_, x0);
 
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Warning: Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
@@ -106,13 +141,19 @@ bool Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
   {
     // if(verbosity)
     std::cout << "Conjugate gradient converged with " << solver.iterations() << " iterations.\n";
-    std::cout << "Estimated error = "<< solver.error() << std::endl;
+    std::cout << "Estimated error = " << solver.error() << std::endl;
     return true;
   }
 }
 
 bool Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
 {
+  #ifdef VERBOSITY
+    std::cout << "Solving the linear system...";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   Eigen::BiCGSTAB<Eigen::SparseMatrix<Real>> solver;
   solver.setMaxIterations(iterMax);
   solver.setTolerance(tol);
@@ -131,6 +172,11 @@ bool Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
 
   u_ = solver.solveWithGuess(b_, x0);
 
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Warning: BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
@@ -147,6 +193,12 @@ bool Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
 
 Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>& uex) const
 {
+  #ifdef VERBOSITY
+    std::cout << "Computing the L2-error......";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   Real errSquared = 0.0;
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
@@ -167,11 +219,24 @@ Real Problem::computeErrorL2(const std::function<Real (const Eigen::Vector3d&)>&
       }
   }
 
-  return std::sqrt(errSquared);
+  Real err = std::sqrt(errSquared);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
+  return err;
 }
 
 Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::Vector3d&)>& uexGrad) const
 {
+  #ifdef VERBOSITY
+    std::cout << "Computing the H10-error.....";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   Real errSquared = 0.0;
 
   for(auto it = Vh_.feElementsCbegin(); it != Vh_.feElementsCend(); it++)
@@ -192,7 +257,14 @@ Real Problem::computeErrorH10(const std::function<Eigen::Vector3d (const Eigen::
       }
   }
 
-  return std::sqrt(errSquared);
+  Real err = std::sqrt(errSquared);
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
+
+  return err;
 }
 
 void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision) const
@@ -202,6 +274,12 @@ void Problem::exportSolutionVTK(const std::string& fileName, unsigned precision)
 
 void Problem::exportSolutionVTK(const Eigen::VectorXd& u, const std::string& fileName, unsigned precision) const
 {
+  #ifdef VERBOSITY
+    std::cout << "Exporting the solution......";
+    Utilities::Watch ch;
+    ch.start();
+  #endif
+
   std::ofstream fout{fileName};
 
   // Create a vector with random integers in order to distinguish elements.
@@ -283,6 +361,11 @@ void Problem::exportSolutionVTK(const Eigen::VectorXd& u, const std::string& fil
   fout << "</VTKFile>" << std::endl;
 
   fout.close();
+
+  #ifdef VERBOSITY
+    ch.stop();
+    std::cout << "Done!   " << ch << std::endl;
+  #endif
 }
 
 
