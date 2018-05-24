@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <exception>
+#include <vector>
 
 int main()
 {
@@ -46,15 +47,17 @@ int main()
   PolyDG::Normal          n;
   PolyDG::Function        f(source), gd(uex);
 
+  std::vector<PolyDG::BCLabelType> dirichlet = {1, 2, 3, 4, 5, 6};
+
   // Problem instantation and integration
   std::cout << "-------------------- Symmetric Problem --------------------" << std::endl;
   PolyDG::Problem poisson(Vh);
 
   poisson.integrateVol(dot(uGrad, vGrad), true);
-  poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1}, true);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet, true);
   poisson.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), true);
   poisson.integrateVolRhs(f * v);
-  poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, {1});
+  poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
   poisson.finalizeMatrix();
 
@@ -65,7 +68,7 @@ int main()
   ch.start();
   poisson.solveLU();
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
@@ -76,7 +79,7 @@ int main()
   ch.start();
   poisson.solveCholesky();
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
@@ -87,7 +90,7 @@ int main()
   ch.start();
   poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
@@ -98,7 +101,7 @@ int main()
   ch.start();
   poisson.solveBiCGSTAB(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
@@ -111,11 +114,11 @@ int main()
   PolyDG::Mass  mass;
 
   poisson.integrateVol(stiff + mass, true);
-  poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1},  false);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet,  false);
   poisson.integrateFacesInt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), false);
 
   poisson.integrateVolRhs(f * v);
-  poisson.integrateFacesExtRhs(gd * dot(n, vGrad) + gamma * gd * v, {1});
+  poisson.integrateFacesExtRhs(gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
   poisson.finalizeMatrix();
 
@@ -124,7 +127,7 @@ int main()
   ch.start();
   poisson.solveLU();
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 
@@ -137,7 +140,7 @@ int main()
   {
     poisson.solveCholesky();
     ch.stop();
-    std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+    std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
     std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
     std::cout << ch << std::endl;
 
@@ -155,7 +158,7 @@ int main()
   {
     poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
     ch.stop();
-    std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+    std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
     std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
     std::cout << ch << std::endl;
   } catch(const std::exception& e)
@@ -170,7 +173,7 @@ int main()
   ch.start();
   poisson.solveBiCGSTAB(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 1e-10);
   ch.stop();
-  std::cout << "L2 error  = " << poisson.computeErrorL2(uex) << std::endl;
+  std::cout << "L2  error = " << poisson.computeErrorL2(uex) << std::endl;
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
   std::cout << ch << std::endl;
 

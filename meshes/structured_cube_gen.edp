@@ -1,28 +1,34 @@
 // Creates a structured tetrahedral mesh in the cube [0,1]x[0,1]x[0,1]
+// Label are:
+// 1: x = 0
+// 2: x = 1
+// 3: y = 0
+// 4: y = 1
+// 5: z = 0
+// 6: z = 1
 //
 // Author: Andrea Vescovini
 
 load "msh3"
 load "medit"
+include "cube.idp"
 
-int[int, int] lab = [[1,1],[1,1],[1,1]];
+mesh3 Th1 = Cube(1,1,1);
+// medit("Th1", Th1);
+savemesh(Th1, "cube_str6tnew.mesh");
 
-mesh3 Th1 = cube(1,1,1, label=lab);
-medit("Th1", Th1);
-savemesh(Th1, "cube_str6.mesh");
-
-mesh3 Th2 = cube(2,2,2, label=lab);
+mesh3 Th2 = Cube(2,2,2);
 // medit("Th2", Th2);
-savemesh(Th2, "cube_str48t2.mesh");
+savemesh(Th2, "cube_str48tnew.mesh");
 
-mesh3 Th4 = cube(4,4,4, label=lab);
+mesh3 Th4 = Cube(4,4,4);
 // medit("Th4", Th4);
-savemesh(Th4, "cube_str384t2.mesh");
+savemesh(Th4, "cube_str384tnew.mesh");
 
-mesh3 Th6 = cube(6,6,6, label=lab);
+mesh3 Th6 = cube(6,6,6);
 // medit("Th6", Th6);
-savemesh(Th6, "cube_str1296t2.mesh");
+savemesh(Th6, "cube_str1296tnew.mesh");
 
-mesh3 Th8 = cube(8,8,8, label=lab);
+mesh3 Th8 = Cube(8,8,8);
 // medit("Th8", Th8);
-savemesh(Th8, "cube_str3072t2.mesh");
+savemesh(Th8, "cube_str3072tnew.mesh");

@@ -11,6 +11,7 @@
 
 #include <cfenv>
 #include <cmath>
+#include <vector>
 
 int main()
 {
@@ -56,23 +57,23 @@ int main()
   Function f(source);
   Function gd(uex);
 
-  unsigned r = 2;
+  std::vector<PolyDG::BCLabelType> dirichlet = {1, 2, 3, 4, 5, 6};
 
   std::vector<double> errL2, errH10, hh;
 
   for(SizeType i = 0; i < fileNames.size(); i++)
   {
     PolyDG::Mesh Th(fileNames[i], reader);
-    FeSpace Vh(Th, r);
+    FeSpace Vh(Th, 2);
 
     Problem prob(Vh);
 
     bool symform = true;
     prob.integrateVol(dot(uGrad, vGrad), symform);
     prob.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), symform);
-    prob.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1}, symform);
+    prob.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet, symform);
     prob.integrateVolRhs(f * v);
-    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, {1});
+    prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
     // ch.start();
     prob.finalizeMatrix();

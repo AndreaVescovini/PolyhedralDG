@@ -135,7 +135,10 @@ bool MeshReaderPoly::goToSection(std::ifstream& meshFile, unsigned secNo) const
 
   if(curLine == "End")
   {
-    std::cout << sections_[3] << " not found." << std::endl;
+    #ifdef VERBOSITY
+      std::cout << sections_[3] << " not found in the mesh." << std::endl;
+    #endif
+
     return false;
   }
 

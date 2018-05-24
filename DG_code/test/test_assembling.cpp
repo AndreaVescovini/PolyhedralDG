@@ -7,6 +7,7 @@
 #include "Utilities.hpp"
 
 #include <cmath>
+#include <vector>
 
 int main()
 {
@@ -40,12 +41,14 @@ int main()
   // Problem instantation and integration
   PolyDG::Problem poisson(Vh);
 
+  std::vector<PolyDG::BCLabelType> dirichlet = {1, 2, 3, 4, 5, 6};
+
   poisson.integrateVol(dot(uGrad, vGrad), true);
-  poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1},  true);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet,  true);
   poisson.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), true);
 
   poisson.integrateVolRhs(f * v);
-  poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, {1});
+  poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
   poisson.finalizeMatrix();
 
@@ -62,11 +65,11 @@ int main()
   PolyDG::PhiJ  u;
 
   poisson.integrateVol(stiff + u*v, true);
-  poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), {1},  false);
+  poisson.integrateFacesExt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet,  false);
   poisson.integrateFacesInt(-dot(uGradAver, vJump) + dot(uJump, vGradAver) + gamma * dot(uJump, vJump), false);
 
   poisson.integrateVolRhs(f * v);
-  poisson.integrateFacesExtRhs(gd * dot(n, vGrad) + gamma * gd * v, {1});
+  poisson.integrateFacesExtRhs(gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
   poisson.finalizeMatrix();
 
