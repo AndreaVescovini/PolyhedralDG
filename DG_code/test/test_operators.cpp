@@ -1,3 +1,15 @@
+// Test for the assembling of the matrix of the linear system.
+//
+// 1)  -laplacian(u) + u = f1   in omega
+//                     u = gd   in delta_omega
+//
+// 2)  -laplacian(u) + div(b*u) + u = f2  in omega
+//                                u = gd  in delta_omega
+//
+// 3)  -laplacian(u) = f3  in omega
+//                 u = gd  in gamma_dirichlet
+//       grad(u) . n = h   in gamma_neaumann
+
 #include "ExprOperators.hpp"
 #include "FeSpace.hpp"
 #include "Mesh.hpp"

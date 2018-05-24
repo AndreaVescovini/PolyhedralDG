@@ -1,15 +1,17 @@
+// I test the initialization of the basis of the FeSpace.
+
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 
 #include <string>
 
-using PolyDG::FeSpace;
-using PolyDG::Mesh;
-using PolyDG::MeshReaderPoly;
-
 int main()
 {
+  using PolyDG::FeSpace;
+  using PolyDG::Mesh;
+  using PolyDG::MeshReaderPoly;
+
   // Mesh Reading
   std::string fileName = "../meshes/cube_str48h.mesh";
 

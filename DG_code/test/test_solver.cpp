@@ -1,8 +1,17 @@
+// Test for the solvers of the linear system.
+//
+// 1)  -laplacian(u) = f   in omega
+//                 u = gd   in delta_omega
+//
+// 2)  -laplacian(u) + u = f   in omega
+//                     u = gd  in delta_omega
+
 #include "ExprOperators.hpp"
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 #include "Operators.hpp"
+#include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
 #include "Watch.hpp"

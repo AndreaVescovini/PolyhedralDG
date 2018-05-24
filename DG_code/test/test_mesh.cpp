@@ -1,3 +1,5 @@
+// Test for the reading of the mesh
+
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 #include "Watch.hpp"
@@ -9,7 +11,7 @@ int main()
 {
   using PolyDG::Mesh;
   using PolyDG::MeshReaderPoly;
-  
+
   Utilities::Watch ch;
   ch.start();
 

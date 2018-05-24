@@ -1,3 +1,5 @@
+// Test for the exactness of the quadrature rules integrating polynomials
+
 #include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
 #include "Utilities.hpp"

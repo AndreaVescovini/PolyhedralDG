@@ -1,8 +1,16 @@
+// I test the exactness of the method applied to problems with polynomial solutions,
+// I expect the error to be 0 if the order of the FeSpace is greater of equal to
+// that of the solution and the integration is exact.
+//
+// -laplacian(u) = f    in omega
+//             u = gd   in delta_omega
+
 #include "ExprOperators.hpp"
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
 #include "Operators.hpp"
+#include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
 
@@ -38,7 +46,7 @@ int main()
   source.emplace_back([](const Eigen::Vector3d& /* x */) { return 0.0; });
   source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(1) * x(2); });
   source.emplace_back([](const Eigen::Vector3d& x) { return -6.0 * x(0) * x(1) * x(2); });
-  source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(0) * x(2) * (3.0 * x(1) * x(1) + x(0) * x(0)); });
+  source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(0) * x(2) * (3.0 * pow(x(1) * x(1), 2)); });
 
   uexGrad.emplace_back([](const Eigen::Vector3d& /* x */) { return Eigen::Vector3d(1.0,0.0, 0.0); });
   uexGrad.emplace_back([](const Eigen::Vector3d& x) { return Eigen::Vector3d(x(1), x(0), 0.0); });
@@ -92,7 +100,7 @@ int main()
 
     poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim());
 
-    std::cout << "Error L2 =  " << poisson.computeErrorL2(uex[r - 1]) << std::endl;
+    std::cout << "Error L2  = " << poisson.computeErrorL2(uex[r - 1]) << std::endl;
     std::cout << "Error H10 = " << poisson.computeErrorH10(uexGrad[r - 1]) << '\n' << std::endl;
   }
 
