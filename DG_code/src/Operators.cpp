@@ -12,7 +12,10 @@ namespace PolyDG
 PenaltyScaling::PenaltyScaling(Real sigma)
   : sigma_{sigma} {}
 
-Function::Function(const fun3real& fun)
+Function::Function(const funR3R1& fun)
+  : fun_{fun} {}
+
+Function3::Function3(const funR3R3& fun)
   : fun_{fun} {}
 
 } // namespace PolyDG

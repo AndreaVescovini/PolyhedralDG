@@ -32,6 +32,8 @@ namespace PolyDG
 class Stiff : public ExprWrapper<Stiff>
 {
 public:
+  using ReturnType = Real;
+
   //! Constructor
   Stiff() = default;
 
@@ -53,7 +55,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  inline ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   //! Destructor
   virtual ~Stiff() = default;
@@ -72,6 +74,8 @@ public:
 class Mass : public ExprWrapper<Mass>
 {
 public:
+  using ReturnType = Real;
+
   //! Constructor
   Mass() = default;
 
@@ -93,7 +97,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  inline ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   //! Destructor
   virtual ~Mass() = default;
@@ -109,6 +113,8 @@ public:
 class GradPhiI : public ExprWrapper<GradPhiI>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   GradPhiI() = default;
 
@@ -128,7 +134,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  inline const ReturnType& operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the gradient of phi_i inside a FeElement
@@ -142,7 +148,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeElement& fe, unsigned i, unsigned /* j */, SizeType t, SizeType p) const;
+  inline const ReturnType& operator()(const FeElement& fe, unsigned i, unsigned /* j */, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the gradient of phi_i inside a FeFaceExt
@@ -152,7 +158,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  inline const ReturnType& operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   //! Destructor
   virtual ~GradPhiI() = default;
@@ -169,6 +175,8 @@ public:
 class GradPhiJ : public ExprWrapper<GradPhiJ>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   GradPhiJ() = default;
 
@@ -191,7 +199,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeElement& fe, unsigned /* i */, unsigned j, SizeType t, SizeType p) const;
+  inline const ReturnType& operator()(const FeElement& fe, unsigned /* i */, unsigned j, SizeType t, SizeType p) const;
 
   //! Destructor
   virtual ~GradPhiJ() = default;
@@ -207,6 +215,8 @@ public:
 class PhiI : public ExprWrapper<PhiI>
 {
 public:
+  using ReturnType = Real;
+
   //! Constructor
   PhiI() = default;
 
@@ -226,7 +236,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  inline ReturnType operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates phi_i inside a FeElement
@@ -240,7 +250,19 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeElement& fe, unsigned i, unsigned /* j */, SizeType t, SizeType p) const;
+  inline ReturnType operator()(const FeElement& fe, unsigned i, unsigned /* j */, SizeType t, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates jump_phi_i inside a FeFaceExt
+
+      The third argument is not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param i  Index related to the test function, it can be 0,...,fe.getDof() -1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates phi_i inside a FeFaceExt
@@ -250,7 +272,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  inline ReturnType operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   //! Destructor
   virtual ~PhiI() = default;
@@ -266,6 +288,8 @@ public:
 class PhiJ : public ExprWrapper<PhiJ>
 {
 public:
+  using ReturnType = Real;
+
   //! Constructor
   PhiJ() = default;
 
@@ -288,7 +312,20 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Real operator()(const FeElement& fe, unsigned /* i */, unsigned j, SizeType t, SizeType p) const;
+  inline ReturnType operator()(const FeElement& fe, unsigned /* i */, unsigned j, SizeType t, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates _phi_j inside a FeFaceExt
+
+      The second argument is not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param j  Index related to the basis function related to the solution,
+                it can be 0,...,fe.getDof() -1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline ReturnType operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~PhiJ() = default;
@@ -306,6 +343,8 @@ public:
 class JumpPhiI : public ExprWrapper<JumpPhiI>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   JumpPhiI() = default;
 
@@ -326,7 +365,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, SizeType p) const;
+  inline ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates jump_phi_i inside a FeFaceExt
@@ -338,7 +377,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const;
+  inline ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const;
 
   //! Destructor
   virtual ~JumpPhiI() = default;
@@ -356,6 +395,8 @@ public:
 class JumpPhiJ : public ExprWrapper<JumpPhiJ>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   JumpPhiJ() = default;
 
@@ -378,7 +419,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const;
+  inline ReturnType operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates jump_phi_j inside a FeFaceExt
@@ -391,14 +432,14 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
+  inline ReturnType operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~JumpPhiJ() = default;
 };
 
 /*!
-    @brief Expression for the average of the gradient test function across a face
+    @brief Expression for the average of the gradient of a test function across a face
 
     This class is an expression and inherits from ExprWrapper<AverGradPhiI>. It
     rapresents the average of the gradient of a test function across a face, i.e.
@@ -410,6 +451,8 @@ public:
 class AverGradPhiI : public ExprWrapper<AverGradPhiI>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   AverGradPhiI() = default;
 
@@ -430,7 +473,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, SizeType p) const;
+  inline ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates aver_grad_phi_i inside a FeFaceExt
@@ -442,25 +485,27 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const;
+  inline const ReturnType& operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const;
 
   //! Destructor
   virtual ~AverGradPhiI() = default;
 };
 
 /*!
-    @brief Expression for the average of a basis function related to the solution across a face
+    @brief Expression for the average of the gradient of a basis function related to the solution across a face
 
     This class is an expression and inherits from ExprWrapper<AverGradPhiJ>. It
-    rapresents the average of a basis function related to the solution across a face,
-    i.e. \f$ \{\!\!\{ \nabla \varphi_j \}\!\!\} = 0.5(\nabla \varphi_j^+ + \nabla \varphi_j^-) \f$ over
-    internal faces and \f$ \{\!\!\{ \nabla \varphi_j \}\!\!\} = \nabla \varphi_j \f$
+    rapresents the average of the gradient of a basis function related to the
+    solution across a face, i.e. \f$ \{\!\!\{ \nabla \varphi_j \}\!\!\} = 0.5(\nabla \varphi_j^+ + \nabla \varphi_j^-) \f$
+    over internal faces and \f$ \{\!\!\{ \nabla \varphi_j \}\!\!\} = \nabla \varphi_j \f$
     over external faces.
 */
 
 class AverGradPhiJ : public ExprWrapper<AverGradPhiJ>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   AverGradPhiJ() = default;
 
@@ -483,7 +528,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const;
+  inline ReturnType operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates aver_grad_phi_j inside a FeFaceExt
@@ -496,10 +541,65 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  inline const Eigen::Vector3d& operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
+  inline const ReturnType& operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~AverGradPhiJ() = default;
+};
+
+/*!
+    @brief Expression for the average of a basis function related to the solution across a face
+
+    This class is an expression and inherits from ExprWrapper<AverPhiJ>. It
+    rapresents the average of a basis function related to the solution across a face,
+    i.e. \f$ \{ \varphi_j \} = 0.5( \varphi_j^+ \varphi_j^-) \f$ over internal
+    faces and \f$ \{ \varphi_j \} = \varphi_j \f$ over external faces.
+*/
+
+class AverPhiJ : public ExprWrapper<AverPhiJ>
+{
+public:
+  using ReturnType = Real;
+
+  //! Constructor
+  AverPhiJ() = default;
+
+  //! Copy constructor
+  AverPhiJ(const AverPhiJ&) = default;
+
+  //! Move constructor
+  AverPhiJ(AverPhiJ&&) = default;
+
+  /*!
+      @brief Call operator that evaluates aver_phi_j inside a FeFaceInt
+
+      The second and fourth arguments are not used.
+
+      @param fe FeFaceInt over which the evaluation has to be done.
+      @param j  Index related to the basis function related to the solution,
+                it can be 0,...,fe.getDof() -1.
+      @param sj Side from which the evaluation of the basis function related to
+                the solution has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Real operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates aver_phi_j inside a FeFaceExt
+
+      The second argument is not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param j  Index related to the basis function related to the solution,
+                it can be 0,...,fe.getDof() -1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Real operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const;
+
+  //! Destructor
+  virtual ~AverPhiJ() = default;
 };
 
 /*!
@@ -516,6 +616,8 @@ public:
 class PenaltyScaling : public ExprWrapper<PenaltyScaling>
 {
 public:
+  using ReturnType = Real;
+
   /*!
       @brief Constructor
       @param sigma Constant \f$ \sigma \f$ that multiplies the penalty parameter.
@@ -573,6 +675,8 @@ private:
 class Normal : public ExprWrapper<Normal>
 {
 public:
+  using ReturnType = Eigen::Vector3d;
+
   //! Constructor
   Normal() = default;
 
@@ -614,11 +718,13 @@ public:
 class Function : public ExprWrapper<Function>
 {
 public:
+  using ReturnType = Real;
+
   //! Alias for a function taking a @c Eigen::Vector3d and returning a PolyDG::Real
-  using fun3real = std::function<Real (const Eigen::Vector3d&)>;
+  using funR3R1 = std::function<Real (const Eigen::Vector3d&)>;
 
   //! Constructor
-  explicit Function(const fun3real& fun);
+  explicit Function(const funR3R1& fun);
 
   //! Copy constructor
   Function(const Function&) = default;
@@ -690,7 +796,98 @@ public:
 
 private:
   //! The function
-  fun3real fun_;
+  funR3R1 fun_;
+};
+
+/*!
+    @brief Expression for a function from R^3 to R^3
+
+    This class is an expression and inherits from ExprWrapper<Function3>. It
+    rapresents a function \f$ f: \mathbb{R}^3 \rightarrow \mathbb{R}^3 \f$.
+*/
+
+class Function3 : public ExprWrapper<Function3>
+{
+public:
+  using ReturnType = Eigen::Vector3d;
+
+  //! Alias for a function taking a @c Eigen::Vector3d and returning a PolyDG::Real
+  using funR3R3 = std::function<Eigen::Vector3d (const Eigen::Vector3d&)>;
+
+  //! Constructor
+  explicit Function3(const funR3R3& fun);
+
+  //! Copy constructor
+  Function3(const Function3&) = default;
+
+  //! Move constructor
+  Function3(Function3&&) = default;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeElement
+
+      The second argument is not used.
+
+      @param fe FeElement over which the evaluation has to be done.
+      @param t  Index related to the tetrahedron over which the evaluation has
+                to be done, it can be 0,...,fe.getTetrahedraNo() - 1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeElement& fe, unsigned /* i */, SizeType t, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeElement
+
+      The second and third arguments are not used.
+
+      @param fe FeElement over which the evaluation has to be done.
+      @param t  Index related to the tetrahedron over which the evaluation has
+                to be done, it can be 0,...,fe.getTetrahedraNo() - 1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeElement& fe, unsigned /* i */, unsigned /* j */, SizeType t, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceInt
+
+      The second, third, fourth and fifth arguments are not used.
+
+      @param fe FeFaceInt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, SideType /* si */, SideType /* sj */, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceExt
+
+      The second argument is not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned /* i */, SizeType p) const;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceExt
+
+      The second and third arguments are not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, SizeType p) const;
+
+  //! Destructor
+  virtual ~Function3() = default;
+
+private:
+  //! The function
+  funR3R3 fun_;
 };
 
 //----------------------------------------------------------------------------//
@@ -742,9 +939,19 @@ inline Real PhiI::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
   return fe.getPhi(p, i);
 }
 
+inline Real PhiI::operator()(const FeFaceExt& fe, unsigned i, unsigned /* j */, SizeType p) const
+{
+  return fe.getPhi(p, i);
+}
+
 inline Real PhiJ::operator()(const FeElement& fe, unsigned /* i */, unsigned j, SizeType t, SizeType p) const
 {
   return fe.getPhi(t, p, j);
+}
+
+inline Real PhiJ::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const
+{
+  return fe.getPhi(p, j);
 }
 
 inline Eigen::Vector3d JumpPhiI::operator()(const FeFaceInt& fe, unsigned i, unsigned /* j */, SideType si, SideType /* sj */, SizeType p) const
@@ -785,6 +992,16 @@ inline Eigen::Vector3d AverGradPhiJ::operator()(const FeFaceInt& fe, unsigned /*
 inline const Eigen::Vector3d& AverGradPhiJ::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const
 {
   return fe.getPhiDer(p, j);
+}
+
+inline Real AverPhiJ::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned j, SideType /* si */, SideType sj, SizeType p) const
+{
+  return 0.5 * fe.getPhi(sj, p, j);
+}
+
+inline Real AverPhiJ::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const
+{
+  return fe.getPhi(p, j);
 }
 
 inline Real PenaltyScaling::operator()(const FeFaceExt& fe, unsigned /* i */, SizeType /* p */) const
@@ -833,6 +1050,31 @@ inline Real Function::operator()(const FeFaceExt& fe, unsigned /* i */, SizeType
 }
 
 inline Real Function::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, SizeType p) const
+{
+  return fun_(fe.getQuadPoint(p));
+}
+
+inline Eigen::Vector3d Function3::operator()(const FeElement& fe, unsigned /* i */, SizeType t, SizeType p) const
+{
+  return fun_(fe.getQuadPoint(t, p));
+}
+
+inline Eigen::Vector3d Function3::operator()(const FeElement& fe, unsigned /* i */, unsigned /* j */, SizeType t, SizeType p) const
+{
+  return fun_(fe.getQuadPoint(t, p));
+}
+
+inline Eigen::Vector3d Function3::operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, SideType /* si */, SideType /* sj */, SizeType p) const
+{
+  return fun_(fe.getQuadPoint(p));
+}
+
+inline Eigen::Vector3d Function3::operator()(const FeFaceExt& fe, unsigned /* i */, SizeType p) const
+{
+  return fun_(fe.getQuadPoint(p));
+}
+
+inline Eigen::Vector3d Function3::operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, SizeType p) const
 {
   return fun_(fe.getQuadPoint(p));
 }

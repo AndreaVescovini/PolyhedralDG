@@ -372,7 +372,7 @@ void Problem::exportSolutionVTK(const Eigen::VectorXd& u, const std::string& fil
 void Problem::printInfo(std::ostream& out) const
 {
   out << "-------------------- PROBLEM INFO --------------------" << '\n';
-  out << "Symmetric:  " << (this->isSymmetric() == true ? "Yes" : "No") << '\n';
+  out << "Symmetric: " << (this->isSymmetric() == true ? "Yes" : "No") << '\n';
   out << "Total degrees of freedom: " << dim_ <<'\n';
   if(A_.nonZeros() != 0)
     out << "Actual non-zeros in the matrix: " << A_.nonZeros() << '\n';

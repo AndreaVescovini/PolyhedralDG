@@ -13,6 +13,7 @@
 #include "PolyDG.hpp"
 
 #include <functional>
+#include <utility>
 
 namespace PolyDG
 {
@@ -32,6 +33,8 @@ template <typename LO, typename RO, typename OP>
 class BinaryOperator : public ExprWrapper<BinaryOperator<LO, RO, OP>>
 {
 public:
+  using ReturnType = decltype(OP()(std::declval<typename LO::ReturnType>(), std::declval<typename RO::ReturnType>()));
+
   //! Constructor
   BinaryOperator(const LO& lo, const RO& ro);
 
@@ -51,7 +54,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeElement
@@ -65,7 +68,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceInt
@@ -80,7 +83,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -90,7 +93,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -102,7 +105,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~BinaryOperator() = default;
@@ -127,6 +130,8 @@ template <typename RO, typename OP>
 class BinaryOperator<Real, RO, OP> : public ExprWrapper<BinaryOperator<Real, RO, OP>>
 {
 public:
+  using ReturnType = decltype(OP()(std::declval<Real>(), std::declval<typename RO::ReturnType>()));
+
   //! Constructor
   BinaryOperator(Real lo, const RO& ro);
 
@@ -146,7 +151,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeElement
@@ -160,7 +165,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceInt
@@ -175,7 +180,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -185,7 +190,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -197,17 +202,17 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~BinaryOperator() = default;
 
-  private:
-    //! Left operand
-    Real lo_;
+private:
+  //! Left operand
+  Real lo_;
 
-    //! Right operand
-    const RO& ro_;
+  //! Right operand
+  const RO& ro_;
 };
 
 /*!
@@ -222,6 +227,8 @@ template <typename LO, typename OP>
 class BinaryOperator<LO, Real, OP> : public ExprWrapper<BinaryOperator<LO, Real, OP>>
 {
 public:
+  using ReturnType = decltype(OP()(std::declval<typename LO::ReturnType>(), std::declval<Real>()));
+
   //! Constructor
   BinaryOperator(const LO& lo, Real ro);
 
@@ -241,7 +248,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeElement
@@ -255,7 +262,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceInt
@@ -270,7 +277,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -280,7 +287,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -292,7 +299,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~BinaryOperator() = default;
@@ -319,6 +326,8 @@ template <typename RO, typename OP>
 class UnaryOperator : public ExprWrapper<UnaryOperator<RO, OP>>
 {
 public:
+  using ReturnType = typename RO::ReturnType;
+
   //! Constructor
   explicit UnaryOperator(const RO& ro);
 
@@ -338,7 +347,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeElement
@@ -352,7 +361,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
+  ReturnType operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceInt
@@ -367,7 +376,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
+  ReturnType operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -377,7 +386,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, SizeType p) const;
 
   /*!
       @brief Call operator that evaluates the BinaryOperator inside a FeFaceExt
@@ -389,7 +398,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  Real operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
+  ReturnType operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const;
 
   //! Destructor
   virtual ~UnaryOperator() = default;
@@ -408,26 +417,103 @@ private:
 struct DotProduct
 {
   //! Call operator that evaluates the dot product between two @c Eigen::Vector3d
-  inline Real operator()(const Eigen::Vector3d& lo, const Eigen::Vector3d& ro) const;
+  template <typename D>
+  inline Real operator()(const Eigen::MatrixBase<D>& lo, const Eigen::MatrixBase<D>& ro) const;
 
   //! Call operator that evaluates the dot product between two PolyDG::Real
   inline Real operator()(Real lo, Real ro) const;
 };
 
+struct Add
+{
+  inline Real operator()(Real lo, Real ro) const
+  {
+    return lo + ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(const Eigen::MatrixBase<D>& lo, const Eigen::MatrixBase<D>& ro) const
+  {
+    return lo + ro;
+  }
+};
+
+struct Subtract
+{
+  inline Real operator()(Real lo, Real ro) const
+  {
+    return lo - ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(const Eigen::MatrixBase<D>& lo, const Eigen::MatrixBase<D>& ro) const
+  {
+    return lo - ro;
+  }
+};
+
+struct Multiply
+{
+  inline Real operator()(Real lo, Real ro) const
+  {
+    return lo * ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(const Eigen::MatrixBase<D>& lo, Real ro) const
+  {
+    return lo * ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(Real lo, const Eigen::MatrixBase<D>& ro) const
+  {
+    return lo * ro;
+  }
+};
+
+struct Divide
+{
+  inline Real operator()(Real lo, Real ro) const
+  {
+    return lo / ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(const Eigen::MatrixBase<D>& lo, Real ro) const
+  {
+    return lo / ro;
+  }
+};
+
+struct Negate
+{
+  inline Real operator()(Real ro) const
+  {
+    return -ro;
+  }
+
+  template <typename D>
+  inline Eigen::Vector3d operator()(const Eigen::MatrixBase<D>& ro) const
+  {
+    return -ro;
+  }
+};
+
 //! Alias for the addition functor for PolyDG::Real
-using Add = std::plus<Real>;
+// using Add = std::plus<Real>;
 
 //! Alias for the subtraction functor for PolyDG::Real
-using Subtract = std::minus<Real>;
+// using Subtract = std::minus<Real>;
 
 //! Alias for the multiplication functor for PolyDG::Real
-using Multiply = std::multiplies<Real>;
+// using Multiply = std::multiplies<Real>;
 
 //! Alias for the division functor for PolyDG::Real
-using Divide = std::divides<Real>;
+// using Divide = std::divides<Real>;
 
 //! Alias for the negation functor for PolyDG::Real
-using Negate = std::negate<Real>;
+// using Negate = std::negate<Real>;
 
 //! Overloading of the operator+ for summing expressions
 template <typename LO, typename RO>
@@ -508,31 +594,31 @@ BinaryOperator<LO, RO, OP>::BinaryOperator(const LO& lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
+typename BinaryOperator<LO, RO, OP>::ReturnType BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
   return OP()(lo_(fe, i, t, p), ro_(fe, i, t, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
+typename BinaryOperator<LO, RO, OP>::ReturnType BinaryOperator<LO, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
   return OP()(lo_(fe, i, j, t, p), ro_(fe, i, j, t, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
+typename BinaryOperator<LO, RO, OP>::ReturnType BinaryOperator<LO, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
   return OP()(lo_(fe, i, j, si, sj, p), ro_(fe, i, j, si, sj, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
+typename BinaryOperator<LO, RO, OP>::ReturnType BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
   return OP()(lo_(fe, i, p), ro_(fe, i, p));
 }
 
 template <typename LO, typename RO, typename OP>
-Real BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
+typename BinaryOperator<LO, RO, OP>::ReturnType BinaryOperator<LO, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
   return OP()(lo_(fe, i, j, p), ro_(fe, i, j, p));
 }
@@ -542,31 +628,31 @@ BinaryOperator<Real, RO, OP>::BinaryOperator(Real lo, const RO& ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
+typename BinaryOperator<Real, RO, OP>::ReturnType BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
   return OP()(lo_, ro_(fe, i, t, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
+typename BinaryOperator<Real, RO, OP>::ReturnType BinaryOperator<Real, RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
   return OP()(lo_, ro_(fe, i, j, t, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
+typename BinaryOperator<Real, RO, OP>::ReturnType BinaryOperator<Real, RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
   return OP()(lo_, ro_(fe, i, j, si, sj, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
+typename BinaryOperator<Real, RO, OP>::ReturnType BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
   return OP()(lo_, ro_(fe, i, p));
 }
 
 template <typename RO, typename OP>
-Real BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
+typename BinaryOperator<Real, RO, OP>::ReturnType BinaryOperator<Real, RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
   return OP()(lo_, ro_(fe, i, j, p));
 }
@@ -576,31 +662,31 @@ BinaryOperator<LO, Real, OP>::BinaryOperator(const LO& lo, Real ro)
   : lo_{lo}, ro_{ro} {}
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
+typename BinaryOperator<LO, Real, OP>::ReturnType BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, SizeType t, SizeType p) const
 {
   return OP()(lo_(fe, i, t, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
+typename BinaryOperator<LO, Real, OP>::ReturnType BinaryOperator<LO, Real, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
   return OP()(lo_(fe, i, j, t, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
+typename BinaryOperator<LO, Real, OP>::ReturnType BinaryOperator<LO, Real, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
   return OP()(lo_(fe, i, j, si, sj, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
+typename BinaryOperator<LO, Real, OP>::ReturnType BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
   return OP()(lo_(fe, i, j, p), ro_);
 }
 
 template <typename LO, typename OP>
-Real BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
+typename BinaryOperator<LO, Real, OP>::ReturnType BinaryOperator<LO, Real, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
   return OP()(lo_(fe, i, p), ro_);
 }
@@ -610,30 +696,31 @@ UnaryOperator<RO, OP>::UnaryOperator(const RO& ro)
   : ro_{ro} {}
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
+typename UnaryOperator<RO, OP>::ReturnType UnaryOperator<RO, OP>::operator()(const FeElement& fe, unsigned i, unsigned j, SizeType t, SizeType p) const
 {
   return OP()(ro_(fe, i, j, t, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
+typename UnaryOperator<RO, OP>::ReturnType UnaryOperator<RO, OP>::operator()(const FeFaceInt& fe, unsigned i, unsigned j, SideType si, SideType sj, SizeType p) const
 {
   return OP()(ro_(fe, i, j, si, sj, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
+typename UnaryOperator<RO, OP>::ReturnType UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, SizeType p) const
 {
   return OP()(ro_(fe, i, p));
 }
 
 template <typename RO, typename OP>
-Real UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
+typename UnaryOperator<RO, OP>::ReturnType UnaryOperator<RO, OP>::operator()(const FeFaceExt& fe, unsigned i, unsigned j, SizeType p) const
 {
   return OP()(ro_(fe, i, j, p));
 }
 
-inline Real DotProduct::operator()(const Eigen::Vector3d& lo, const Eigen::Vector3d& ro) const
+template <typename D>
+inline Real DotProduct::operator()(const Eigen::MatrixBase<D>& lo, const Eigen::MatrixBase<D> & ro) const
 {
   return lo.dot(ro);
 }
