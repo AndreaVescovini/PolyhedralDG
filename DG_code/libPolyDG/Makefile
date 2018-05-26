@@ -1,6 +1,7 @@
 #http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#gcc
 
-EIGEN_INC = $(mkEigenInc)
+EIGEN_INC  = $(mkEigenInc)
+GETPOT_INC = /vagrant/pacs/Material/Examples/src/Utilities
 
 #------------
 # Directories
@@ -56,7 +57,7 @@ WFLAGS  += -Wall
 STDFLAG += -std=c++11
 
 ifdef RELEASE
- OPTFLAGS += -O3 -DNDEBUG #pg
+ OPTFLAGS += -O3 -DNDEBUG
 else
  OPTFLAGS += -g -DVERBOSITY
  WFLAGS   += -Wextra -pedantic
@@ -78,16 +79,13 @@ $(shell mkdir -p $(DEP_DIR))
 # Targets
 #--------
 
-all: static tests
+all: static test
 
 static: $(STATIC_LIB)
 
 dynamic: $(DYNAMIC_LIB)
 
-tests: $(EXE)
-
-# run: $(word 2, $(MAKECMDGOALS))
-# 	@$<
+test: $(EXE)
 
 clean:
 	@$(RM) -r -v $(BUILD_DIR) $(DEP_DIR)
@@ -104,7 +102,7 @@ doc: $(wildcard $(INCLUDE_DIR)/*.hpp) $(wildcard $(INCLUDE_DIR)/$(INCLUDE_SUBDIR
 #----------------
 # Special targets
 #----------------
-.PHONY:		  all clean distclean run
+.PHONY:		  all static dynamic test clean distclean doc
 .PRECIOUS:  $(DEP_DIR)/%.d
 .SECONDARY: $(STATIC_OBJS) $(DYNAMIC_OBJS) $(TEST_OBJS) $(STATIC_LIB) $(DYNAMIC_LIB)
 
@@ -136,7 +134,7 @@ $(BUILD_DIR_DYNAMIC)/%.o: $(SOURCE_DIR)/%.cpp $(DEP_DIR)/%.d
 
 $(BUILD_DIR_TEST)/%.o: $(TEST_DIR)/%.cpp $(DEP_DIR)/%.d
 	@mkdir -p $(BUILD_DIR_TEST)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(OUTPUT_OPTION)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(GETPOT_INC) $(DEPFLAGS) -c $< $(OUTPUT_OPTION)
 	@mv -f $(DEP_DIR)/$*.Td $(DEP_DIR)/$*.d && touch $(word 2,$^) && touch $@
 
 $(DEP_DIR)/%.d: ;

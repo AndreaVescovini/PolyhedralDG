@@ -18,11 +18,15 @@
 #include "Utilities.hpp"
 #include "Watch.hpp"
 
+#include <Eigen/Core>
+#include "GetPot.hpp"
+
 #include <cmath>
 #include <iostream>
+#include <string>
 #include <vector>
 
-int main()
+int main(int argc, char* argv[])
 {
   using Utilities::pow;
 
@@ -33,11 +37,15 @@ int main()
   auto uex     = [](const Eigen::Vector3d& x) { return x(0) * x(1); };
   auto uexGrad = [](const Eigen::Vector3d& x) { return Eigen::Vector3d(x(1), x(0), 0.0); };
 
-  // Mesh reading
-  std::string fileName = "../meshes/cube_str384ht.mesh";
+  GetPot comLine(argc, argv);
+  const std::string fileName = comLine.follow("../data.pot", 2, "-f", "--file");
+  GetPot fileData(fileName.c_str());
 
+  const std::string meshFile = fileData("dir", "../../meshes") + "/cube_str384ht.mesh";
+
+  // Mesh reading
   PolyDG::MeshReaderPoly reader;
-  PolyDG::Mesh Th(fileName, reader);
+  PolyDG::Mesh Th(meshFile, reader);
   Th.printInfo();
 
   // Operators

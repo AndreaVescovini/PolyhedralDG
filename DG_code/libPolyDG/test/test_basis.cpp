@@ -5,10 +5,12 @@
 #include "MeshReaderPoly.hpp"
 #include "Watch.hpp"
 
+#include "GetPot.hpp"
+
 #include <iostream>
 #include <string>
 
-int main()
+int main(int argc, char* argv[])
 {
   using PolyDG::FeSpace;
   using PolyDG::Mesh;
@@ -17,11 +19,15 @@ int main()
   Utilities::Watch ch;
   ch.start();
 
-  // Mesh Reading
-  std::string fileName = "../meshes/cube_str48h.mesh";
+  GetPot comLine(argc, argv);
+  const std::string fileName = comLine.follow("../data.pot", 2, "-f", "--file");
+  GetPot fileData(fileName.c_str());
 
+  const std::string meshFile = fileData("dir", "../../meshes") + "/cube_str48h.mesh";
+
+  // Mesh Reading
   MeshReaderPoly reader;
-  Mesh Th(fileName, reader);
+  Mesh Th(meshFile, reader);
 
   // FeSpace creation
   unsigned r = 1;

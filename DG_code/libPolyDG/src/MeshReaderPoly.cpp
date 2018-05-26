@@ -28,7 +28,7 @@ void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 
   std::ifstream meshFile{fileName};
   if(meshFile.is_open() == false)
-    throw std::runtime_error("Can't open mesh file. Mesh file does not exist or is corrupted.");
+    throw std::runtime_error("Can't open the mesh file " + fileName + "\nThe mesh file does not exist or is corrupted.");
 
   // I use the proxy to access the Mesh class.
   MeshProxy mp(mesh);
