@@ -14,16 +14,20 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Operators.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
+#include "Watch.hpp"
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 int main()
 {
   using Utilities::pow;
+
+  Utilities::Watch ch;
+  ch.start();
 
   // Exact solution
   auto uex     = [](const Eigen::Vector3d& x) { return x(0) * x(1); };
@@ -93,8 +97,8 @@ int main()
   // Problem instantation and integration
   PolyDG::Problem adr(Vh2);
 
-  adr.integrateVol(stiff + mass - u * dot(b, vGrad), false);
-  adr.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump) + dot(b, n) * u * v, dirichlet, true);
+  adr.integrateVol(stiff + mass - dot(b * u, vGrad), false);
+  adr.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump) + dot(b * u, n) * v, dirichlet, true);
   adr.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump) + dot(b, vJump) * uAver, false);
   adr.integrateVolRhs(f2 * v);
   adr.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
@@ -137,6 +141,9 @@ int main()
   std::cout << "H10 error = " << poisson.computeErrorH10(uexGrad) << std::endl;
 
   std::cout << "-----------------------------------------------------------" << std::endl;
+
+  ch.stop();
+  std::cout << ch << std::endl;
 
   return 0;
 }

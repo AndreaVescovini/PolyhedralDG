@@ -9,19 +9,23 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Operators.hpp"
 #include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
+#include "Watch.hpp"
 
 #include <Eigen/Core>
 
 #include <cmath>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 int main()
 {
+  Utilities::Watch ch;
+  ch.start();
+
   // Mesh reading
   std::string fileName = "../meshes/cube_str384h.mesh";
 
@@ -46,7 +50,7 @@ int main()
   source.emplace_back([](const Eigen::Vector3d& /* x */) { return 0.0; });
   source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(1) * x(2); });
   source.emplace_back([](const Eigen::Vector3d& x) { return -6.0 * x(0) * x(1) * x(2); });
-  source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(0) * x(2) * (3.0 * pow(x(1) * x(1), 2)); });
+  source.emplace_back([](const Eigen::Vector3d& x) { return -2.0 * x(0) * x(2) * (3.0 * x(1) * x(1) + x(0) * x(0)); });
 
   uexGrad.emplace_back([](const Eigen::Vector3d& /* x */) { return Eigen::Vector3d(1.0,0.0, 0.0); });
   uexGrad.emplace_back([](const Eigen::Vector3d& x) { return Eigen::Vector3d(x(1), x(0), 0.0); });
@@ -77,6 +81,8 @@ int main()
 
   std::vector<double> errL2, errH10, hh;
 
+  std::cout << "Testing the exactness of the method..." << std::endl;
+
   for(unsigned r = 1; r < 7; r++)
   {
     std::cout << "Degree = " << r << std::endl;
@@ -103,6 +109,11 @@ int main()
     std::cout << "Error L2  = " << poisson.computeErrorL2(uex[r - 1]) << std::endl;
     std::cout << "Error H10 = " << poisson.computeErrorH10(uexGrad[r - 1]) << '\n' << std::endl;
   }
+
+  std::cout << "Test finished" << std::endl;
+
+  ch.stop();
+  std::cout << ch << std::endl;
 
   return 0;
 }

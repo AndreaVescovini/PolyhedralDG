@@ -2,7 +2,6 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Operators.hpp"
 #include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
@@ -10,8 +9,9 @@
 
 #include <Eigen/Core>
 
-#include <cfenv>
+// #include <cfenv>
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 int main()
@@ -24,9 +24,9 @@ int main()
   ch.start();
 
   std::vector<std::string> fileNames;
-  // fileNames.push_back("../meshes/cube_str6t.mesh");
-  // fileNames.push_back("../meshes/cube_str48h.mesh");
-  // fileNames.push_back("../meshes/cube_str384h.mesh");
+  fileNames.push_back("../meshes/cube_str6t.mesh");
+  fileNames.push_back("../meshes/cube_str48h.mesh");
+  fileNames.push_back("../meshes/cube_str384h.mesh");
   fileNames.push_back("../meshes/cube_str1296h.mesh");
   // fileNames.push_back("/vagrant/pacs/progetto_codici/meshes/cube_str1296h.mesh");
 
@@ -58,6 +58,8 @@ int main()
   Function f(source);
   Function gd(uex);
 
+  unsigned deg = 2;
+
   std::vector<PolyDG::BCLabelType> dirichlet = {1, 2, 3, 4, 5, 6};
 
   std::vector<double> errL2, errH10, hh;
@@ -65,24 +67,21 @@ int main()
   for(SizeType i = 0; i < fileNames.size(); i++)
   {
     PolyDG::Mesh Th(fileNames[i], reader);
-    FeSpace Vh(Th, 2);
+    FeSpace Vh(Th, deg);
 
     Problem prob(Vh);
 
-    bool symform = true;
-    prob.integrateVol(dot(uGrad, vGrad), symform);
-    prob.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), symform);
-    prob.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet, symform);
+    prob.integrateVol(dot(uGrad, vGrad), true);
+    prob.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), true);
+    prob.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet, true);
     prob.integrateVolRhs(f * v);
     prob.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
-    // ch.start();
     prob.finalizeMatrix();
 
-    // ch.stop();
-    prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 10000, 1e-6);
+    prob.solveCG(Eigen::VectorXd::Zero(prob.getDim()), 10000, 1e-10);
     // prob.solveBiCGSTAB(Eigen::VectorXd::Zero(prob.getDim()), 10000, 1e-6);
-    // prob.solveChloesky();
+    // prob.solveCholesky();
     // prob.solveLU();
     // ch.start();
 
@@ -97,7 +96,7 @@ int main()
     // std::cout << prob.getRhs() << std::endl;
     // std::cout << prob.getSolution() << std::endl;
     // std::cout << prob.getMatrix()/*.selfadjointView<Eigen::Upper>()*/ << std::endl;
-    prob.exportSolutionVTK("speriamo.vtu");
+    // prob.exportSolutionVTK("speriamo.vtu");
   }
 
 

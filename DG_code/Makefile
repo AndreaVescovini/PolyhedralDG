@@ -5,14 +5,15 @@ EIGEN_INC = $(mkEigenInc)
 #------------
 # Directories
 #------------
-SOURCE_DIR  = src
-INCLUDE_DIR = include
-BUILD_DIR 	= obj
-LIB_DIR 		= lib
-TEST_DIR 		= test
-EXE_DIR 		= bin
-DEP_DIR 		= .d
-DOC_DIR 		= doc
+SOURCE_DIR  	 = src
+INCLUDE_DIR 	 = include
+INCLUDE_SUBDIR = expr
+BUILD_DIR 		 = obj
+LIB_DIR 			 = lib
+TEST_DIR  	   = test
+EXE_DIR 		   = bin
+DEP_DIR 		   = .d
+DOC_DIR 		   = doc
 
 BUILD_DIR_STATIC 	= $(BUILD_DIR)/static
 BUILD_DIR_DYNAMIC = $(BUILD_DIR)/dynamic
@@ -62,7 +63,7 @@ else
 endif
 
 CXXFLAGS += $(WFLAGS) $(STDFLAG) $(OPTFLAGS)
-CPPFLAGS += -I./$(INCLUDE_DIR) -I$(EIGEN_INC)
+CPPFLAGS += -I./$(INCLUDE_DIR) -I./$(INCLUDE_DIR)/$(INCLUDE_SUBDIR) -I$(EIGEN_INC)
 DEPFLAGS  = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.Td
 
 LD_FLAGS += -L./$(LIB_DIR)
@@ -94,7 +95,7 @@ clean:
 distclean: clean
 	@$(RM) -r -v $(EXE_DIR) $(LIB_DIR) $(DOC_DIR)
 
-doc: $(wildcard $(INCLUDE_DIR)/*.hpp) Doxyfile
+doc: $(wildcard $(INCLUDE_DIR)/*.hpp) $(wildcard $(INCLUDE_DIR)/$(INCLUDE_SUBDIR)/*.hpp) $(SRCS) mainpage.dox Doxyfile
 	@mkdir -p $(DOC_DIR)
 	doxygen Doxyfile
 

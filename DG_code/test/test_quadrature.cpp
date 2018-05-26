@@ -3,6 +3,7 @@
 #include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
 #include "Utilities.hpp"
+#include "Watch.hpp"
 
 #include <Eigen/Core>
 
@@ -18,6 +19,9 @@ int main()
   using PolyDG::Real;
   using PolyDG::SizeType;
   using Utilities::pow;
+
+  Utilities::Watch ch;
+  ch.start();
 
   const Real tol = 1e-14;
 
@@ -78,5 +82,9 @@ int main()
   }
 
   std::cout << "\nTest finished." << std::endl;
+
+  ch.stop();
+  std::cout << ch << std::endl;
+
   return 0;
 }

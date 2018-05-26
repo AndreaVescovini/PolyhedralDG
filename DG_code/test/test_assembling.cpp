@@ -10,17 +10,21 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Operators.hpp"
 #include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"
+#include "Watch.hpp"
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 int main()
 {
   using Utilities::pow;
+
+  Utilities::Watch ch;
+  ch.start();
 
   // Mesh reading
   std::string fileName = "../meshes/cube_str48h.mesh";
@@ -62,8 +66,8 @@ int main()
   poisson.finalizeMatrix();
 
   poisson.printInfo();
-  std::cout << poisson.getMatrix() << std::endl;
-  std::cout << poisson.getRhs() << std::endl;
+  std::cout << "Matrix:\n" <<  poisson.getMatrix() << std::endl;
+  std::cout << "Rhs:\n" << poisson.getRhs() << std::endl;
 
   // Another poroblem.
   poisson.clearMatrix();
@@ -83,8 +87,11 @@ int main()
   poisson.finalizeMatrix();
 
   poisson.printInfo();
-  std::cout << poisson.getMatrix() << std::endl;
-  std::cout << poisson.getRhs() << std::endl;
+  std::cout << "Matrix:\n" <<  poisson.getMatrix() << std::endl;
+  std::cout << "Rhs:\n" << poisson.getRhs() << '\n' << std::endl;
+
+  ch.stop();
+  std::cout << ch << std::endl;
 
   return 0;
 }

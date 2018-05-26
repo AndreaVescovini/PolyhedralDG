@@ -3,7 +3,9 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
+#include "Watch.hpp"
 
+#include <iostream>
 #include <string>
 
 int main()
@@ -11,6 +13,9 @@ int main()
   using PolyDG::FeSpace;
   using PolyDG::Mesh;
   using PolyDG::MeshReaderPoly;
+
+  Utilities::Watch ch;
+  ch.start();
 
   // Mesh Reading
   std::string fileName = "../meshes/cube_str48h.mesh";
@@ -28,6 +33,9 @@ int main()
   Vh.printElemBasisDer();
   Vh.printFaceBasis();
   Vh.printFaceBasisDer();
+
+  ch.stop();
+  std::cout << ch << std::endl;
 
   return 0;
 }

@@ -10,7 +10,6 @@
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
-#include "Operators.hpp"
 #include "PolyDG.hpp"
 #include "Problem.hpp"
 #include "Utilities.hpp"

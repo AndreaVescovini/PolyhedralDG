@@ -1,0 +1,133 @@
+/*!
+    @file   Function3.hpp
+    @author Andrea Vescovini
+    @brief  Class for the expression for a function from R^3 to R^3
+*/
+
+#ifndef _FUNCTION3_HPP_
+#define _FUNCTION3_HPP_
+
+#include "ExprWrapper.hpp"
+#include "FeElement.hpp"
+#include "FeFaceExt.hpp"
+#include "FeFaceInt.hpp"
+#include "PolyDG.hpp"
+
+#include <Eigen/Core>
+
+#include <functional>
+
+namespace PolyDG
+{
+
+/*!
+    @brief Class for the expression for a function from R^3 to R^3
+
+    This class is an expression and inherits from ExprWrapper<Function3>. It
+    rapresents a function \f$ f: \mathbb{R}^3 \rightarrow \mathbb{R}^3 \f$.
+*/
+
+class Function3 : public ExprWrapper<Function3>
+{
+public:
+  //! Alias for the return type of the call operator
+  using ReturnType = Eigen::Vector3d;
+
+  //! Alias for a function taking a @c Eigen::Vector3d and returning a PolyDG::Real
+  using funR3R3 = std::function<Eigen::Vector3d (const Eigen::Vector3d&)>;
+
+  //! Constructor
+  explicit Function3(const funR3R3& fun)
+    : fun_{fun} {}
+
+  //! Copy constructor
+  Function3(const Function3&) = default;
+
+  //! Move constructor
+  Function3(Function3&&) = default;
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeElement
+
+      The second argument is not used.
+
+      @param fe FeElement over which the evaluation has to be done.
+      @param t  Index related to the tetrahedron over which the evaluation has
+                to be done, it can be 0,...,fe.getTetrahedraNo() - 1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  Eigen::Vector3d operator()(const FeElement& fe, unsigned /* i */, SizeType t, SizeType p) const
+  {
+    return fun_(fe.getQuadPoint(t, p));
+  }
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeElement
+
+      The second and third arguments are not used.
+
+      @param fe FeElement over which the evaluation has to be done.
+      @param t  Index related to the tetrahedron over which the evaluation has
+                to be done, it can be 0,...,fe.getTetrahedraNo() - 1.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  Eigen::Vector3d operator()(const FeElement& fe, unsigned /* i */, unsigned /* j */, SizeType t, SizeType p) const
+  {
+    return fun_(fe.getQuadPoint(t, p));
+  }
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceExt
+
+      The second argument is not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  inline Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned /* i */, SizeType p) const
+  {
+    return fun_(fe.getQuadPoint(p));
+  }
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceExt
+
+      The second and third arguments are not used.
+
+      @param fe FeFaceExt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  Eigen::Vector3d operator()(const FeFaceExt& fe, unsigned /* i */, unsigned /* j */, SizeType p) const
+  {
+    return fun_(fe.getQuadPoint(p));
+  }
+
+  /*!
+      @brief Call operator that evaluates the function inside a FeFaceInt
+
+      The second, third, fourth and fifth arguments are not used.
+
+      @param fe FeFaceInt over which the evaluation has to be done.
+      @param p  Index related to the quadrature point at which the evaluation
+                has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
+  */
+  Eigen::Vector3d operator()(const FeFaceInt& fe, unsigned /* i */, unsigned /* j */, SideType /* si */, SideType /* sj */, SizeType p) const
+  {
+    return fun_(fe.getQuadPoint(p));
+  }
+
+  //! Destructor
+  virtual ~Function3() = default;
+
+private:
+  //! The function
+  funR3R3 fun_;
+};
+
+} // namespace PolyDG
+
+#endif // _FUNCTION3_HPP_
