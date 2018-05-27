@@ -1,0 +1,18 @@
+# Directory that contains meshes
+directory = /vagrant/pacs/progetto_codici/meshes
+
+# Mesh
+mesh = cube_str384h.mesh
+
+# Maximum degree of the FeSpace
+degMax = 5
+
+# Type of solver (direct, iterative)
+solverType = iterative
+
+# Maximum number of iterations and tolerance (only for the iterative solver)
+maxIter   = 10000
+tolerance = 1e-10
+
+# Export solutions (true / false)
+exportSol = yes
