@@ -280,7 +280,12 @@ void Problem::exportSolutionVTK(const Eigen::VectorXd& u, const std::string& fil
     ch.start();
   #endif
 
-  std::ofstream fout{fileName};
+  std::ofstream fout;
+
+  if(fileName.substr(fileName.size() - 4, 4) != ".vtu")
+    fout.open(fileName + ".vtu");
+  else
+    fout.open(fileName);
 
   // Create a vector with random integers in order to distinguish elements.
   std::vector<unsigned> elemValues;

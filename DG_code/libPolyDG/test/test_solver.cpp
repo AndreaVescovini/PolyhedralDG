@@ -1,3 +1,9 @@
+/*!
+    @file   test_solver.cpp
+    @author Andrea Vescovini
+    @brief  Test for the solvers of the linear system
+*/
+
 // Test for the solvers of the linear system.
 //
 // 1)  -laplacian(u) = f   in omega
@@ -22,6 +28,18 @@
 #include <exception>
 #include <string>
 #include <vector>
+
+/*!
+    Two problems are solved with the available methods:
+
+    1)  \f$ - \Delta u = f  \quad \text{in} \quad \Omega\\
+                     u = g_d  \quad \text{on} \quad \partial \Omega \f$ @n
+      using a symmetric formulation and:
+
+    2)  \f$ - \Delta u + u = f  \quad \text{in} \quad \Omega\\
+                     u = g_d  \quad \text{on} \quad \partial \Omega \f$ @n
+      using a non-symmetric formulation.
+*/
 
 int main(int argc, char* argv[])
 {

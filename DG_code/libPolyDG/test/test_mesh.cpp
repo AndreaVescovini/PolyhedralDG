@@ -1,4 +1,8 @@
-// Test for the reading of the mesh
+/*!
+    @file   test_mesh.cpp
+    @author Andrea Vescovini
+    @brief  Test for the reading of the mesh
+*/
 
 #include "Mesh.hpp"
 #include "MeshReaderPoly.hpp"
@@ -10,6 +14,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+/*!
+    All the meshes are read.
+*/
 
 int main(int argc, char* argv[])
 {

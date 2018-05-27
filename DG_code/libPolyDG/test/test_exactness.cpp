@@ -1,9 +1,8 @@
-// I test the exactness of the method applied to problems with polynomial solutions,
-// I expect the error to be 0 if the order of the FeSpace is greater of equal to
-// that of the solution and the integration is exact.
-//
-// -laplacian(u) = f    in omega
-//             u = gd   in delta_omega
+/*!
+    @file   test_exactness.cpp
+    @author Andrea Vescovini
+    @brief  Test for the exactness of the method
+*/
 
 #include "ExprOperators.hpp"
 #include "FeSpace.hpp"
@@ -22,6 +21,16 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+/*!
+    The exactness of the method applied to problems with polynomial solutions is tested,
+    the error is expected to be 0 if the order of the FeSpace is greater of equal to
+    that of the solution and the integration is exact.@n
+    The problem is:
+
+    \f$ - \Delta u = f  \quad \text{in} \quad \Omega\\
+                     u = g_d  \quad \text{on} \quad \partial \Omega \f$
+*/
 
 int main(int argc, char* argv[])
 {

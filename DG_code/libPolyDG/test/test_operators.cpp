@@ -1,14 +1,8 @@
-// Test for the assembling of the matrix of the linear system.
-//
-// 1)  -laplacian(u) + u = f1   in omega
-//                     u = gd   in delta_omega
-//
-// 2)  -laplacian(u) + div(b*u) + u = f2  in omega
-//                                u = gd  in delta_omega
-//
-// 3)  -laplacian(u) = f3  in omega
-//                 u = gd  in gamma_dirichlet
-//             du/dn = h   in gamma_neaumann
+/*!
+    @file   test_operators.cpp
+    @author Andrea Vescovini
+    @brief  Test for different operators
+*/
 
 #include "ExprOperators.hpp"
 #include "FeSpace.hpp"
@@ -25,6 +19,21 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+/*!
+    Three different problems are tested with a konwn polynomial solution:
+
+    1) \f$ - \Delta u = f_1  \quad \text{in} \quad \Omega\\
+                    u = g_d  \quad \text{on} \quad \partial \Omega \f$
+
+    2)  \f$ - \Delta u + div(\mathbf{b}u) = f_2  \quad \text{in} \quad \Omega\\
+                                        u = g_d  \quad \text{on} \quad \partial \Omega \f$
+
+    3)           \f$ - \Delta u = f_3 \quad \text{in} \quad \Omega\\
+                              u = g_d \quad \text{on} \quad \Gamma_{Dirichlet}\\
+      \nabla u \cdot \mathbf{n} = g_n \quad \text{on} \quad \Gamma_{Neumann} \f$
+
+*/
 
 int main(int argc, char* argv[])
 {

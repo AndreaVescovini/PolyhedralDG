@@ -1,4 +1,8 @@
-// I test the initialization of the basis of the FeSpace.
+/*!
+    @file   test_basis.cpp
+    @author Andrea Vescovini
+    @brief  Test for the initialization of the PolyDG::FeSapce
+*/
 
 #include "FeSpace.hpp"
 #include "Mesh.hpp"
@@ -9,6 +13,10 @@
 
 #include <iostream>
 #include <string>
+
+/*!
+    The basis of a FeSapce with degree 1 is assembled.
+*/
 
 int main(int argc, char* argv[])
 {

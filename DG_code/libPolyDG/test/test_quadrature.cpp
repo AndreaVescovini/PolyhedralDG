@@ -1,4 +1,8 @@
-// Test for the exactness of the quadrature rules integrating polynomials
+/*!
+    @file   test_quadrature.cpp
+    @author Andrea Vescovini
+    @brief  Test for the exactness of the quadrature rules integrating polynomials
+*/
 
 #include "PolyDG.hpp"
 #include "QuadRuleManager.hpp"
@@ -12,6 +16,11 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
+
+/*!
+    All the default quadrature rules are tested with polynomials and the degrees
+    of exactness are verified.
+*/
 
 int main()
 {
