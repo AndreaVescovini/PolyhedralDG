@@ -1,0 +1,8 @@
+# I ignore object files, executables
+*.o
+h_convergence
+p_convergence
+
+# I ignore output files
+*.vtk
+*.vtu

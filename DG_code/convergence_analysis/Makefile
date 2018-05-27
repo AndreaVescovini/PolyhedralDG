@@ -1,10 +1,8 @@
-#------------
-# Directories
-#------------
-EIGEN_INC  = $(mkEigenInc)
-GETPOT_INC = /vagrant/pacs/Material/Examples/src/Utilities
-POLYDG_INC = /vagrant/pacs/progetto_codici/DG_code/libPolyDG/include
-POLYDG_LIB = /vagrant/pacs/progetto_codici/DG_code/libPolyDG/lib
+#------------------------------
+# Including the global Makefile
+#------------------------------
+THAT_DIR = ..
+include $(THAT_DIR)/Makefile.inc
 
 #------------------------
 # Sources and executables
@@ -12,30 +10,26 @@ POLYDG_LIB = /vagrant/pacs/progetto_codici/DG_code/libPolyDG/lib
 SRCS = $(wildcard *.cpp)
 EXE  = $(basename $(SRCS))
 
-#-------------------------------
-# Compiler and compilation flags
-#-------------------------------
-CXX = g++
-
-WFLAGS  += -Wall
-STDFLAG += -std=c++11
-
-ifdef RELEASE
- OPTFLAGS += -O3 -DNDEBUG
-else
- OPTFLAGS += -g -DVERBOSITY
- WFLAGS   += -Wextra -pedantic
-endif
-
-CXXFLAGS += $(WFLAGS) $(STDFLAG) $(OPTFLAGS)
-CPPFLAGS += -I$(EIGEN_INC) -I$(GETPOT_INC) -I$(POLYDG_INC)
-
+#------------------
+# Compilation flags
+#------------------
+CPPFLAGS += -I$(GETPOT_INC) -I$(POLYDG_INC)
 LD_FLAGS += -L$(POLYDG_LIB)
-LD_LIBS  += -lPolyDG
 
 #--------
 # Targets
 #--------
+
+help:
+	@echo "---------------------- CONVERGENCE ANALISYS -------------------------"
+	@echo "make help: ----- Prints this help"
+	@echo "make all: ------ Makes the executables"
+	@echo "make clean: ---- Cleans all the temporary files"
+	@echo "make distclean:  Cleans all"
+	@echo ""
+	@echo "REMEMBER: Specify always RELEASE=yes in order to enable optimizations"
+	@echo "---------------------------------------------------------------------"
+
 
 all: $(EXE)
 
@@ -45,9 +39,9 @@ clean:
 distclean: clean
 	@$(RM) -r -v $(EXE) *.vtu
 
-.DEFAULT_GOAL = all
+.DEFAULT_GOAL = help
 
-.PHONY: all clean distclean
+.PHONY: all clean distclean help
 
 #------
 # Rules
