@@ -9,17 +9,20 @@ EIGEN_INC  = $(mkEigenInc)
 GETPOT_INC = /vagrant/pacs/Material/Examples/src/Utilities
 
 # Enter the directory where you want to install the library
-POLYDG_PATH = /vagrant/pacs/polyDG
+POLYDG_PATH = /vagrant/pacs
+
+#---------
+# Compiler
+#---------
+CXX = g++
 
 #-------------------------------------------------------------------------------
 #------------------- DO NOT MODIFY ANYTHING BELOW THIS LINE --------------------
 #-------------------------------------------------------------------------------
 
-#-------------------------------
-# Compiler and compilation flags
-#-------------------------------
-CXX = g++
-
+#------------------
+# Compilation flags
+#------------------
 WFLAGS  += -Wall
 STDFLAG += -std=c++11
 
@@ -38,5 +41,5 @@ LD_LIBS  += -lPolyDG
 #------------
 # Directories
 #------------
-POLYDG_INC = $(POLYDG_PATH)/include
-POLYDG_LIB = $(POLYDG_PATH)/lib
+POLYDG_INC = $(POLYDG_PATH)/polydg/include
+POLYDG_LIB = $(POLYDG_PATH)/polydg/lib

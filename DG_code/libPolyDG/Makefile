@@ -1,5 +1,3 @@
-#http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#gcc
-
 #------------------------------
 # Including the global Makefile
 #------------------------------
@@ -104,14 +102,14 @@ test: $(EXE)
 
 test: CPPFLAGS += -I$(GETPOT_INC)
 
-install: clean
+install:
 	@mkdir -p $(POLYDG_INC)
 	cp $(INCLUDE_DIR)/* -r $(POLYDG_INC)
 	@mkdir -p $(POLYDG_LIB)
-	cp $(STATIC_LIB) $(DYNAMIC_LIB) $(POLYDG_LIB)
+	cp $(LIB_DIR)/* $(POLYDG_LIB)
 
 uninstall:
-	@$(RM) -r -v $(POLYDG_PATH)
+	@$(RM) -r -v $(POLYDG_PATH)/polydg
 
 doc: $(HEADERS) $(SRCS) $(TEST_SRCS) mainpage.dox Doxyfile
 	@mkdir -p $(DOC_DIR)

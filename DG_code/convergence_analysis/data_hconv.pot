@@ -1,18 +1,18 @@
 # Directory that contains meshes
-directory = /vagrant/pacs/progetto_codici/meshes
+directory = ../../meshes
 
 # Mesh type ('t' -> tetrahedra, 'h' -> hexahedra, 'ht' -> hexahedra/polyhedra, 'p' -> polyhedra)
 MeshType = h
 
 # Degree of the FeSpace
-degree = 1;
+degree = 6;
 
 # Type of solver (direct, iterative)
 solverType = iterative
 
 # Maximum number of iterations and tolerance (only for the iterative solver)
 maxIter   = 10000
-tolerance = 1e-6
+tolerance = 1e-12
 
 # Export solutions (yes / no)
 exportSol = yes

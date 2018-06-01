@@ -1,2 +1,2 @@
 # Directory that contains meshes
-dir = /vagrant/pacs/progetto_codici/meshes
+dir = ../../../meshes

@@ -16,7 +16,7 @@ assembling of the matrix and of the right-hand-side of the linear system, moreov
 this approach allows a flexible implementation of different models starting from
 the variational formulation of the problem.  
 It is written in C++11.  
-Developed with gcc 5.3.0, tested with clang???
+Developed with gcc 5.3.0, tested with gcc 4.9.3, clang 3.5.0 and clang 4.0.0.
 
 #### convergence_analisys
 The folder `convergence_analisys` contains examples of use of the library concerning
@@ -29,7 +29,7 @@ the basis of the finite element space.
 #### Requirments
 * The library **Eigen** is used for linear algebra, it does not have to be compiled
   since it is a header only library.  
-  The project has been developed with the **version 3.3.3**  
+  It is required the **version 3.3.3** or higher.  
   See http://eigen.tuxfamily.org/index.php?title=Main_Page for more information.
 
 * The library **GetPot** is used to parse the tests commaind line arguments, it is not
@@ -39,6 +39,7 @@ the basis of the finite element space.
   See http://getpot.sourceforge.net/ for more information.
 
 * The tool **Doxygen** is used to generate the documentation.  
+  It is suggested the version 1.8.11 or higher.  
   See http://www.stack.nl/~dimitri/doxygen/index.html for more information.
 
 #### Installation of the library
@@ -67,7 +68,8 @@ If the library has been successfully built, you should find in the folder `libPo
 the two libraries, static and dynamic.  
 In the folder `libPolyDG/doc` there should be the documentation, in HTML and LaTeX format. In the main page of the documentation you can find a tutorial for the use of the library.  
 In the folder `libPolyDG/bin` there should be
-the executables of the tests, that run with the configuration file `libPolyDG/data.pot`.
+the executables of the tests, that run with the configuration file `libPolyDG/data.pot`,
+in which you can set the directory in which the meshes are.
 If you have build the dynamic version of the library before building the tests (for
 example if you have used `make all`), then the executables have been linked with the
 dynamic one, so remember to tell the loader where the library is editing
@@ -87,5 +89,6 @@ make all RELEASE=yes
 ```
 in order to compile the two examples. Again remember to specify `RELEASE=yes` for the optimization.
 
-Then you can run the exacutables and you can modify some parameters from the
-input files `h_convergence.pot` and `p_convergence.pot`.
+Then you can run the exacutables `h_convergence` and `p_convergence`, from the
+input files `h_convergence.pot` and `p_convergence.pot` you can modify the
+directory that contains the meshes and some other options.
