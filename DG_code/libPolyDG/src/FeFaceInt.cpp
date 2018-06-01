@@ -86,7 +86,7 @@ void FeFaceInt::printBasis(std::ostream& out = std::cout) const
   out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
   out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
-  std::array<SideType, 2> sides = { Out, In };
+  std::array<SideType, 2> sides = {{ Out, In }};
 
   // Loop over sides.
   for(SizeType i = 0; i < 2; i++)
@@ -116,7 +116,7 @@ void FeFaceInt::printBasisDer(std::ostream& out = std::cout) const
   out << face_.getVertex(1).getCoords().transpose() << " ] [ ";
   out << face_.getVertex(2).getCoords().transpose() << "]\n";
 
-  std::array<SideType, 2> sides = { Out, In };
+  std::array<SideType, 2> sides = {{ Out, In }};
 
   // Loop over sides.
   for(SizeType i = 0; i < 2; i++)

@@ -48,7 +48,7 @@ public:
                       and "Polyhedra".
   */
   explicit MeshReaderPoly(const std::array<std::string, 4>& sections =
-    {"Vertices", "Tetrahedra", "Triangles", "Polyhedra"});
+    {{"Vertices", "Tetrahedra", "Triangles", "Polyhedra"}});
 
   //! Copy constructor
   MeshReaderPoly(const MeshReaderPoly&) = default;

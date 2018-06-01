@@ -18,7 +18,7 @@ namespace PolyDG
 {
 
 MeshReaderPoly::MeshReaderPoly(const std::array<std::string, 4>& sections)
-  : sections_{sections} {}
+  : sections_(sections) {}
 
 void MeshReaderPoly::read(Mesh& mesh, const std::string& fileName) const
 {

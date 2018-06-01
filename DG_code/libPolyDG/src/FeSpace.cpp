@@ -38,9 +38,9 @@ void FeSpace::integerComposition()
       int nz = degree_ - nx - ny;
       while(nz >= 0)
       {
-        basisComposition_.emplace_back(std::array<unsigned, 3>{static_cast<unsigned>(nx),
-                                                               static_cast<unsigned>(ny),
-                                                               static_cast<unsigned>(nz)});
+        basisComposition_.emplace_back(std::array<unsigned, 3>{{static_cast<unsigned>(nx),
+                                                                static_cast<unsigned>(ny),
+                                                                static_cast<unsigned>(nz)}});
         nz--;
       }
       ny--;

@@ -422,9 +422,9 @@ void Problem::finalizeMatrix()
         if(t.row() != t.col())
           concatVec.emplace_back(t.col(), t.row(), t.value());
 
-    concatVec.insert(concatVec.cend(),
-                     std::make_move_iterator(triplets_[i].cbegin()),
-                     std::make_move_iterator(triplets_[i].cend()));
+    concatVec.insert(concatVec.end(),
+                     std::make_move_iterator(triplets_[i].begin()),
+                     std::make_move_iterator(triplets_[i].end()));
     triplets_[i].clear();
   }
 

@@ -369,7 +369,7 @@ void Problem::integrateVol(const ExprWrapper<T>& expr, bool sym)
   const T& exprDerived(expr);
 
   triplets_.emplace_back();
-  sym_.emplace_back(sym);
+  sym_.push_back(sym);
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
@@ -416,7 +416,7 @@ void Problem::integrateFacesExt(const ExprWrapper<T>& expr, const std::vector<BC
   const T& exprDerived(expr);
 
   triplets_.emplace_back();
-  sym_.emplace_back(sym);
+  sym_.push_back(sym);
 
   // If the variational form is symmetric I store only half elements,
   // I overestimate considering all the external faces with the same type of
@@ -465,7 +465,7 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
   const T& exprDerived(expr);
 
   triplets_.emplace_back();
-  sym_.emplace_back(sym);
+  sym_.push_back(sym);
 
   // If the variational form is symmetric I store only half elements
   if(sym == true)
@@ -473,12 +473,12 @@ void Problem::integrateFacesInt(const ExprWrapper<T>& expr, bool sym)
   else
     triplets_.back().reserve(Vh_.getFeFacesIntNo() * Vh_.getDof() * Vh_.getDof() * 4);
 
-  const std::array<SideType, 2> sides = {Out, In};
+  const std::array<SideType, 2> sides = {{Out, In}};
 
   for(auto it = Vh_.feFacesIntCbegin(); it != Vh_.feFacesIntCend(); it++)
   {
-    const std::array<unsigned, 2> indexOffset = { it->getElemIn() * Vh_.getDof(),
-                                                  it->getElemOut() * Vh_.getDof() };
+    const std::array<unsigned, 2> indexOffset = {{ it->getElemIn() * Vh_.getDof(),
+                                                   it->getElemOut() * Vh_.getDof() }};
 
     for(unsigned sj = 0; sj < 2; sj++)
       for(unsigned si = 0; si < (sym == true ? sj + 1 : 2); si++)

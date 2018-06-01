@@ -14,7 +14,7 @@ namespace PolyDG
 {
 
 Tetrahedron::Tetrahedron(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4)
-  : id_{counter_}, vertices_{v1, v2, v3, v4}, poly_{nullptr}
+  : id_{counter_}, vertices_{{v1, v2, v3, v4}}, poly_{nullptr}
 {
   counter_++;
 

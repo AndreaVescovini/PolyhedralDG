@@ -77,7 +77,7 @@ QuadRuleManager::QuadRuleManager()
   // 3d-simplex are defined.
 
   // Face z = 0
-  (Eigen::Matrix3d() << 0.0, 1.0, 0.0,
+  {(Eigen::Matrix3d() << 0.0, 1.0, 0.0,
                         1.0, 0.0, 0.0,
                         0.0, 0.0, 0.0).finished(),
   // Face y = 0
@@ -91,7 +91,7 @@ QuadRuleManager::QuadRuleManager()
   // Face x + y + z = 1
   (Eigen::Matrix3d() << 1.0, 0.0, 0.0,
                         0.0, 1.0, 0.0,
-                       -1.0, -1.0, 1.0).finished()}
+                       -1.0, -1.0, 1.0).finished()}}
 {
   // Here the quadrature rules over the standard 3d-simplex are initalized.
   // There are 8 rules with degree of exactness up to 8.
