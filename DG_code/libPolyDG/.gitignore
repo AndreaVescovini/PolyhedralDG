@@ -8,3 +8,4 @@ doc/
 # I ignore output files
 *.vtk
 *.vtu
+*.bak
