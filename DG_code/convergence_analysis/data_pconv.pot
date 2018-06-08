@@ -14,5 +14,5 @@ solverType = iterative
 maxIter   = 10000
 tolerance = 1e-10
 
-# Export solutions (true / false)
+# Export solutions (yes / no)
 exportSol = yes
