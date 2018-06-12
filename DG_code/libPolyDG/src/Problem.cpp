@@ -135,11 +135,11 @@ bool Problem::solveCG(const Eigen::VectorXd& x0, unsigned iterMax, Real tol)
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Warning: Conjugate gradient not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    std::cout << "Estimated error = " << solver.error() << std::endl;
     return false;
   }
   else
   {
-    // if(verbosity)
     std::cout << "Conjugate gradient converged with " << solver.iterations() << " iterations.\n";
     std::cout << "Estimated error = " << solver.error() << std::endl;
     return true;
@@ -180,11 +180,11 @@ bool Problem::solveBiCGSTAB(const Eigen::VectorXd& x0, unsigned iterMax, Real to
   if(solver.info() != Eigen::Success)
   {
     std::cerr << "Warning: BiCGSTAB not converged within " << solver.maxIterations() << " iterations." << std::endl;
+    std::cout << "Estimated error = "<< solver.error() << std::endl;
     return false;
   }
   else
   {
-    // if(verbosity)
     std::cout << "BiCGSTAB converged with " << solver.iterations() << " iterations.\n";
     std::cout << "Estimated error = "<< solver.error() << std::endl;
     return true;
