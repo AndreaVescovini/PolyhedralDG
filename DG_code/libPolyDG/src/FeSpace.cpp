@@ -20,8 +20,6 @@ FeSpace::FeSpace(Mesh& Th, unsigned degree, unsigned doeQuad3D, unsigned doeQuad
     initialize();
   }
 
-// ho solo il termine di stiffness con le derivate e non il termine di massa,
-// quindi posso abbassare l'ordine della quadratura nei tetraedri
 FeSpace::FeSpace(Mesh& Th, unsigned degree)
   : FeSpace(Th, degree, 2 * (degree - 1), 2 * degree) {}
 

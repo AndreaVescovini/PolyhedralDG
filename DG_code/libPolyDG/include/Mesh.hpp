@@ -127,7 +127,7 @@ public:
   //! Get the maximum diameter of the polyhedra
   inline Real getMaxDiameter() const;
 
-  //! Get the minumum diameter of the polyhedra
+  //! Get the minimum diameter of the polyhedra
   inline Real getMinDiameter() const;
 
   //! Prints all the entries of each entity of the Mesh
@@ -175,10 +175,10 @@ private:
   //! Maximum diameter
   Real hmax_;
 
-  //! Minumim diameter
+  //! Minimum diameter
   Real hmin_;
 
-  //! Computes the internal faces of the mesh and complete the information about the external ones
+  //! Compute the internal faces of the mesh and complete the information about the external ones
   void computeFaces();
 
   //! Inialize the maximum and minumum diameter
