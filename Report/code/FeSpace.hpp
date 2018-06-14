@@ -8,7 +8,8 @@ public:
 
   // ...
 
-  // Alias for a random access const iterator over FeElement, FeFaceExt or FeFaceInt
+  // Alias for a random access const iterator over FeElement, FeFaceExt or
+  // FeFaceInt
   template <typename T>
   using ConstIter = typename std::vector<T>::const_iterator;
 
@@ -21,7 +22,8 @@ private:
   const unsigned degree_;
   const unsigned dof_;
 
-  // Possible degrees of the monomials that multiplied togheter give polynomials of degree less or equal to degree_
+  // Possible degrees of the monomials that multiplied togheter give polynomials
+  // of degree less or equal to degree_
   std::vector<std::array<unsigned, 3>> basisComposition_;
 
   std::vector<FeElement> feElements_;

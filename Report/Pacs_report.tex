@@ -20,7 +20,8 @@
 \lstset{
     backgroundcolor=\color{mygray},
     language=C++,
-    basicstyle=\footnotesize\ttfamily,
+%    basicstyle=\footnotesize\ttfamily,
+    basicstyle=\fontsize{9}{10.5}\selectfont\ttfamily,
     tabsize=3,
     numbers=left,
     numberstyle=\tiny,
@@ -34,6 +35,8 @@
     keepspaces=true,
     columns=fullflexible
 	}
+
+\newcommand{\code}[1]{{\footnotesize\ttfamily #1}}
 
 \graphicspath{{img/}}
 \pgfplotsset{compat=newest, every axis/.append style = {font=\relsize{-2}}}
@@ -234,12 +237,12 @@ $u$ of
 \eqref{eq:dgvarform} belongs to $H^1(\Omega) \cap H^s(\mathcal{T})$, then $u$ 
 is the solution of the Poisson problem \eqref{eq:poisson}.\\
 We can introduce the bilinear form $a_\epsilon:~H^s(\mathcal{T})~\times~H^s(\mathcal{T})~\rightarrow~\mathbb{R}$:
-\begin{equation*}
+\begin{equation} \label{eq:bilinear}
 a_\epsilon(u, v) = \sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v
 -\sum_{e \in \Gamma} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
 -\epsilon \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\}
 - \gamma_e \int_e [u]\cdot[v] \bigg)
-\end{equation*}
+\end{equation}
 and the functional $F_\epsilon:~H^s(\mathcal{T})~\rightarrow~\mathbb{R}$:
 \begin{equation*}
 	F_\epsilon(v) = \sum_{\kappa \in \mathcal{T}} \int_\kappa fv
@@ -790,41 +793,54 @@ We developed the library PolyDG\footnote{\url{https://github.com/AndreaVescovini
 three-dimensional domains, allowing also general kinds of boundary conditions. It relies on the library Eigen (see \cite{eigen}) for the linear algebra.\\
 The workflow of the code can be split into three levels and three main classes:
 \begin{itemize}
-	\item The \emph{geometrical} level, at which the file with the mesh is read and its information is stored into an object of type \lstinline|Mesh|.
-	\item The \emph{functional} level, at which the finite dimensional space \eqref{eq:dgspace} is chosen through the definition of an object of type \lstinline|FeSpace| and its basis functions are computed.
-	\item The \emph{problem} level, at which, through an object of type \lstinline|Problem|, equations are written and then solved.
+	\item The \emph{geometrical} level, at which the file with the mesh is read and its information is stored into an object of type \code{Mesh}.
+	\item The \emph{functional} level, at which the finite dimensional space \eqref{eq:dgspace} is chosen through the definition of an object of type \code{FeSpace} and its basis functions are computed.
+	\item The \emph{problem} level, at which, through an object of type \code{Problem}, equations are written and then solved.
 \end{itemize}
 Here we show the key features of these three classes, while there is a tutorial that explains how to use the library in the documentation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class Mesh}
 \lstinputlisting[caption=Mesh.hpp]{code/Mesh.hpp}
-The class \lstinline|Mesh| stores into five \lstinline|std::vector| the geometrical entities that compose the mesh. They can be accessed through the getter methods , but in order to be safer they can be added and modified only through the proxy \lstinline|MeshProxy|, which exposes references to the containers.\\
-The constructor requires an object of type \lstinline|MeshReader|; this object has a method \lstinline|read(Mesh&, const std::string&)| that is the one that actually performs the reading from the file and fills the containers of the \lstinline|Mesh| using the proxy. The library provides the class \lstinline|MeshReaderPoly|, that inherits from \lstinline|MeshReader| and it is used for reading MEDIT text meshes with the extension *.mesh\footnote{\url{https://www.ljll.math.upmc.fr/frey/publications/RT-0253.pdf}}, possibly partitioned as described in Subsection \ref{subsec:meshstructures}. The class \lstinline|MeshReader| is abstract since the method \lstinline|read| is pure virtual, so another kind of reader could be easily implemented deriving from this base class and overriding the function \lstinline|read|.\\
+The class \code{Mesh} stores into five \code{std::vector} the geometrical entities that compose the mesh. They can be accessed through the getter methods , but in order to be safer they can be added and modified only through the proxy \code{MeshProxy}, which exposes references to the containers.\\
+The constructor requires an object of type \code{MeshReader}; this object has a method \code{read(Mesh\&, const std::string\&)} that is the one that actually performs the reading from the file and fills the containers of the \code{Mesh} using the proxy. The library provides the class \code{MeshReaderPoly}, that inherits from \code{MeshReader} and it is used for reading MEDIT text meshes with the extension *.mesh\footnote{\url{https://www.ljll.math.upmc.fr/frey/publications/RT-0253.pdf}}, possibly partitioned as described in Subsection \ref{subsec:meshstructures}. The class \code{MeshReader} is abstract since the method \code{read} is pure virtual, so another kind of reader could be easily implemented deriving from this base class and overriding the function \code{read}.\\
 Then, always in the constructor, the internal faces are computed through a loop over tetrahedra, since usually they are not written in the mesh file, but we need them in our method.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Geometrical entities}
-As mentioned above, the classes that represent geometrical entities are: \lstinline|Vertex|, \lstinline|Tetrahedron|, \lstinline|FaceExt|, \lstinline|FaceInt| and \lstinline|Polyhedron|. The connectivity structure of the mesh is implemented through \emph{aggregation}, in the sense that these classes store references (or pointers in few cases) to other classes they are linked to. For example a \lstinline|Tetrahedron| contains references to four \lstinline|Vertex| and a pointer to a \lstinline|Polyhedron|. In this way we have tried to maximize the efficiency in accessing the data and minimize the memory consumption. \lstinline|FaceExt| and \lstinline|FaceInt| derive both from the abstract class \lstinline|FaceAbs|, they enrich it respectively with a label used for boundary conditions and with a pointer to a second tetrahedron.
+As mentioned above, the classes that represent geometrical entities are: \code{Vertex}, \code{Tetrahedron}, \code{FaceExt}, \code{FaceInt} and \code{Polyhedron}. The connectivity structure of the mesh is implemented through \emph{aggregation}, in the sense that these classes store references (or pointers in few cases) to other classes they are linked to. For example a \code{Tetrahedron} contains references to four \code{Vertex} and a pointer to a \code{Polyhedron}. In this way we have tried to maximize the efficiency in accessing the data and minimize the memory consumption. \code{FaceExt} and \code{FaceInt} derive both from the abstract class \code{FaceAbs}, they enrich it respectively with a label used for boundary conditions and with a pointer to a second tetrahedron.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class FeSpace}
 \lstinputlisting[caption=FeSpace.hpp]{code/FeSpace.hpp}
-The class \lstinline|FeSpace| stores vectors containing \lstinline|FeElement|, \lstinline|FeFaceExt| and \lstinline|FeFaceInt| that are the objects that contain the evaluations of basis functions over elements, external faces and internal faces. The class stores also a quadrature formula for integrals over tetrahedra and another one for integrals over triangles. The containers can be accessed from outside through getter methods like in \lstinline|Mesh|, but also through iterators.
+The class \code{FeSpace} stores vectors containing \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt} that are the objects that contain the evaluations of basis functions over elements, external faces and internal faces. The class stores also a quadrature formula for integrals over tetrahedra and another one for integrals over triangles. The containers can be accessed from outside through getter methods like in \code{Mesh}, but also through iterators.
 \lstinputlisting[caption=FeSpace.cpp]{code/FeSpace.cpp}
-The constructor requires a \lstinline|Mesh| and an \lstinline|unsigned| corresponding to the degree we want for the space, then optionally we can specify the degrees of exactness that we want for the quadrature formulas.\lstinline|integerComposition()| computes all the possible combinations of three integers whose sum is \lstinline|degree|; this is needed to compute all the basis functions of the space. Eventually \lstinline|initialize()| fills the containers; each \lstinline|FeElement|, \lstinline|FeFaceExt| and \lstinline|FeFaceInt| is created with respectively a \lstinline|Polyhedron|, \lstinline|FeFaceExt| and a \lstinline|FeFaceInt|, with the information about the degrees of freedom and with a quadrature rule. The constructors of these ``Fe" classes compute the values of the basis functions as described in Subsection \ref{subsec:basis} and store them.\\
+The constructor requires a \code{Mesh} and an \code{unsigned} corresponding to the degree we want for the space, then optionally we can specify the degrees of exactness that we want for the quadrature formulas. The method \code{integerComposition()} computes all the possible combinations of three integers whose sum is \code{degree}; this is needed to compute all the basis functions of the space. Eventually \code{initialize()} fills the containers; each \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt} is created with respectively a \code{Polyhedron}, \code{FeFaceExt} and a \code{FeFaceInt}, with the information about the degrees of freedom and with a quadrature rule. The constructors of these ``Fe" classes compute the values of the basis functions as described in Subsection \ref{subsec:basis} and store them.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quadrature formulas}
 \lstinputlisting[caption=QuadRuleManager.hpp]{code/QuadRuleManager.hpp}
-Quadrature formulas are stored in and managed by the class \lstinline|QuadRuleManager|. By default quadrature formulas over tetrahedra with degree of exactness up to 8 and over triangles with degree of exactness up to 10 are implemented. Since there is no reason to duplicate these formulas, the class is implemented as a singleton using the \emph{Mayer's Trick} and it can be accessed creating a static object with the method \lstinline|instance()|.\\
-Quadratures rules are stored through a \lstinline|std::set| and two rules are considered equal if they have the same degree of exactness. With the methods \lstinline|setTriaRule| and \lstinline|setTetraRule| the user can add a new rule or modify one.\\
-Moreover \lstinline|QuadRuleManager| contains also four matrices corresponding to the maps from the reference triangle in 2D to the faces of the reference tetrahedron in 3D; they are used to map the two-dimensional quadrature points to the three-dimensional space.\\
+Quadrature formulas are stored in and managed by the class \code{QuadRuleManager}. By default quadrature formulas over tetrahedra with degree of exactness up to 8 and over triangles with degree of exactness up to 10 are implemented. Since there is no reason to duplicate these formulas, the class is implemented as a singleton using the \emph{Mayer's Trick} and it can be accessed creating a static object with the method \code{instance()}.\\
+Quadratures rules are stored through a \code{std::set} and two rules are considered equal if they have the same degree of exactness. With the methods \code{setTriaRule} and \code{setTetraRule} the user can add a new rule or modify one.\\
+Moreover \code{QuadRuleManager} contains also four matrices corresponding to the maps from the reference triangle in 2D to the faces of the reference tetrahedron in 3D; they are used to map the two-dimensional quadrature points to the three-dimensional space.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class Problem}
-\lstinputlisting[caption=Problem.hpp]{code/Problem.hpp}
-The class \lstinline|Problem| is used to assemble and solve the linear system that arises from the boundary value problem.
-It stores the matrix and the vectors of the right-hand-side and the solution, together with two \lstinline|std::vector|: \lstinline|triplets_| and \lstinline|sym| that are used to store the entries of the matrix before that it is actually filled.
-As already mentioned we use the technique of \emph{expression templates} in order to compute those entries.\\
+\lstinputlisting[caption=Problem.hpp, lastline=44]{code/Problem.hpp}
+The class \code{Problem} is used to assemble and solve the linear system that arises from the boundary value problem.
+It stores the matrix and the vectors of the right-hand-side and the solution, together with two \code{std::vector}: \code{triplets\_} and \code{sym\_} that are used to store the entries of the matrix before that it is actually filled.
+As already mentioned we use the technique of \emph{expression templates} in order to compute those entries, so that, for example, the function \code{integrateVol} can be called in the following way:
+\begin{lstlisting}
+Problem poisson(Vh); // Vh is a FeSpace
+GradPhiJ uGrad;
+GradPhiI vGrad;
+poisson.integrateVol(dot(uGrad, vGrad), true);
+\end{lstlisting}
+The first argument represents the integrand of the volume integrals of the bilinear form \eqref{eq:bilinear}. It is a template argument and its type, deduced by the compiler, will be a tree made of binary and unary operators, as we will explain later.
+The second argument is a \code{bool} that can be used to specify if the integrand is symmetric or not; half of the computational cost can be saved if it is. There are other four functions of this kind, they are used to integrate the bilinear form over the external and internal faces of the mesh and the linear functional at the right-hand-side of \eqref{eq:dgfempolyform} over the volume and the external faces.
+\lstinputlisting[caption=Problem.hpp, firstline=46]{code/Problem.hpp}
+Inside the function there is the \emph{scalar core} in line 15, where, through the loops, the integrand is evaluated at each quadrature point of each element and for each basis function. The integrand is evaluated in one expression and this is an advantage when it is made of the sum of many terms, like over the faces in our case.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Expression templates}
-There is a template class \lstinline|ExpressionWrapper| that implements a cast operator to derived and every expression must inherits through CRTP
+\lstinputlisting[caption=ExprWrapper.hpp]{code/ExprWrapper.hpp}
+We have a template class \code{ExprWrapper} that is meant to be the base class from which every expression has to inherit through the CRTP. This class implements a conversion by cast operator to the template type and an equivalent method \code{asDerived()}, both in the \code{const} and non-\code{const} version.
+\lstinputlisting[caption=BinaryOperator.hpp]{code/BinaryOperator.hpp}
+Then we have two template classes that encapsulate algebraic binary and unary operation. They overload the call operator in order to be called with {\footnotesize\ttfamily FeElement}, \code{FeElement}
 \subsubsection{Solvers}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \section{Numerical results}\label{sec:res}
