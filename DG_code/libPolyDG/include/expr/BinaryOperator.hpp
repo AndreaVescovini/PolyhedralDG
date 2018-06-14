@@ -43,7 +43,6 @@ public:
   BinaryOperator(const LO& lo, const RO& ro)
     : lo_{lo}, ro_{ro} {}
 
-
   //! Copy constructor
   BinaryOperator(const BinaryOperator&) = default;
 
