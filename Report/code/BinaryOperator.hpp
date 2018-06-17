@@ -26,3 +26,10 @@ private:
   const LO& lo_;
   const RO& ro_;
 };
+
+template <typename LO, typename RO>
+BinaryOperator<LO, RO, DotProduct> dot(const ExprWrapper<LO>& lo,
+                                       const ExprWrapper<RO>& ro)
+{
+  return BinaryOperator<LO, RO, DotProduct>(lo, ro);
+}

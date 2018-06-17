@@ -2,10 +2,10 @@
 directory = ../../meshes
 
 # Mesh type ('t' -> tetrahedra, 'h' -> hexahedra, 'ht' -> hexahedra/polyhedra, 'p' -> polyhedra)
-MeshType = h
+meshType = h
 
 # Degree of the FeSpace
-degree = 6;
+degree = 2;
 
 # Type of solver (direct, iterative)
 solverType = iterative

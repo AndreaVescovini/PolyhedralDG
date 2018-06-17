@@ -67,7 +67,7 @@ public:
       @param p  Index related to the quadrature point at which the evaluation
                 has to be done, it can be 0,...,fe.getQuadPointsNo() - 1.
   */
-  const ReturnType& operator()(const FeFaceExt& fe, unsigned /* i */, unsigned  j, SizeType p) const
+  const ReturnType& operator()(const FeFaceExt& fe, unsigned /* i */, unsigned j, SizeType p) const
   {
     return fe.getPhiDer(p, j);
   }

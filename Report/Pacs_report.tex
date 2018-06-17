@@ -823,7 +823,7 @@ Moreover \code{QuadRuleManager} contains also four matrices corresponding to the
 \subsection{The class Problem}
 \lstinputlisting[caption=Problem.hpp, lastline=44]{code/Problem.hpp}
 The class \code{Problem} is used to assemble and solve the linear system that arises from the boundary value problem.
-It stores the matrix and the vectors of the right-hand-side and the solution, together with two \code{std::vector}: \code{triplets\_} and \code{sym\_} that are used to store the entries of the matrix before that it is actually filled.
+It stores the matrix and the vectors of the right-hand-side and of the solution, together with two \code{std::vector}: \code{triplets\_} and \code{sym\_} that are used to store the entries of the matrix before that it is actually filled.
 As already mentioned we use the technique of \emph{expression templates} in order to compute those entries, so that, for example, the function \code{integrateVol} can be called in the following way:
 \begin{lstlisting}
 Problem poisson(Vh); // Vh is a FeSpace
@@ -832,16 +832,35 @@ GradPhiI vGrad;
 poisson.integrateVol(dot(uGrad, vGrad), true);
 \end{lstlisting}
 The first argument represents the integrand of the volume integrals of the bilinear form \eqref{eq:bilinear}. It is a template argument and its type, deduced by the compiler, will be a tree made of binary and unary operators, as we will explain later.
-The second argument is a \code{bool} that can be used to specify if the integrand is symmetric or not; half of the computational cost can be saved if it is. There are other four functions of this kind, they are used to integrate the bilinear form over the external and internal faces of the mesh and the linear functional at the right-hand-side of \eqref{eq:dgfempolyform} over the volume and the external faces.
-\lstinputlisting[caption=Problem.hpp, firstline=46]{code/Problem.hpp}
-Inside the function there is the \emph{scalar core} in line 15, where, through the loops, the integrand is evaluated at each quadrature point of each element and for each basis function. The integrand is evaluated in one expression and this is an advantage when it is made of the sum of many terms, like over the faces in our case.\\
+The second argument is a \code{bool} that can be used to specify if the integrand is symmetric or not; half of the computational cost can be saved if it is symmetric. There are other four functions of this kind, they are used to integrate the bilinear form over the external and internal faces of the mesh and the linear functional at the right-hand-side of \eqref{eq:dgfempolyform} over the volume and the external faces.
+\lstinputlisting[caption=Problem.hpp, firstline=48]{code/Problem.hpp}
+Inside the function there is in line 15 the \emph{scalar core} of the integration, where, through the loops, the integrand is evaluated at each quadrature point (indentified by \code{p} and \code{t}) of each element (\code{*it}) and for each basis function (\code{i} is the index of basis functions for the solution while \code{j} is for the test functions). The integrand is evaluated in one expression and this is an advantage when it is made of the sum of many terms, like in our formulation.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Expression templates}
 \lstinputlisting[caption=ExprWrapper.hpp]{code/ExprWrapper.hpp}
 We have a template class \code{ExprWrapper} that is meant to be the base class from which every expression has to inherit through the CRTP. This class implements a conversion by cast operator to the template type and an equivalent method \code{asDerived()}, both in the \code{const} and non-\code{const} version.
-\lstinputlisting[caption=BinaryOperator.hpp]{code/BinaryOperator.hpp}
-Then we have two template classes that encapsulate algebraic binary and unary operation. They overload the call operator in order to be called with {\footnotesize\ttfamily FeElement}, \code{FeElement}
+\lstinputlisting[caption=BinaryOperator.hpp, lastline=28]{code/BinaryOperator.hpp}
+Then we have two template classes that encapsulate algebraic binary and unary operators. They overload the call operator in order to be called with \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt}. Moreover notice that, in order to keep the symmetry, the call operator forwards both the arguments \code{i} and \code{j} to \code{lo\_} and \code{ro\_}. The return type of the binary operator is deduced from the types of the operands and from the operation applied, basically it can result to be a scalar or a vector. In order to be used with more flexibility, we have also partial specializations of the class for operations with \code{double}s.\\
+Then operators \code{+,-,*,/} are overloaded so that they can be easily used by the user in order to call \code{BinaryOperator} or \code{UnaryOperator}. For the scalar product a \code{dot} operator and a \code{DotProduct} functor have been defined:
+\lstinputlisting[caption=BinaryOperator.hpp, firstline=30]{code/BinaryOperator.hpp}
+Eventually, at the basis of this structure, there are the classes that encapsulate the \emph{elementary operators} that have to be combined in order to build the differential problem. They have been implemented as functors, for example the gradient of a basis function related to the solution is:
+\lstinputlisting[caption=GradPhiJ.hpp]{code/GradPhiJ.hpp}
+Analogously the other operators required from the variational formulation have been implemented, like \code{PhiI, PhiJ, GradPhiI, JumpPhiI, JumpGradPhiI}, etc. Those one ending in \code{I} are related to the test functions since they use the argument \code{i} and discard \code{j}, while those ending in \code{J} are related to the solution and behave the opposite. We have chosen to implement this double version because, as we mentioned, binary operators are symmetric but then it is necessary to distinguish which is the right index for the evaluation of the operator.\\
+To complete it was necessary to implement also and operator \code{Normal} for the normal vector to a face, \code{PenaltyScaling} for the penalty scaling term $\gamma_e$ defined in \eqref{eq:penalty} and \code{Function} for functions $\mathbb{R}^3 \rightarrow \mathbb{R}$, in order consider the source term and the boundary data.\\
+At the end, in the case of the Poisson problem with the formulation \eqref{eq:dgfempolyform}, the code becomes:
+\begin{lstlisting}
+poisson.integrateVol(dot(uGrad, vGrad), true);
+poisson.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), true);
+poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + gamma * dot(uJump, vJump), dirichlet, true);
+poisson.integrateVolRhs(f * v);
+poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
+
+poisson.finalizeMatrix();
+\end{lstlisting}
+The method \code{finalizeMatrix} assembles the sparse matrix \code{A\_} from the vectors of triplets stored in \code{triplets\_}.\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Solvers}
+The class \code{Problem} provides four methods for solving the linear system, exploiting the capabilities of the library Eigen. For symmetric and positive definite matrices a \emph{Cholesky} factorization or the conjugate gradient algorithm can be used, while for non symmetric matrices the options are the LU factorization and the BiCGSTAB algorithm. Iterative solvers are necessary when the matrix of the system becomes big and this happens easily if we want to use high-order methods. However, for very large system, 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \section{Numerical results}\label{sec:res}
 We solve problem~\eqref{eq:dgfempolyform} on the unit cube $\Omega = (0,1)^3$, 
@@ -859,9 +878,9 @@ above by the $DG$-norm, and the $L^2$-norm $|\!|e_h|\!|_{L^2(\mathcal{T})}$.
 \subsection{\textit{h}-convergence}
 First we solve problem~\eqref{eq:dgfempolyform} over four structured 
 tetrahedral meshes of 48, 
-384, 1296 and 3072 elements, for $r=1,2,3$. We see in Table~\ref{tab:htet} that 
+384, 1296 and 3072 elements, for $r=1,2,3$. We see in Table~\ref{tab:htet} that the 
 convergence rates with respect to $h$-convergence are optimal: they correspond 
-to theoretical ones given by the estimates~\eqref{eq:dgbound} 
+to the theoretical ones given by the estimates~\eqref{eq:dgbound} 
 and~\eqref{eq:l2bound}.\\
 \begin{table}[h]\footnotesize
 	\centering
@@ -871,14 +890,14 @@ and~\eqref{eq:l2bound}.\\
 	r & \text{Error} & \text{48 elem} & \text{384 elem} & \text{1296 elem} & 
 	\text{3072 elem} & \text{Rate} \\ 
 	\midrule
-	1 & |\!|\nabla e_{h}|\!|_{L^2}   & 3.7594 \times 10^{-1} & 1.9785 \times 10^{-1} & 1.3266 \times 10^{-1} & 9.9471 \times 10^{-2} & 1.0009\\
-	& |\!|e_{h}|\!|_{L^2} & 1.1256 \times 10^{-2} & 3.6017 \times 10^{-3} & 1.7376 \times 10^{-3} & 1.0227 \times 10^{-3} & 1.8426\\
+	1 & |\!|\nabla e_{h}|\!|_{L^2}   & 2.4486 \times 10^{-1} & 1.2628 \times 10^{-1} & 8.4537 \times 10^{-2} & 6.3263 \times 10^{-2} & 1.0077\\
+	& |\!|e_{h}|\!|_{L^2} & 2.1925 \times 10^{-2} & 6.6318 \times 10^{-3} & 3.1769 \times 10^{-3} & 1.8679 \times 10^{-3} & 1.8461\\
 	\midrule
-	2 & |\!|\nabla e_{h}|\!|_{L^2}   & 6.5447 \times 10^{-2} & 1.7846 \times 10^{-2} & 8.1377 \times 10^{-3} & 4.6327 \times 10^{-3} & 1.9583\\
+	2 & |\!|\nabla e_{h}|\!|_{L^2}   & 6.5446 \times 10^{-2} & 1.7846 \times 10^{-2} & 8.1377 \times 10^{-3} & 4.6327 \times 10^{-3} & 1.9583\\
 	& |\!|e_{h}|\!|_{L^2} & 5.3216 \times 10^{-3} & 7.2800 \times 10^{-4} & 2.2107 \times 10^{-4} & 9.4460 \times 10^{-5} & 2.9557\\
 	\midrule
-	3 & |\!|\nabla e_{h}|\!|_{L^2}   & 1.1484 \times 10^{-2} & 1.5987 \times 10^{-3} & 4.8485 \times 10^{-4} & 2.0627 \times 10^{-4} & 2.9708\\
-	& |\!|e_{h}|\!|_{L^2} & 8.3358 \times 10^{-4} & 5.7744 \times 10^{-5} & 1.1575 \times 10^{-5} & 3.6715 \times 10^{-6} & 3.9915\\
+	3 & |\!|\nabla e_{h}|\!|_{L^2}   & 1.2746 \times 10^{-2} & 1.8062 \times 10^{-3} & 5.5061 \times 10^{-4} & 2.3498 \times 10^{-4} & 2.9599\\
+	& |\!|e_{h}|\!|_{L^2} & 8.0974 \times 10^{-4} & 5.5229 \times 10^{-5} & 1.0991 \times 10^{-5} & 3.4699 \times 10^{-6} & 4.0078\\
 	\bottomrule
 	\end{array}
 	\]
@@ -902,23 +921,16 @@ manage successfully.
 	\[
 	\begin{array}{ccccccc}
 	\toprule
-	r & \text{Error} & \text{8 elem} & \text{64 elem} & \text{216 elem} & 
-	\text{512 elem} & \text{Rate} \\ 
+	r & \text{Error} & \text{8 elem} & \text{64 elem} & \text{216 elem} & \text{512 elem} & \text{Rate} \\ 
 	\midrule
-	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.1840 \times 10^{-1} & 1.6678 \times 
-	10^{-1} & 1.1196 \times 10^{-1} & 8.4123 \times 10^{-2} & 0.9938\\
-	& |\!|e_{h}|\!|_{L^2} & 2.7755 \times 10^{-2} & 7.3256 \times 10^{-3} & 3.3204 \times 10^{-3} & 
-	1.8931 \times 10^{-3} & 1.9530\\
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 1.4069 \times 10^{-1} & 7.1546 \times 10^{-2} & 4.7473 \times 10^{-2} & 3.5407 \times 10^{-2} & 1.0193\\
+	& |\!|e_{h}|\!|_{L^2} & 1.7201 \times 10^{-2} & 4.1524 \times 10^{-3} & 1.7866 \times 10^{-3} & 9.9060 \times 10^{-4} & 2.0500\\
 	\midrule
-	2 & |\!|\nabla e_{h}|\!|_{L^2} & 6.9691 \times 10^{-2} & 1.8519 \times 
-	10^{-2} & 8.2554 \times 10^{-3} & 4.6362 \times 10^{-3} & 2.0056\\
-	& |\!|e_{h}|\!|_{L^2} & 4.9882 \times 10^{-3} & 6.5314 \times 10^{-4} & 1.9059 \times 10^{-4} & 
-	7.9122 \times 10^{-5} & 3.0560\\
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 6.9691 \times 10^{-2} & 1.8519 \times 10^{-2} & 8.2554 \times 10^{-3} & 4.6362 \times 10^{-3} & 2.0056\\
+	& |\!|e_{h}|\!|_{L^2} & 4.9882 \times 10^{-3} & 6.5314 \times 10^{-4} & 1.9059 \times 10^{-4} & 7.9122 \times 10^{-5} & 3.0560\\
 	\midrule
-	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.6100 \times 10^{-2} & 2.1286 \times 
-	10^{-3} & 6.1836 \times 10^{-4} & 2.5782 \times 10^{-4} & 3.0409\\
-	& |\!|e_{h}|\!|_{L^2} & 1.0479 \times 10^{-3} & 6.6445 \times 10^{-5} & 1.2080 \times 10^{-5} & 
-	3.6604 \times 10^{-6} & 4.1503\\
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.8454 \times 10^{-2} & 2.5109 \times 10^{-3} & 7.4112 \times 10^{-4} & 3.1132 \times 10^{-4} & 3.0149\\
+	& |\!|e_{h}|\!|_{L^2} & 1.0154 \times 10^{-3} & 6.5589 \times 10^{-5} & 1.2013 \times 10^{-5} & 3.6620 \times 10^{-6} & 4.1294\\
 	\bottomrule
 	\end{array}
 	\]
@@ -930,23 +942,16 @@ manage successfully.
 	\[
 	\begin{array}{ccccccc}
 	\toprule
-	r & \text{Error} & \text{28 elem} & \text{224 elem} & \text{756 elem} & 
-	\text{1792 elem} & \text{Rate} \\ 
+	r & \text{Error} & \text{28 elem} & \text{224 elem} & \text{756 elem} & \text{1792 elem} & \text{Rate} \\ 
 	\midrule
-	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.3681 \times 10^{-1} & 1.8227 \times 
-	10^{-1} & 1.2424 \times 10^{-1} & 9.4090 \times 10^{-2} & 0.9662\\
-	& |\!|e_{h}|\!|_{L^2} & 2.5401 \times 10^{-2} & 6.1132 \times 10^{-3} & 2.6651 \times 10^{-3} & 
-	1.4851 \times 10^{-3} & 2.0326\\
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 1.8549 \times 10^{-1} & 1.0327 \times 10^{-1} & 7.1844 \times 10^{-2} & 5.5018 \times 10^{-2} & 0.92750\\
+	& |\!|e_{h}|\!|_{L^2} & 1.8914 \times 10^{-2} & 5.1255 \times 10^{-3} & 2.3510 \times 10^{-3} & 1.3546 \times 10^{-3} & 1.9164\\
 	\midrule
-	2 & |\!|\nabla e_{h}|\!|_{L^2} & 7.4183 \times 10^{-2} & 1.9944 \times 
-	10^{-2} & 8.9959 \times 10^{-3} & 5.0984 \times 10^{-3} & 1.9738\\
-	& |\!|e_{h}|\!|_{L^2} & 4.1276 \times 10^{-3} & 7.0478 \times 10^{-4} & 2.1079 \times 10^{-4} & 
-	8.9470 \times 10^{-5} & 2.9787\\
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 7.4183 \times 10^{-2} & 1.9944 \times 10^{-2} & 8.9959 \times 10^{-3} & 5.0984 \times 10^{-3} & 1.9738\\
+	& |\!|e_{h}|\!|_{L^2} & 4.1276 \times 10^{-3} & 7.0478 \times 10^{-4} & 2.1079 \times 10^{-4} & 8.9470 \times 10^{-5} & 2.9787\\
 	\midrule
-	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.8013 \times 10^{-2} & 2.3198 \times 
-	10^{-3} & 6.6815 \times 10^{-4} & 2.7689 \times 10^{-4} & 3.0621\\
-	& |\!|e_{h}|\!|_{L^2} & 1.1527 \times 10^{-3} & 7.1514 \times 10^{-5} & 1.3122 \times 10^{-5} & 
-	3.9958 \times 10^{-6} & 4.1332\\
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.9898 \times 10^{-2} & 2.6110 \times 10^{-3} & 7.5814 \times 10^{-4} & 3.1529 \times 10^{-4} & 3.0498\\
+	& |\!|e_{h}|\!|_{L^2} & 1.1472 \times 10^{-3} & 7.1915 \times 10^{-5} & 1.3250 \times 10^{-5} & 4.0441 \times 10^{-6} & 4.1251\\
 	\bottomrule
 	\end{array}
 	\]
@@ -959,21 +964,16 @@ manage successfully.
 	\[
 	\begin{array}{ccccccc}
 	\toprule
-	r & \text{Error} & \text{15 elem} & \text{120 elem} & \text{392 elem} & 
-	\text{965 elem} & \text{Rate} \\ 
+	r & \text{Error} & \text{15 elem} & \text{120 elem} & \text{392 elem} & \text{965 elem} & \text{Rate} \\ 
 	\midrule
-	1 & |\!|\nabla e_{h}|\!|_{L^2} & 3.5875 \times 10^{-1} & 2.5131 \times 
-	10^{-1} & 1.8462 \times 10^{-1} & 1.4168 \times 10^{-1} & 0.9200\\
-	& |\!|e_{h}|\!|_{L^2} & 3.1209 \times 10^{-2} & 1.7716 \times 10^{-2} & 1.0018 \times 10^{-2} & 
-	5.9973 \times 10^{-3} & 1.7935\\
+	1 & |\!|\nabla e_{h}|\!|_{L^2} & 2.1049 \times 10^{-1} & 1.9550 \times 10^{-1} & 1.5199 \times 10^{-1} & 1.1807 \times 10^{-1} & 0.8779\\
+	& |\!|e_{h}|\!|_{L^2} & 2.5624 \times 10^{-2} & 1.5503 \times 10^{-2} & 9.2100 \times 10^{-2} & 5.6298 \times 10^{-3} & 1.7110\\
 	\midrule
-	2 & |\!|\nabla e_{h}|\!|_{L^2} & 8.7963 \times 10^{-2} & 4.2298 \times 
-	10^{-2} & 2.3058 \times 10^{-2} & 1.3036 \times 10^{-2} & 1.9823\\
+	2 & |\!|\nabla e_{h}|\!|_{L^2} & 8.7963 \times 10^{-2} & 4.2298 \times 10^{-2} & 2.3058 \times 10^{-2} & 1.3036 \times 10^{-2} & 1.9823\\
 	& |\!|e_{h}|\!|_{L^2} & 5.3520 \times 10^{-3} & 1.8324 \times 10^{-3} & 7.5865 \times 10^{-4} & 2.8963 \times 10^{-4} & 3.3472\\
 	\midrule
-	3 & |\!|\nabla e_{h}|\!|_{L^2} & 1.9945 \times 10^{-2} & 6.1835 \times 
-	10^{-3} & 2.5932 \times 10^{-3} & 1.1137 \times 10^{-3} & 2.9381\\
-	& |\!|e_{h}|\!|_{L^2} & 1.4164 \times 10^{-3} & 2.2474 \times 10^{-4} & 7.0145 \times 10^{-5} & 2.0407 \times 10^{-5} & 4.2918\\
+	3 & |\!|\nabla e_{h}|\!|_{L^2} & 2.1312 \times 10^{-2} & 6.3080 \times 10^{-3} & 2.6210 \times 10^{-3} & 1.1239 \times 10^{-3} & 2.9432\\
+	& |\!|e_{h}|\!|_{L^2} & 1.3199 \times 10^{-3} & 2.2410 \times 10^{-4} & 7.0107 \times 10^{-5} & 2.0359 \times 10^{-5} & 4.2981\\
 	\bottomrule
 	\end{array}
 	\]
