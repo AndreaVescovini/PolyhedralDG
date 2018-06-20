@@ -6,3 +6,4 @@ p_convergence
 # I ignore output files
 *.vtk
 *.vtu
+*.txt

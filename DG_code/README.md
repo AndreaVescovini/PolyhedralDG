@@ -66,7 +66,9 @@ Typing `make help` you can get some information about other kinds of commands.
 
 If the library has been successfully built, you should find in the folder `libPolyDG/lib`
 the two libraries, static and dynamic.  
-In the folder `libPolyDG/doc` there should be the documentation, in HTML and LaTeX format. In the main page of the documentation you can find a tutorial for the use of the library.  
+In the folder `libPolyDG/doc` there should be the documentation, in HTML and LaTeX format.
+To compile the latex sources with pdflatex go into the folder `libPolyDG/doc/latex` and type `make`.  
+In the main page of the documentation you can find a tutorial for the use of the library.  
 In the folder `libPolyDG/bin` there should be
 the executables of the tests, that run with the configuration file `libPolyDG/data.pot`,
 in which you can set the directory in which the meshes are.

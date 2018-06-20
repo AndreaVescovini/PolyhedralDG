@@ -50,13 +50,13 @@ namespace PolyDG
     @arg 19 points, degree of exactness 9, [D].
     @arg 25 points, degree of exactness 10, [D].
 
-    [D] Dunavant D.: High degree ecient symmetrical Gaussian quadrature
+    [D] Dunavant D.: High degree efficient symmetrical Gaussian quadrature
         rules for the triangle. @a International @a Journal @a for @a Numerical
         @a Methods @a in @a Engineering, 21, 1129-1148 (1985).@n
     [K] Keast P.: Moderate-degree tetrahedral quadrature formulas. @a Computer
         @a Methods @a in @a Applied @a Mechanics @a and @a Engineering, 55,
         339-348 (1986).@n
-    [Q] Quarteroni A.: @a Numerical @a Models @a for @a Differential @a Problems.
+    [Q] Quarteroni A.: @a Numerical @a Models @a for @a Differential @a Problems.
         MS&A, Springer-Verlag Italia, Milan (2014).
 
     When you ask for a quadraure rule with a certain degree of exactness, you
