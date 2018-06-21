@@ -1,0 +1,268 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[british]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{mygray}{rgb}{0.97,0.97,0.97}
+\definecolor{mygreen}{rgb}{0, 0.6, 0}
+\lstset{
+	backgroundcolor=\color{mygray},
+	language=C++,
+	%    basicstyle=\footnotesize\ttfamily,
+	basicstyle=\fontsize{9}{10.5}\selectfont\ttfamily,
+	tabsize=3,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	stepnumber=5,
+	breaklines=true,
+	showstringspaces=false,
+	keywordstyle=\color{blue},
+	commentstyle=\color{mygreen},
+	stringstyle=\color{red},
+	keepspaces=true,
+	columns=fullflexible
+}
+
+\newcommand{\code}[1]{{\footnotesize\ttfamily #1}}
+
+\theoremstyle{definition}
+\newtheorem*{remark}{Remark}
+
+\title{\textbf{Introduction to the library PolyDG}}
+
+\begin{document}
+\maketitle
+
+PolyDG is a library for the approximation of elliptic problems with 
+Discontinuous Galerkin finite element methods on polyhedral grids.
+It makes use of the technique of \emph{expression templates} in order to speed 
+up the assembling of the matrix and of the right-hand-side of the linear 
+system, moreover this approach allows a flexible implementation of different 
+models starting from the variational formulation of the problem.\\
+It is written in C++11.
+
+\section{DG finite element methods}
+Discontinuous Galerkin methods have shown to be very flexible and have been
+successfully applied to hyperbolic, elliptic and parabolic problems arising 
+from many different fields of application. Moreover one of the main advantages 
+with respect to the continuous framework is the possibility of handling meshes 
+with hanging nodes and made of general-shaped elements without any difficulty.\\
+Meshes made of general polyhedral elements can be useful in many problems, 
+especially when	we have to deal with domains that present small details or 
+microstructures; these features would need too many  ``classical" 
+tetrahedral/hexahedral elements to be described and so too many degrees of 
+freedom.
+
+\section{Getting started}
+If you want to write a program that solves an elliptic partial differential
+equation, you have to deal with three subsequent steps: the reding of the 
+\code{Mesh} from a file, the creation of the \code{FeSpace} and the 
+instantation of the \code{Problem}.
+
+\begin{remark}
+	You have to use the namespace \code{PolyDG} to access each class, function 
+	and	type in the library (there are only few functions in the namespace 
+	Utilities). For brevity we will neglect it in the following examples.
+\end{remark}
+
+\subsection{Reading the mesh}
+\begin{lstlisting}
+// Define a MeshReader
+MeshReaderPoly reader;
+// Define a Mesh
+Mesh Th("fileName.mesh", reader);
+// Print some information
+Th.printInfo();
+\end{lstlisting}
+
+The reading of the mesh is simple, you have to declare a \code{MeshReader} and
+to pass it to the constructor of \code{Mesh} together with the name of the file
+containing the mesh.\\
+The library provides a class \code{MeshReaderPoly} that inherits from 
+\code{MeshReader} and can be used to read tridimensional tetrahedral MEDIT text 
+meshes with the extension *.mesh (see 
+\url{https://www.ljll.math.upmc.fr/frey/publications/RT-0253.pdf} for more 
+information) or a polyhedral meshes generated with METIS (see 
+\url{http://glaros.dtc.umn.edu/gkhome/metis/metis/overview}) using the bash
+script provided with the meshes used for the examples.\\
+If you need to read a mesh stored in another format, you can write your own
+reader \emph{myReader} inheriting from the class \code{MeshReader}. The class 
+has to implement a method \code{read(Mesh\& mesh, const std::string\& 
+fileName)} that performs the actual reading from the file \code{fileName} and 
+fills the containers of \code{Th} using a \code{MeshProxy}. In particular you 
+have to read vertices with their coordinates, tetrahdra with their vertices and 
+polyhedra in which are contained, external faces with their label and polyhedra 
+with the tetrahedra that contain.\\
+\subsection{Creating the FeSpace}
+\begin{lstlisting}
+// Degree of exactness for the quadrature rule over tetrahedra
+unsigned quad3dDoe = 2;
+// Degree of exactness for the quadrature rule over triangles
+unsigned quad2dDoe = 4;
+// Degree of the polynomials in the FeSpace
+unsigned degree    = 2;
+// Define a FeSpace
+FeSpace Vh(Th, degree, quad3dDoe, quad2dDoe);
+// Print some information
+Vh.printInfo();
+\end{lstlisting}
+
+The creation of the FeSpace is simple too, in the constructor you have to pass	
+the Mesh @c Th and the degree of the polynomials in the FeSpace.\\
+
+\begin{remark}
+The method makes use of legendre polynomials to construct the basis of the
+FeSpace through the functions \code{legendre(unsigned n, Real x)} and 
+\code{legendreDer(unsigned n, Real x)},	they are implemented up to \code{n = 
+8}.
+\end{remark}
+
+If you want you can choose the quadrature rules you want to use specifying the
+degrees of exactness. Quadrature rules are stores in \code{QuadRuleManager}. 
+Actually there are rules over tetrahedra with degree of exactness from 1 to 8 
+and quadrature rules over triangles with degree of exactness from 1 to 10. Some 
+of them have one negative weight.\\
+You can add a new rule with \code{QuadRuleManager::setTetraRule(const 
+QuadRule3D\& rule)} and \code{QuadRuleManager::setTriaRule(const QuadRule2D\& 
+rule)}.
+
+\subsection{Instantation of the Problem}
+\begin{lstlisting}
+// Define a problem
+Problem poisson(Vh);
+\end{lstlisting}
+
+The instantation of the Problem is the key part of the program.
+To the constructor you have to pass only the FeSpace that is used for the
+approximation of the solution and for the test functions.\\
+Then there are three substeps: the definition of the variational formulation,
+the integration and the solution of the linear system. Let us suppose we
+want to solve the Poisson problem with Dirchlet boundary conditions, then the 
+variational formulation is:\\
+find $ u \in H^s(\mathcal{T}), s>3/2 $, such that:
+\begin{multline*}
+			\sum_{\kappa \in \mathcal{T}} \int_\kappa \nabla u \cdot \nabla v
+			-\sum_{e \in \Gamma} \bigg( \int_e [v] \cdot \{\!\!\{ \nabla u \}\!\!\}
+			+ \int_e [u] \cdot \{\!\!\{ \nabla v \}\!\!\}
+			- \gamma_e \int_e [u] \cdot [v] \bigg)\\
+			= \sum_{\kappa \in \mathcal{T}} \int_\kappa fv
+			+ \sum_{e \in \Gamma_D} \bigg( - \int_e g \nabla v \cdot \mathbf{n}
+			+ \gamma_e \int_e gv \bigg) \quad \forall v \in H^s(\mathcal{T})
+\end{multline*}
+where $ \mathcal{T} $ is the mesh, $ \Gamma_D $ is the set of
+external faces with Dirichlet boundary conditions and $ \Gamma = \Gamma_h
+\cup \Gamma_D $, with $ \Gamma_h $ the set of internal faces.\\
+
+\subsubsection{Operators}
+\begin{lstlisting}
+// Test function
+PhiI            v;
+// Gradient of the solution
+GradPhiJ        uGrad;
+// Gradient of the test function
+GradPhiI        vGrad;
+// Jump of the solution
+JumpPhiJ        uJump;
+// Jump of the test function
+JumpPhiI        vJump;
+// Average of the gradient of the solution
+AverGradPhiJ    uGradAver;
+// Average of the gradient of the test function
+AverGradPhiI    vGradAver;
+// Penalty scaling for the penalization term
+PenaltyScaling  gamma(10.0);
+// Normal vector to faces
+Normal          n;
+// Source function
+Function        f(source);
+// Dirichlet datum
+Function        gd(uex);
+\end{lstlisting}
+First you have to declare the operators you want to use to compose the
+variational formulation. Basically they are callable objects and once defined
+you can use them many times.\\
+\begin{remark}
+Operators that end with \code{J} are related to the solution, operators
+that end with \code{I} are related to the test function.
+\end{remark}
+
+\subsubsection{Integration}
+\begin{lstlisting}
+// Integration of the bilinear form over the volume of the elements
+poisson.integrateVol(dot(uGrad, vGrad), true);
+// Integration of the bilinear form over the external faces
+poisson.integrateFacesExt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + 
+gamma * dot(uJump, vJump), {1, 2, 3, 4, 5, 6}, true);
+// Integration of the bilinear form over the internal faces
+poisson.integrateFacesInt(-dot(uGradAver, vJump) - dot(uJump, vGradAver) + 
+gamma * dot(uJump, vJump), true);
+// Integration of the rhs over the volume of the elements
+poisson.integrateVolRhs(f * v);
+// Integration of the rhs over the external faces
+poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, {1, 2, 3, 4, 
+5, 6});
+
+// Assembly of the matrix
+poisson.finalizeMatrix();
+\end{lstlisting}
+
+Then you have to insert the variational formulation that may consist of
+integrals over volumes, external faces and integrnal faces. You can une
+the operator dot to perform scalar products, while you can use \code{+,*,-,/}
+for algebraic operations with real numbers.\\
+In the integrals over external faces you have to specify over which faces
+you want to integrate, using the labels. In the example above 
+\code{{1,2,3,4,5,6}} stands for a \code{std::vector<BCLabelType>} containing 
+the label of faces,	that in this case are all the faces of the cube.\\
+For each of the integrals of the bilinear form, you can specify if it is
+symmetric or not with respect to the solution and the test function (if
+not specified it is assumed to be non-symmetric). If an integral is symmetric
+it can be computed for half of the basis function, with a noticible reduction
+in the computational cost. Moreover if the bilinear form is symmetric so that
+all the integrals are symmetric then a symmetric matrix is stored, with another
+noticible memory saving.\\
+Finally remember to call the method \code{Problem::finalizeMatrix()} that is 
+needed to actually assemble the matrix.\\
+
+\subsubsection{Solution of the linear system}
+\begin{lstlisting}
+// Solve with LU sparse decomposition
+poisson.solveLU();
+// Solve with Chlolesky sparse decomposition
+poisson.solveCholesky();
+// Solve with conjugate gradient
+poisson.solveCG(Eigen::VectorXd::Zero(poisson.getDim()), 2 * poisson.getDim(), 
+1e-10);
+// Solve with BiCGSTAB
+poisson.solveBiCGSTAB(Eigen::VectorXd::Zero(poisson.getDim()), 2 * 
+poisson.getDim(), 1e-10);
+\end{lstlisting}
+
+Eventually the solution of the linear system can be obtained through four
+methods provided by the class Problem exploiting the library Eigen
+(see \url{https://eigen.tuxfamily.org/dox/group__TopicSparseSystems.html} for 
+more information).\\
+The iterative ones need an initial guess and allow to set a maximum number
+of iteration and a tolerance for the convergence.
+
+\begin{lstlisting}
+// Export the solution
+poisson.exportSolutionVTK("solution.vtu");
+// Compute the L2 norm of the error
+Real errL2  = computeErrorL2(uex);
+// Compute the H1 seminorm of the error
+Real errH10 = computeErrorH10(uexGrad);
+\end{lstlisting}
+
+At very last you can export the solution in a VTK format in order to visualize 
+it or you can compute the $L^2$ norm and $H^1$ seminorm of the error if you 
+know the 
+analytical solution and its gradient.
+
+\end{document}

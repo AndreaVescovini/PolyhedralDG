@@ -28,6 +28,7 @@ namespace PolyDG {
 
 	@note	You have to use the namespace PolyDG to access each class, function and
 		type in the library (there are only few functions in the namespace Utilities).
+		For brevity we will neglect it in the following examples.
 
 	@subsection mesh Reading the mesh
 		@code
@@ -53,7 +54,7 @@ namespace PolyDG {
 		reader @c myReader inheriting from the class MeshReader. The class has to
 		implement a method @c read(Mesh& mesh, const std::string& fileName) that performs
 		the actual reading from the file @c fileName and fills the containers of
-		@c mesh using a MeshProxy. In particular you have to read vertices with their
+		@c Th using a @c MeshProxy. In particular you have to read vertices with their
 		coordinates, tetrahdra with their vertices and polyhedra in which are contained,
 		external faces with their label and polyhedra with the tetrahedra that they
 		contain.
@@ -81,7 +82,7 @@ namespace PolyDG {
 			they are implemented up to @c n = 8.
 
 		If you want you can choose the quadrature rules you want to use specifying the
-		degrees of exactness. Quadrature rules are stores in QuadRuleManager. actually
+		degrees of exactness. Quadrature rules are stores in QuadRuleManager. Actually
 		there are rules over tetrahedra with degree of exactness from 1 to 8 and quadrature
 		rules over triangles with degree of exactness from 1 to 10. Some of them have
 		one negative weight.@n
@@ -214,6 +215,6 @@ namespace PolyDG {
 
 			At very last you can export the solution in a VTK format in order to visualize it
 			or you can compute the L2 norm and H1 seminorm of the error if you know the
-			analitical solution and its gradient.
+			analytical solution and its gradient.
 */
 }
