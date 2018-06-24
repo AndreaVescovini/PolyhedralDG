@@ -14,6 +14,7 @@
 \usepackage[font=small, textfont=sl]{caption}
 \usepackage[hidelinks]{hyperref}
 \usepackage[nottoc]{tocbibind}
+\usepackage{setspace}
 \usepackage{listings}
 \definecolor{mygray}{rgb}{0.97,0.97,0.97}
 \definecolor{mygreen}{rgb}{0, 0.6, 0}
@@ -92,12 +93,15 @@ problems on polyhedral grids}}
 	methods, then in Subsection~\ref{sec:poly} we develop the theory in order 
 	to 
 	handle polyhedral grids. Afterwards in Section~\ref{sec:imp} we explain our 
-	choices for the implementation of the algorithm, is Section~\ref{sec:lib} we highlight how the C++ library works and in Section~\ref{sec:res} 
+	choices for the implementation of the algorithm, is Section~\ref{sec:lib} we highlight how the C++ library works and
+	eventually in Section~\ref{sec:res} 
 	we present some numerical results conforming to the theoretical estimates.
 \end{abstract}
 \newpage
 \phantomsection
+\begin{spacing}{0.97}
 \tableofcontents
+\end{spacing}
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,7 +282,7 @@ This kind of formulation is called \textit{Interior Penalty} (IP) and as briefly
 \begin{itemize}
 \item
 If $\epsilon = -1$ the method is called \textit{Symmetric Interior Penalty 
-Galerkin} (SIPG), indeed in the bilinear form becomes symmetrical because the 
+Galerkin} (SIPG), indeed the bilinear form becomes symmetrical because the 
 two terms involving jumps and averages appear with the same sign. Introduced by 
 Arnold \cite{arn82} and Wheeler \cite{whe78}.
 \item
@@ -319,7 +323,7 @@ We will use the following inverse trace inequality for polynomials
 \end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Coercivity}
-We have to show that $\exists \alpha > 0 $ such that:
+We have to show that $\exists \; \alpha > 0 $ such that:
 \begin{equation*}
 a_\epsilon(u_h, u_h) = |\!|u_h|\!|^2_{DG} + (\epsilon - 1) \sum_{e \in \Gamma} \int_e [u_h] \cdot \{\!\!\{ \nabla u_h \}\!\!\} \geq \alpha |\!|u_h|\!|^2_{DG}.
 \end{equation*}
@@ -381,7 +385,7 @@ and that $\exists M_2 > 0$ such that:
 	|F_\epsilon(v_h)| \leq M_2 |\!|v_h|\!|_{DG} \quad \forall v_h \in 
 	\mathcal{D}_r(\mathcal{T}).
 \end{equation*}
-The proof follows easily from standard arguments; indeed exploiting triangular inequality and Cauchy-Schwarz's inequality we can obtain very straight forward the required bounds for the first and last term of $a_\epsilon(u, v)$. For the second and third term we just have to use smartly Cauchy-Schwarz and then apply the trace inequality \eqref{eq:trineq} like for the coercivity.\\
+The proof follows easily from standard arguments; indeed exploiting triangular inequality and Cauchy-Schwarz's inequality we can obtain very straight forward the required bounds for the first and last term of $a_\epsilon(u, v)$. For the second and third term we just have to use smartly Cauchy-Schwarz and then apply the trace inequality \eqref{eq:trineq} as we have done for the coercivity.\\
 We can proceed analogously for $F_\epsilon(v)$.
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -608,7 +612,7 @@ that do not put any restriction on the number or size of faces.
 		|\!|w-\bar{\Pi}w|\!|_{DG} \leq C_{interp} \frac{h}{r^{1/2}} |\!| w |\!|_{H^2(\Omega)} \leq C_{interp}C_{reg} \frac{h}{r^{1/2}} |\!| u-u_h |\!|_{L^2(\Omega)}.
 	\end{equation}
 	Inserting \eqref{pas:last} into \eqref{eq:go} and employing again the 
-	bound~\eqref{eq:dgbound}, gives the desired result~\eqref{eq:l2bound}.
+	bound~\eqref{eq:dgbound}, we get the desired result~\eqref{eq:l2bound}.
 \end{proof}	
 %Finally we quote from \cite{multigrid} the following result about the maximum 
 %eigenvalue of the bilinear form $a(\cdot, \cdot)$:
@@ -753,7 +757,8 @@ where
 \subsection{Quadrature rules}
 Quadrature over general polyhedral elements and polygonal faces is undertaken 
 on constructing a sub-triangulation, followed by the exploitation of 
-standard integration schemes over simplices. For every polyhedral element $\kappa \in 
+standard integration schemes over simplexes. For every polyhedral element 
+$\kappa \in 
 \mathcal{T}$ we first construct a non-overlapping sub-triangulation 
 $\kappa_\mathcal{S} = \{\tau_\kappa\}$ made of tetrahedral elements, then we 
 map quadrature nodes from a reference simplex to each tetrahedron 
@@ -790,48 +795,101 @@ available.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The C++ library}\label{sec:lib}
 We developed the library PolyDG\footnote{\url{https://github.com/AndreaVescovini/PolyhedralDG}} in order to test the presented method. It provides to the user a simple interface for the implementation of elliptic equations over
-three-dimensional domains, allowing also general kinds of boundary conditions. It relies on the library Eigen (see \cite{eigen}) for the linear algebra.\\
-The workflow of the code can be split into three levels and three main classes:
+three-dimensional domains. We have carried out the theoretical analysis taking 
+into account only Dirichlet boundary conditions, but the code allows also 
+general kinds of boundary conditions. We relied on the library Eigen (see 
+\cite{eigen}) for the linear algebra.\\
+The workflow of the code can be split into three levels corresponding to three 
+main classes:
 \begin{itemize}
 	\item The \emph{geometrical} level, at which the file with the mesh is read and its information is stored into an object of type \code{Mesh}.
 	\item The \emph{functional} level, at which the finite dimensional space \eqref{eq:dgspace} is chosen through the definition of an object of type \code{FeSpace} and its basis functions are computed.
 	\item The \emph{problem} level, at which, through an object of type \code{Problem}, equations are written and then solved.
 \end{itemize}
-Here we show the key features of these three classes, while there is a tutorial that explains how to use the library in the documentation.
+Here we show the key features of these three classes. There is a tutorial that 
+explains how to use the library in the Doxygen documentation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class Mesh}
 \lstinputlisting[caption=Mesh.hpp]{code/Mesh.hpp}
-The class \code{Mesh} stores into five \code{std::vector} the geometrical entities that compose the mesh. They can be accessed through the getter methods , but in order to be safer they can be added and modified only through the proxy \code{MeshProxy}, which exposes references to the containers.\\
-The constructor requires an object of type \code{MeshReader}; this object has a method \code{read(Mesh\&, const std::string\&)} that is the one that actually performs the reading from the file and fills the containers of the \code{Mesh} using the proxy. The library provides the class \code{MeshReaderPoly}, that inherits from \code{MeshReader} and it is used for reading MEDIT text meshes with the extension *.mesh\footnote{\url{https://www.ljll.math.upmc.fr/frey/publications/RT-0253.pdf}}, possibly partitioned as described in Subsection \ref{subsec:meshstructures}. The class \code{MeshReader} is abstract since the method \code{read} is pure virtual, so another kind of reader could be easily implemented deriving from this base class and overriding the function \code{read}.\\
-Then, always in the constructor, the internal faces are computed through a loop over tetrahedra, since usually they are not written in the mesh file, but we need them in our method.\\
+The class \code{Mesh} stores five \code{std::vector} containing the geometrical entities that compose the mesh. They can be accessed through getter methods , but in order to be safer they can be added and modified only through the proxy \code{MeshProxy}, which exposes references to the containers.\\
+The constructor of the class requires an object of type \code{MeshReader}; this object implements a 
+method \code{read(Mesh\&, const std::string\&)} that is the one that actually 
+performs the reading from the file and fills the containers of the \code{Mesh} 
+using the proxy.\\ The library provides the class \code{MeshReaderPoly}, that 
+inherits from \code{MeshReader} and it is used for reading MEDIT text meshes 
+with the extension 
+*.mesh\footnote{\url{https://www.ljll.math.upmc.fr/frey/publications/RT-0253.pdf}},
+ possibly partitioned as described in Subsection \ref{subsec:meshstructures}. 
+The class \code{MeshReader} is abstract since the method \code{read} is pure 
+virtual, so another kind of reader could be easily implemented deriving from 
+this base class and overriding the function \code{read}.\\
+Then, always in the constructor, the internal faces are computed by the functions \code{computeFaces()} through a loop over tetrahedra, since usually they are not written in the mesh file, but we need them in our method.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Geometrical entities}
-As mentioned above, the classes that represent geometrical entities are: \code{Vertex}, \code{Tetrahedron}, \code{FaceExt}, \code{FaceInt} and \code{Polyhedron}. The connectivity structure of the mesh is implemented through \emph{aggregation}, in the sense that these classes store references (or pointers in few cases) to other classes they are linked to. For example a \code{Tetrahedron} contains references to four \code{Vertex} and a pointer to a \code{Polyhedron}. In this way we have tried to maximize the efficiency in accessing the data and minimize the memory consumption. \code{FaceExt} and \code{FaceInt} derive both from the abstract class \code{FaceAbs}, they enrich it respectively with a label used for boundary conditions and with a pointer to a second tetrahedron.
+As mentioned above, the classes that represent geometrical entities are: 
+\code{Vertex}, \code{Tetrahedron}, \code{FaceExt}, \code{FaceInt} and 
+\code{Polyhedron}. The connectivity structure of the mesh is implemented 
+through \emph{aggregation}, in the sense that these classes store references 
+(or pointers in few cases) to other classes they are linked to. For example a 
+\code{Tetrahedron} contains references to four \code{Vertex} and a pointer to a 
+\code{Polyhedron}. In this way we tried to maximize the efficiency in accessing 
+the data and minimize the memory consumption. \code{FaceExt} and \code{FaceInt} 
+derive both from the abstract class \code{FaceAbs}, they enrich it respectively 
+with a label used for boundary conditions and with a pointer to a second 
+tetrahedron.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class FeSpace}
 \lstinputlisting[caption=FeSpace.hpp]{code/FeSpace.hpp}
-The class \code{FeSpace} stores vectors containing \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt} that are the objects that contain the evaluations of basis functions over elements, external faces and internal faces. The class stores also a quadrature formula for integrals over tetrahedra and another one for integrals over triangles. The containers can be accessed from outside through getter methods like in \code{Mesh}, but also through iterators.
+The class \code{FeSpace} stores vectors containing \code{FeElement}, 
+\code{FeFaceExt} and \code{FeFaceInt}. \code{FeElement}s, \code{FeFaceExt}s and 
+\code{FeFaceInt}s are in one-to-one relation with elements (\code{Polyhedron}), 
+\code{FaceExt}s and \code{FaceInt}s, in the sense that they contain the 
+evaluations of basis functions over the correspondent geometrical entity. The 
+class stores also a quadrature formula used for integrals over tetrahedra and 
+another one used for integrals over triangles. The containers can be accessed from 
+outside through getter methods like in \code{Mesh}, but also through iterators.
 \lstinputlisting[caption=FeSpace.cpp]{code/FeSpace.cpp}
-The constructor requires a \code{Mesh} and an \code{unsigned} corresponding to the degree we want for the space, then optionally we can specify the degrees of exactness that we want for the quadrature formulas. The method \code{integerComposition()} computes all the possible combinations of three integers whose sum is \code{degree}; this is needed to compute all the basis functions of the space. Eventually \code{initialize()} fills the containers; each \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt} is created with respectively a \code{Polyhedron}, \code{FeFaceExt} and a \code{FeFaceInt}, with the information about the degrees of freedom and with a quadrature rule. The constructors of these ``Fe" classes compute the values of the basis functions as described in Subsection \ref{subsec:basis} and store them.\\
+The constructor of \code{FeSpace} requires a \code{Mesh} and an \code{unsigned} corresponding to 
+the degree we want for the space, then optionally we can specify the degrees of 
+exactness that we want for the quadrature formulas, otherwise they are chosen 
+automatically. The method \code{integerComposition()} computes all the possible 
+combinations of three integers whose sum is \code{degree}; this is needed to 
+compute all the basis functions of the space. Eventually \code{initialize()} 
+fills the containers; each \code{FeElement}, \code{FeFaceExt} and 
+\code{FeFaceInt} is created respectively with a \code{Polyhedron}, a 
+\code{FeFaceExt} and a \code{FeFaceInt}, with the information about the degrees 
+of freedom and with the quadrature rule. The constructors of these ``Fe" 
+classes compute the values of the basis functions as described in
+Subsection~\ref{subsec:basis} and store them. The Legendre polynomials (and their first derivative)
+are implemented through two free functions up to degree 8.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quadrature formulas}
 \lstinputlisting[caption=QuadRuleManager.hpp]{code/QuadRuleManager.hpp}
 Quadrature formulas are stored in and managed by the class \code{QuadRuleManager}. By default quadrature formulas over tetrahedra with degree of exactness up to 8 and over triangles with degree of exactness up to 10 are implemented. Since there is no reason to duplicate these formulas, the class is implemented as a singleton using the \emph{Mayer's Trick} and it can be accessed creating a static object with the method \code{instance()}.\\
-Quadratures rules are stored through a \code{std::set} and two rules are considered equal if they have the same degree of exactness. With the methods \code{setTriaRule} and \code{setTetraRule} the user can add a new rule or modify one.\\
+Quadrature rules are stored through a \code{std::set} and two rules are 
+considered equal if they have the same degree of exactness. With the methods 
+\code{setTriaRule} and \code{setTetraRule} the user can add a new rule or 
+modify one. They can also take advantage of the move semantic.\\
 Moreover \code{QuadRuleManager} contains also four matrices corresponding to the maps from the reference triangle in 2D to the faces of the reference tetrahedron in 3D; they are used to map the two-dimensional quadrature points to the three-dimensional space.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The class Problem}
 \lstinputlisting[caption=Problem.hpp, lastline=44]{code/Problem.hpp}
 The class \code{Problem} is used to assemble and solve the linear system that arises from the boundary value problem.
-It stores the matrix and the vectors of the right-hand-side and of the solution, together with two \code{std::vector}: \code{triplets\_} and \code{sym\_} that are used to store the entries of the matrix before that it is actually filled.
-As already mentioned we use the technique of \emph{expression templates} in order to compute those entries, so that, for example, the function \code{integrateVol} can be called in the following way:
+It stores the matrix and the vectors of the right-hand-side and of the 
+solution, together with two auxiliary vectors (\code{triplets\_} and 
+\code{sym\_}) that are used to store the entries of the matrix before that it 
+is actually filled.
+As already mentioned, we use the technique of \emph{expression templates} in order to compute those entries, so that, for example, the function \code{integrateVol} can be called in the following way:
 \begin{lstlisting}
 Problem poisson(Vh); // Vh is a FeSpace
 GradPhiJ uGrad;
 GradPhiI vGrad;
 poisson.integrateVol(dot(uGrad, vGrad), true);
 \end{lstlisting}
-The first argument represents the integrand of the volume integrals of the bilinear form \eqref{eq:bilinear}. It is a template argument and its type, deduced by the compiler, will be a tree made of binary and unary operators, as we will explain later.
+The first argument represents the integrand of the volume integrals of the 
+bilinear form \eqref{eq:bilinear}. It is a template argument and its type, 
+deduced by the compiler, will be a tree made of binary and unary operators, as 
+we will explain later.
 The second argument is a \code{bool} that can be used to specify if the integrand is symmetric or not; half of the computational cost can be saved if it is symmetric. There are other four functions of this kind, they are used to integrate the bilinear form over the external and internal faces of the mesh and the linear functional at the right-hand-side of \eqref{eq:dgfempolyform} over the volume and the external faces.
 \lstinputlisting[caption=Problem.hpp, firstline=48]{code/Problem.hpp}
 Inside the function there is in line 15 the \emph{scalar core} of the integration, where, through the loops, the integrand is evaluated at each quadrature point (indentified by \code{p} and \code{t}) of each element (\code{*it}) and for each basis function (\code{i} is the index of basis functions for the solution while \code{j} is for the test functions). The integrand is evaluated in one expression and this is an advantage when it is made of the sum of many terms, like in our formulation.\\
@@ -841,12 +899,22 @@ Inside the function there is in line 15 the \emph{scalar core} of the integratio
 We have a template class \code{ExprWrapper} that is meant to be the base class from which every expression has to inherit through the CRTP. This class implements a conversion by cast operator to the template type and an equivalent method \code{asDerived()}, both in the \code{const} and non-\code{const} version.
 \lstinputlisting[caption=BinaryOperator.hpp, lastline=28]{code/BinaryOperator.hpp}
 Then we have two template classes that encapsulate algebraic binary and unary operators. They overload the call operator in order to be called with \code{FeElement}, \code{FeFaceExt} and \code{FeFaceInt}. Moreover notice that, in order to keep the symmetry, the call operator forwards both the arguments \code{i} and \code{j} to \code{lo\_} and \code{ro\_}. The return type of the binary operator is deduced from the types of the operands and from the operation applied, basically it can result to be a scalar or a vector. In order to be used with more flexibility, we have also partial specializations of the class for operations with \code{double}s.\\
-Then operators \code{+,-,*,/} are overloaded so that they can be easily used by the user in order to call \code{BinaryOperator} or \code{UnaryOperator}. For the scalar product a \code{dot} operator and a \code{DotProduct} functor have been defined:
+Then operators \code{+,-,*,/} are overloaded so that they can be easily used by 
+the user, which does not need to know about \code{BinaryOperator} and 
+\code{UnaryOperator}. For the scalar product a \code{dot} operator and a 
+\code{DotProduct} functor have been defined:
 \lstinputlisting[caption=BinaryOperator.hpp, firstline=30]{code/BinaryOperator.hpp}
 Eventually, at the basis of this structure, there are the classes that encapsulate the \emph{elementary operators} that have to be combined in order to build the differential problem. They have been implemented as functors, for example the gradient of a basis function related to the solution is:
 \lstinputlisting[caption=GradPhiJ.hpp]{code/GradPhiJ.hpp}
-Analogously the other operators required from the variational formulation have been implemented, like \code{PhiI, PhiJ, GradPhiI, JumpPhiI, JumpGradPhiI}, etc. Those one ending in \code{I} are related to the test functions since they use the argument \code{i} and discard \code{j}, while those ending in \code{J} are related to the solution and behave the opposite. We have chosen to implement this double version because, as we mentioned, binary operators are symmetric but then it is necessary to distinguish which is the right index for the evaluation of the operator.\\
-To complete it was necessary to implement also and operator \code{Normal} for the normal vector to a face, \code{PenaltyScaling} for the penalty scaling term $\gamma_e$ defined in \eqref{eq:penalty} and \code{Function} for functions $\mathbb{R}^3 \rightarrow \mathbb{R}$, in order consider the source term and the boundary data.\\
+Analogously the other operators required by the variational formulation have 
+been implemented, like \code{PhiI, PhiJ, GradPhiI, JumpPhiI, JumpGradPhiI}, 
+etc. Notice that those one ending in \code{I} are related to the test functions since they 
+use the argument \code{i} and discard \code{j}, while those ending in \code{J} 
+are related to the solution and behave the opposite. We have chosen to 
+implement this double version because, as we mentioned, binary operators are 
+symmetric but then it is necessary to distinguish which is the right index for 
+the evaluation of the operator.\\
+To complete the formulation of the problem, it was necessary to implement also an operator \code{Normal} for the normal vector to a face, \code{PenaltyScaling} for the penalty scaling term $\gamma_e$ defined in \eqref{eq:penalty} and \code{Function} for functions $\mathbb{R}^3 \rightarrow \mathbb{R}$, in order consider the source term and the boundary data.\\
 At the end, in the case of the Poisson problem with the formulation \eqref{eq:dgfempolyform}, the code becomes:
 \begin{lstlisting}
 poisson.integrateVol(dot(uGrad, vGrad), true);
@@ -857,10 +925,37 @@ poisson.integrateFacesExtRhs(-gd * dot(n, vGrad) + gamma * gd * v, dirichlet);
 
 poisson.finalizeMatrix();
 \end{lstlisting}
-The method \code{finalizeMatrix} assembles the sparse matrix \code{A\_} from the vectors of triplets stored in \code{triplets\_}.\\
+As we can see the user has to write a code that is very near to the 
+variational formulation.\\ 
+The method \code{finalizeMatrix()} assembles the sparse matrix \code{A\_} from 
+the vectors of triplets stored in \code{triplets\_}. Actually the user could 
+split the integrands and call the same integrate function many times, each time 
+a new vector of triplets will be add in \code{triplets\_}. Then, when 
+\code{finalizeMatrix()} is called, all these vectors will be merged and used to 
+initialize the matrix. This is necessary for \code{integrateFacesExt} if there 
+are mixed boundary conditions, but in general it is more convenient to keep 
+integrands all together.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Solvers}
-The class \code{Problem} provides four methods for solving the linear system, exploiting the capabilities of the library Eigen. For symmetric and positive definite matrices a \emph{Cholesky} factorization or the conjugate gradient algorithm can be used, while for non symmetric matrices the options are the LU factorization and the BiCGSTAB algorithm. Iterative solvers are necessary when the matrix of the system becomes big and this happens easily if we want to use high-order methods. However, for very large system, 
+The class \code{Problem} provides four methods for solving the linear system, 
+exploiting the capabilities of the library Eigen. For non symmetric matrices 
+the options are the LU factorization and the BiCGSTAB algorithm, while for 
+symmetric and positive definite matrices a \emph{Cholesky} factorization or the 
+conjugate gradient algorithm can be used too. Iterative solvers are necessary 
+when the matrix of the linear system becomes big and this happens easily if we want to 
+use high-order methods. In any case, for large systems, this solving step 
+becomes the bottleneck of the code in terms of computational time.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Post processing}
+At the end, after that the linear system has been solved, the user can test the 
+accuracy of the method with a known analytical solution, computing the errors 
+in the $L^2$-norm and $H^1_0$-norm with the methods \code{computeErrorL2} and 
+\code{computeErrorH10}.\\
+Eventually the solution can be exported into a VTK format with the method 
+\code{exportSolutionVTK} in order to be visualized with a visualization 
+software (like Paraview\footnote{\url{https://www.paraview.org/}}). In order to 
+allow discontinuous functions, the mesh is stored as a dataset of 
+\code{UnstructuredGrid} in which each piece corresponds to an element.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \section{Numerical results}\label{sec:res}
 We solve problem~\eqref{eq:dgfempolyform} on the unit cube $\Omega = (0,1)^3$, 
@@ -916,7 +1011,7 @@ meshes generated with METIS, in which different kinds of polyhedra are
 employed. In Table~\ref{tab:hpol} we observe that, even if the rates are not 
 perfect since meshes are no more well structured, our DG polyhedral method can 
 manage successfully.
-\begin{table}[h!]\footnotesize
+\begin{table}[h]\footnotesize
 	\centering
 	\[
 	\begin{array}{ccccccc}
@@ -936,9 +1031,9 @@ manage successfully.
 	\]
 	\caption{Computed errors on a sequence of hexahedral meshes consisting of 
 		8, 64, 216, 512 elements and polynomial degree $r=1,2,3$.} \label{tab:hhex}
-%\end{table}
-%\begin{table}[h]\footnotesize
-%	\centering
+\end{table}
+\begin{table}[h]\footnotesize
+	\centering
 	\[
 	\begin{array}{ccccccc}
 	\toprule
@@ -958,9 +1053,9 @@ manage successfully.
 	\caption{Computed errors on a sequence of mixed tetrahedral/hexahedral 
 	meshes consisting of 28, 224, 756, 1792 elements and polynomial degree 
 	$r=1,2,3$.} \label{tab:hhextet}
-%\end{table}
-%\begin{table}[h]\footnotesize
-%	\centering
+\end{table}
+\begin{table}[h]\footnotesize
+	\centering
 	\[
 	\begin{array}{ccccccc}
 	\toprule
@@ -996,6 +1091,7 @@ manage successfully.
 	\label{fig:mesh}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \subsection{Comparison with other finite element methods}
 We next compare our DG method on polyhedral meshes with the classical SIPG 
 method~\eqref{eq:dgfemform}, based on a Lagrange polynomial basis, and with the 
@@ -1011,7 +1107,7 @@ scheme based on Lagrange functions as well as the conforming FEM.
 \begin{loglogaxis}[width=0.51\textwidth, xlabel=Diameter $h$, x dir=reverse, 
 xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
 \addplot coordinates
-{(0.866, 3.7594e-1) (0.433, 1.9785e-1) (0.289, 1.3266e-1) (0.216, 9.9471e-2)};
+{(0.866, 2.4486e-1) (0.433, 1.2628e-1) (0.289, 8.4537e-2) (0.216, 6.3263e-2)};
 \addlegendentry{$pDG$}
 \addplot coordinates
 {(0.866, 4.2617e-1) (0.433, 2.2842e-1) (0.289, 1.5530e-1) (0.216, 1.1752e-1)};
@@ -1026,7 +1122,7 @@ xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
 \begin{loglogaxis}[width=0.51\textwidth, xlabel=Diameter $h$, x dir=reverse, 
 xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
 \addplot coordinates
-{(0.866, 1.1256e-2) (0.433, 3.6017e-3) (0.289, 1.7376e-3) (0.216, 1.0227e-3)};
+{(0.866, 2.1925e-2) (0.433, 6.6318e-3) (0.289, 3.1769e-3) (0.216, 1.8679e-3)};
 \addlegendentry{$pDG$}
 \addplot coordinates
 {(0.866, 3.0189e-2) (0.433, 8.2593e-3) (0.289, 3.7849e-3) (0.216, 2.1654e-3)};
@@ -1041,7 +1137,7 @@ xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
 \begin{loglogaxis}[width=0.51\textwidth, xlabel=Diameter $h$, x dir=reverse, 
 xtick={0.30,0.45,0.60, 0.75}, xticklabels={$0.30$,$0.45$,$0.60$,$0.75$}]
 \addplot coordinates
-{(0.866, 6.5447e-2) (0.433, 1.7846e-2) (0.289, 8.1377e-3) (0.216, 4.6327e-3)};
+{(0.866, 6.5446e-2) (0.433, 1.7846e-2) (0.289, 8.1377e-3) (0.216, 4.6327e-3)};
 \addlegendentry{$pDG$}
 \addplot coordinates
 {(0.866, 8.2336e-2) (0.433, 2.2406e-2) (0.289, 1.0125e-2) (0.216, 5.7278e-3)};
@@ -1073,6 +1169,7 @@ functions (DG) and continuous Galerkin finite element method (CG).}
 \label{fig:comp}	
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \subsection{\textit{r}-convergence}
 Finally we investigate the convergence with respect to $r$-refinement. In 
 Figure~\ref{fig:rconv} we report the computed errors as a function of $r$ on a 
@@ -1150,10 +1247,19 @@ physical frame and that, as for any DG method, the number of degrees of
 freedom is higher with respect to standard continuous finite elements. This 
 issue however can be mitigated by the fact that we can employ fewer elements 
 when we have to deal with complicated geometries made of small features or 
-microstructures.\\
-%We studied only the Poisson problem with Dirichlet boundary conditions, but in 
-%future we could expand this algorithm to different boundary conditions without 
-%and more complicated elliptic operators without much effort.
+microstructures.
+
+The implementation through expression templates allows to write a code that is
+very near to the \emph{mathematical language} and so very user-friendly, but at 
+the same time the performances in the assembling of the linear system are good,
+thanks to the optimization that the compiler is able to do.\\
+A future development for the library could regard the solvers of the linear 
+system, since 
+actually they are the bottleneck of the code. From the point of view of 
+numerical analysis, a help could come from a good preconditioner for the matrix
+that arises from this kind of interior penalty formulation. Then a 
+parallelization of the code and the employment of a parallel solver may be 
+considered. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \phantomsection
 \begin{thebibliography}{99}\label{sec:bib}
@@ -1254,6 +1360,10 @@ microstructures.\\
 	
 	\bibitem{stack}
 	{\footnotesize \url{https://stackoverflow.com/}}
+	
+	\bibitem{vtk}
+	VTK File Formats, from {\footnotesize 
+	\url{https://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf}}
 	
 \end{thebibliography}
 

@@ -8,8 +8,7 @@ public:
 
   // ...
 
-  // Alias for a random access const iterator over FeElement, FeFaceExt or
-  // FeFaceInt
+  // Alias for a random access const iterator over FeElement, FeFaceExt or FeFaceInt
   template <typename T>
   using ConstIter = typename std::vector<T>::const_iterator;
 

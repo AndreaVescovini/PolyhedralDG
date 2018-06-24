@@ -1,0 +1,20 @@
+The main goal of this project is to implement a Discontinuous Galerkin (DG)
+finite element method for solving a three-dimensional elliptic problems
+employing a general polyhedral mesh. With this purpose a C++ library has been
+developed, employing the technique of expression templates in order to assemble
+the linear system.
+Discontinuous Galerkin methods have shown to be very flexible and have been
+successfully applied to hyperbolic, elliptic and parabolic problems arising from
+many different fields of application.
+Moreover one of the main advantages with respect to the continuous framework is
+the possibility of handling meshes with hanging nodes and made of general-shaped
+elements without any difficulty. Meshes made of general polyhedral elements can
+be useful in many problems, especially when we have to deal with domains that
+present small details or microstructures; these features would need too many
+"classical" tetrahedral/hexahedral elements to be described and so too many
+degrees of freedom.
+In Section 1 we recall the main results about standard DG methods, then in
+Subsection 1.8 we develop the theory in order to handle polyhedral grids.
+Afterwards in Section 2 we explain our choices for the implementation of the
+algorithm, is Section 3 we highlight how the C++ library works and eventually in Section 4 
+we present some numerical results conforming to the theoretical estimates.

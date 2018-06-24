@@ -7,7 +7,7 @@ public:
   void integrateVol(const ExprWrapper<T>& expr, bool sym = false);
   template <typename T>
   void integrateFacesExt(const ExprWrapper<T>& expr,
-                         const std::vector<BCLabelType>& bcLabels, bool sym=false);
+                         const std::vector<BCLabelType>& bcLabels,bool sym=false);
   template <typename T>
   void integrateFacesInt(const ExprWrapper<T>& expr, bool sym = false);
   template <typename T>
@@ -15,6 +15,8 @@ public:
   template <typename T>
   void integrateFacesExtRhs(const ExprWrapper<T>& expr,
                             const std::vector<BCLabelType>& bcLabels);
+
+  void finalizeMatrix();
 
   bool solveLU();
   bool solveCholesky();
@@ -29,8 +31,6 @@ public:
   void exportSolutionVTK(const std::string& fileName, unsigned precision=8) const;
 
   // ...
-
-  void finalizeMatrix();
 
 private:
   const FeSpace& Vh_;
